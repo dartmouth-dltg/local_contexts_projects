@@ -6,7 +6,7 @@ function LocalContexts() {
 
 LocalContexts.prototype.setupLocalContextsAction = function() {
   var self = this;
-  
+
   $('#fetch-local-contexts-data').click( function() {
     var projectId = $(this).closest('section').find('.label-only').text();
     self.fetchLocalContextData(projectId);
@@ -15,20 +15,22 @@ LocalContexts.prototype.setupLocalContextsAction = function() {
 
 LocalContexts.prototype.fetchLocalContextData = function(id) {
   var self = this;
-  // $.ajax({
-  //   url: "/plugins/local_context/fetch_lc_data",
-  //   data: {
-  //     project_id: id
-  //   },
-  //   dataType: 'json'
-  // })
-  // .done(function(data) {
-  //   self.parseLocalContextData(data);
-  // });
 
-  var sampleData = {"unique_id":"259854f7-b261-4c8c-8556-4b153deebc18","title":"Sample Project","bc_labels":[{"name":"BC Provenance (BC P) Sample Label","label_type":"provenance","default_text":"This SAMPLE Label is being used to affirm an inherent interest Indigenous people have in the scientific collections and data about communities, peoples, and the biodiversity found within traditional lands, waters and territories. [Community name or authorizing party] has permissioned the use of this collection and associated data for research purposes, and retains the right to be named and associated with it into the future. This association reflects a significant relationship and responsibility to [the species or biological entity] and associated scientific collections and data. This is a sample Label that is only used for example purposes.","img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/bclabels/bc-provenance.png","community":"Sample Community","translations":[],"created":"2021-10-22T18:13:21.042197Z","updated":"2021-10-22T18:14:13.252527Z"}],"tk_labels":[{"name":"TK Creative (TK CR) Sample Label","label_type":"creative","default_text":"This SAMPLE Label is being used to acknowledge the relationship between the creative practices of [name] and [community name] and the associated cultural responsibilities. This is a sample Label used for examples only.","img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/tklabels/tk-creative.png","community":"Sample Community","translations":[],"created":"2021-10-22T18:19:02.104252Z","updated":"2021-10-22T18:25:49.578629Z"},{"name":"TK Attribution (TK A) Sample Label","label_type":"attribution","default_text":"This SAMPLE label is being used to correct historical mistakes or exclusions pertaining to this material. This is especially in relation to the names of the people involved in performing or making this work and/or correctly naming the community from which it originally derives. As a user you are being asked to also apply the correct attribution in any future use of this work. This is a sample Label used for example purposes only.","img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/tklabels/tk-attribution.png","community":"Sample Community","translations":[],"created":"2021-10-22T18:12:04.455640Z","updated":"2021-10-22T18:13:59.447271Z"}],"notice":[{"notice_type":"biocultural_and_traditional_knowledge","bc_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/bc-notice.png","bc_default_text":"The BC (Biocultural) Notice is a visible notification that there are accompanying cultural rights and responsibilities that need further attention for any future sharing and use of this material or data. The BC Notice recognizes the rights of Indigenous peoples to permission the use of information, collections, data and digital sequence information (DSI) generated from the biodiversity or genetic resources associated with traditional lands, waters, and territories. The BC Notice may indicate that BC Labels are in development and their implementation is being negotiated.","tk_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/tk-notice.png","tk_default_text":"The TK (Traditional Knowledge) Notice is a visible notification that there are accompanying cultural rights and responsibilities that need further attention for any future sharing and use of this material. The TK Notice may indicate that TK Labels are in development and their implementation is being negotiated.","placed_by_researcher":null,"placed_by_institution":{"id":1,"institution_name":"Sample Institution"},"created":"2022-01-05T18:18:17.436498Z","updated":"2022-01-05T18:18:17.490612Z"}],"institution_notice":[{"notice_type":"open_to_collaborate_and_attribution_incomplete","institution":{"id":1,"institution_name":"Sample Institution"},"open_to_collaborate_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/ci-notice-open-to-collaborate.png","open_to_collaborate_default_text":"Our institution is committed to the development of new modes of collaboration, engagement, and partnership with Indigenous peoples for the care and stewardship of past and future heritage collections.","attribution_incomplete_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/ci-notice-attribution-incomplete.png","attribution_incomplete_default_text":"Collections and items in our institution have incomplete, inaccurate, and/or missing attribution. We are using this notice to clearly identify this material so that it can be updated, or corrected by communities of origin. Our institution is committed to collaboration and partnerships to address this problem of incorrect or missing attribution.","created":"2022-01-05T18:18:17.542561Z","updated":"2022-01-05T18:18:17.598332Z"}]};
+  $.ajax({
+    url: "/plugins/local_context/fetch_lc_data",
+    data: {
+      project_id: id
+    },
+    dataType: 'json'
+  })
+  .done(function(data) {
+    console.log(data);
+    self.parseLocalContextData(data);
+  });
 
-  this.parseLocalContextData(sampleData);
+  // var sampleData = {"unique_id":"259854f7-b261-4c8c-8556-4b153deebc18","title":"Sample Project","bc_labels":[{"name":"BC Provenance (BC P) Sample Label","label_type":"provenance","default_text":"This SAMPLE Label is being used to affirm an inherent interest Indigenous people have in the scientific collections and data about communities, peoples, and the biodiversity found within traditional lands, waters and territories. [Community name or authorizing party] has permissioned the use of this collection and associated data for research purposes, and retains the right to be named and associated with it into the future. This association reflects a significant relationship and responsibility to [the species or biological entity] and associated scientific collections and data. This is a sample Label that is only used for example purposes.","img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/bclabels/bc-provenance.png","community":"Sample Community","translations":[],"created":"2021-10-22T18:13:21.042197Z","updated":"2021-10-22T18:14:13.252527Z"}],"tk_labels":[{"name":"TK Creative (TK CR) Sample Label","label_type":"creative","default_text":"This SAMPLE Label is being used to acknowledge the relationship between the creative practices of [name] and [community name] and the associated cultural responsibilities. This is a sample Label used for examples only.","img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/tklabels/tk-creative.png","community":"Sample Community","translations":[],"created":"2021-10-22T18:19:02.104252Z","updated":"2021-10-22T18:25:49.578629Z"},{"name":"TK Attribution (TK A) Sample Label","label_type":"attribution","default_text":"This SAMPLE label is being used to correct historical mistakes or exclusions pertaining to this material. This is especially in relation to the names of the people involved in performing or making this work and/or correctly naming the community from which it originally derives. As a user you are being asked to also apply the correct attribution in any future use of this work. This is a sample Label used for example purposes only.","img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/tklabels/tk-attribution.png","community":"Sample Community","translations":[],"created":"2021-10-22T18:12:04.455640Z","updated":"2021-10-22T18:13:59.447271Z"}],"notice":[{"notice_type":"biocultural_and_traditional_knowledge","bc_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/bc-notice.png","bc_default_text":"The BC (Biocultural) Notice is a visible notification that there are accompanying cultural rights and responsibilities that need further attention for any future sharing and use of this material or data. The BC Notice recognizes the rights of Indigenous peoples to permission the use of information, collections, data and digital sequence information (DSI) generated from the biodiversity or genetic resources associated with traditional lands, waters, and territories. The BC Notice may indicate that BC Labels are in development and their implementation is being negotiated.","tk_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/tk-notice.png","tk_default_text":"The TK (Traditional Knowledge) Notice is a visible notification that there are accompanying cultural rights and responsibilities that need further attention for any future sharing and use of this material. The TK Notice may indicate that TK Labels are in development and their implementation is being negotiated.","placed_by_researcher":null,"placed_by_institution":{"id":1,"institution_name":"Sample Institution"},"created":"2022-01-05T18:18:17.436498Z","updated":"2022-01-05T18:18:17.490612Z"}],"institution_notice":[{"notice_type":"open_to_collaborate_and_attribution_incomplete","institution":{"id":1,"institution_name":"Sample Institution"},"open_to_collaborate_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/ci-notice-open-to-collaborate.png","open_to_collaborate_default_text":"Our institution is committed to the development of new modes of collaboration, engagement, and partnership with Indigenous peoples for the care and stewardship of past and future heritage collections.","attribution_incomplete_img_url":"https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/notices/ci-notice-attribution-incomplete.png","attribution_incomplete_default_text":"Collections and items in our institution have incomplete, inaccurate, and/or missing attribution. We are using this notice to clearly identify this material so that it can be updated, or corrected by communities of origin. Our institution is committed to collaboration and partnerships to address this problem of incorrect or missing attribution.","created":"2022-01-05T18:18:17.542561Z","updated":"2022-01-05T18:18:17.598332Z"}]};
+  //
+  // this.parseLocalContextData(sampleData);
 }
 /**
  * Labels are arranged in an array of labels for each type bc_label or tk_label.
@@ -172,7 +174,7 @@ LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, type) {
   };
 
   $.each(map, function(k,v) {
-    if (json[0][k + "_img_url"]) {
+    if (json[0] && json[0][k + "_img_url"]) {
       self.new_json[type].push({
         "name" : v,
         "img_url" : json[0][k + "_img_url"],
@@ -206,8 +208,9 @@ LocalContexts.prototype.renderLocalContextsData = function() {
   var lc_data_html = "";
 
   $.each(this.new_json, function(k,v) {
-    console.log(v[0]);
-    lc_data_html += AS.renderTemplate("template_local_context_data", {label: v[0] });
+    if (v[0]) {
+      lc_data_html += AS.renderTemplate("template_local_context_data", {label: v[0] });
+    }
   });
 
   target_el.html('').html(lc_data_html);
