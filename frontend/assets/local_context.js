@@ -6,6 +6,7 @@ function LocalContexts() {
 
 LocalContexts.prototype.setupLocalContextsAction = function() {
   var self = this;
+  
   $('#fetch-local-contexts-data').click( function() {
     var projectId = $(this).closest('section').find('.label-only').text();
     self.fetchLocalContextData(projectId);
