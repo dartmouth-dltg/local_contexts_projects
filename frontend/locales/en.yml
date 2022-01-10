@@ -1,0 +1,25 @@
+en:
+  plugins:
+    local_context:
+      _plural: Local Contexts Project
+      _singular: Local Contexts Project
+      _frontend:
+        action:
+          add: Add Local Contexts Project Id
+
+  local_context:
+    fetch_btn: See Local Contexts Labels
+    project_id: Project Id
+
+  advanced_search:
+    text:
+      local_context_u_sbool: Local Contexts Project Id
+
+  reports:
+    local_contexts_list_report:
+      title: Local Contexts Projects List Report
+      description: List all resources, accession, archival objects and digital objects which have been linked to a Local Contexts Project.
+
+  search:
+    multi:
+      local_context_u_sbool: Local Contexts Project

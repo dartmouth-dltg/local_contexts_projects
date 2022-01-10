@@ -1,0 +1,100 @@
+<a id="summary-information"></a>
+<h3><%= I18n.t('pdf_reports.summary_information') %></h3>
+
+<dl>
+    <dt><%= I18n.t('repository._singular') %></dt>
+    <dd><%= record.resolved_repository['name'] %></dd>
+
+    <% if record.agents %>
+        <% record.agents.each do |role, relationships| %>
+            <% relationships.each do |relationship| %>
+                <dt><%= I18n.t("enumerations.linked_agent_role.#{role}", :default => role) %></dt>
+                <dd><%= relationship['_resolved']['title'] %></dd>
+            <% end %>
+        <% end %>
+    <% end %>
+
+    <dt><%= I18n.t('resource._public.finding_aid.title') %></dt><dd><%== process_mixed_content(record.display_string) %></dd>
+
+    <dt><%= I18n.t('resource._public.identifier') %></dt><dd><%= record.identifier %></dd>
+
+    <% record.dates.each do |date| %>
+        <dt><%= I18n.t('resource._public.finding_aid.date') %></dt><dd><%= date['final_expression'] %></dd>
+    <% end %>
+
+    <% record.extents.each do |extent| %>
+        <dt><%= I18n.t('resource._public.physdesc') %></dt><dd><%= extent['display'] %></dd>
+    <% end %>
+
+    <% unless record.notes.include?('langmaterial') || record.lang_materials.blank? %>
+        <dt><%= t('resource._public.lang') %></dt>
+        <% record.lang_materials.each do |lang_material| %>
+            <dd><%= t('enumerations.language_iso639_2.' + lang_material['language'])%></dd>
+        <% end %>
+    <% end %>
+
+    <% record.notes.each do |note_type, note| %>
+        <% if note_type == 'physdesc' %>
+            <a id="note-<%= note_type %>"></a>
+            <% note.each do |n| %>
+              <dt><%= I18n.t("enumerations._note_types.#{note_type}") %></dt><dd><%== process_mixed_content(n['note_text']) %></dd>
+            <% end %>
+        <% end %>
+    <% end %>
+
+    <% if record.container_display && !record.container_display.empty? %>
+        <dt><%= I18n.t('resource._public.storage') %></dt><dd><%= record.container_display.join(', ') %></dd>
+    <% end %>
+
+    <%= render(:partial => 'digital_object_links', :locals => {
+        :instances => record.instances
+    }) %>
+</dl>
+
+<% record.notes.each do |note_type, note| %>
+    <% next if ['physdesc'].include?(note_type) %>
+    <a id="note-<%= note_type %>"></a>
+    <% note.each do |n| %>
+      <h3>
+        <% if n['label'] %>
+            <%== process_mixed_content(n['label']) %>
+        <% else %>
+            <%= I18n.t("enumerations._note_types.#{note_type}") %>
+        <% end %>
+      </h3>
+      <p><%== process_mixed_content(n['note_text']) %></p>
+    <% end %>
+<% end %>
+
+<a id="administrative-information"></a>
+<h3><%= I18n.t('pdf_reports.administrative_information') %></h3>
+
+<h3><%= I18n.t('pdf_reports.publication_statement') %></h3>
+
+<%= render(:partial => 'publication_statement', :locals => {
+    :repository_name => record.resolved_repository['name'],
+    :repository_information => record.repository_information
+}) %>
+
+<h3><%= I18n.t('pdf_reports.controlled_access_headings') %></h3>
+
+<ul>
+<% Array(record.subjects).each do |subject| %>
+    <li><%= subject['title'] %></li>
+<% end %>
+</ul>
+
+<!-- Institution Notice Begin -->
+<% if AppConfig[:plugins].include?('institution_notices') %>
+  <% if AppConfig.has_key?(:institution_notices) && AppConfig[:institution_notices]['public_faceting'] == true %>
+    <h3><%= I18n.t("institution_notice_title.open_to_collaborate") %></h3>
+    <%= render(:partial => 'open_to_collaborate', :locals => {:record => record}) %>
+  <% end %>
+<% end %>
+<!-- Institution Notice End -->
+
+<div class="collection-inventory">
+<% if has_children %>
+    <a id="collection-inventory"></a>
+    <h3><%= I18n.t('pdf_reports.collection_inventory') %></h3>
+<% end %>

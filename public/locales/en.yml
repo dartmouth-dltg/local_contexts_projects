@@ -1,0 +1,16 @@
+en:
+  institution_notice_title:
+    attribution_incomplete: Attribution Incomplete
+    open_to_collaborate: Open to Collaborate
+  institution_notice_description:
+    attribution_incomplete: >
+      Collections and items in our institution have incomplete, inaccurate,
+      and/or missing attribution. We are using this notice to clearly identify
+      this material so that it can be updated, or corrected by communities of
+      origin. Our institution is committed to collaboration and partnerships
+      to address this problem of incorrect or missing attribution.
+    open_to_collaborate: >
+      Our institution is committed to the development of new modes of
+      collaboration, engagement, and partnership with Indigenous peoples for
+      the care and stewardship of past and future heritage collections.
+  institution_notice_local_contexts_more_html: For more information about implementing Institution Notices, contact Local Contexts at <a href="http://localcontexts.org">https://localcontexts.org</a> or <a href="mailto:support@localcontexts.org">support@localcontexts.org</a>

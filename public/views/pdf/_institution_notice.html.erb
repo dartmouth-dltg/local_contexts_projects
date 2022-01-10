@@ -1,0 +1,11 @@
+<ul style="list-style: none;">
+    <li>
+      <%= image_tag(AppConfig[:public_proxy_url] + "/assets/LC-Institution-Notice-Attribution-Incomplete_2021-10-23.png", size: "52x52", style: "float: left; margin-right: 1em", alt: "Attribution Incomplete notice") %>
+      <p>
+        <%= t("institution_notice_description.#{notice_type}") %>
+      </p>
+      <p style="font-size: 0.8em; margin-top: 0.5em">
+        <%= t("institution_notice_local_contexts_more_html") %>
+      </p>
+    </li>
+</ul>

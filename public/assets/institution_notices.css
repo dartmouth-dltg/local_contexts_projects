@@ -1,0 +1,10 @@
+.institution-notice-img {
+  float: left;
+  max-width: 52px;
+  margin-right: 1em;
+}
+
+.institution-notice-img img {
+  width: 52px;
+  max-width: 52px;
+}

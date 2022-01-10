@@ -1,0 +1,13 @@
+<%
+   section_id = "local_context" if section_id.blank?
+%>
+<section id="<%= section_id %>" class="subrecord-form-dummy">
+  <h3><%= I18n.t("plugins.local_context._singular") %><a class="btn btn-sm btn-default pull-right" id="fetch-local-contexts-data"><%= I18n.t('local_context.fetch_btn') %></a></h3>
+  <div class="subrecord-form-container">
+      <div class="subrecord-form-fields" id="local-context-project">
+        <%= read_only_view(local_context) %>
+      </div>
+  </div>
+  <div id="local-contexts-data-holder" class=""></div>
+</section>
+<%= javascript_tag "new LocalContexts();" %>

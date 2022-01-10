@@ -1,0 +1,13 @@
+parents:
+  accession:
+    name: local_context
+    cardinality: zero_to_one
+  archival_object:
+    name: local_context
+    cardinality: zero_to_one
+  resource:
+    name: local_context
+    cardinality: zero_to_one
+  digital_object:
+    name: local_context
+    cardinality: zero_to_one
