@@ -54,24 +54,25 @@ should additional notices be defined in future.
 
 ## Configuration
 
-This plugin accepts three configuration options. These options control the visibility of
-Institution Notices as facets in the staff application, control the visibility of Institution
-Notices as facets in the PUI, and configures the homepage to display the Open to Collaborate Notice
-on the PUI homepage. Set either `staff_faceting` or `public_faceting` to `true` to
-enable Institution Notices facets in that area. Set `open_to_collaborate` to `true` to enable the
-display of the Open to Collaborate Notice on the PUI homepage.
+This plugin accepts two configuration options. These options control the visibility of
+Local Contexts associated projects as facets in the staff application, control the visibility of Local Contexts associated projects as facets in the PUI, and sets the Local Contexts API base URL. If the API base URL
+is not  set in the config, the url is assumed to be `https://localcontextshub.org/api/v1/`
+
+Set either `staff_faceting` or `public_faceting` to `true` to
+enable Local Contexts associated projects facets in that area.
 
 ```
+    AppConfig[:local_context_api_url] = "https://localcontextshub.org/api/v1/"
+
     AppConfig[:local_context] = {
       'staff_faceting' => true,
-      'public_faceting' => true,
-      'open_to_collaborate' => true
+      'public_faceting' => true
     }
 ```
 
 ## Stylesheet Changes
 
-To accomodate the use of Institution Notices in Staff PDF exports, the ead to pdf stylesheet has
+To accomodate the use of Local Contexts labels & notices in Staff PDF exports, the ead to pdf stylesheet has
 been modified. Please replace your core version in
 ```
     stylesheets/as-ead-pdf.xsl
@@ -84,22 +85,22 @@ An example EAD to HTML stylesheet based on the one provided in core has also bee
 
 ## Using the Plugin
 This plugin adds a new subrecord to resources, accessions, archival objects, and digital objects:
-Institution Notices. At this point, there is only one defined Institution Notice available:
-Attribution Incomplete.
+Institution Notices. The subrecord contains one field - the Local Contexts Project Id. In view mode,
+there is a button which fetches the data associated with the project id and displays all
+BC Labels, TK Labels, Notices, & Institution Notices associated with the project.
 
-On the PUI side, if the config option to display the Open to Collaborate Notice has been set, then
-the PUI homepage will display the Notice with the associated icon below the search area. If a
-resource, accession, archival object, or digital object has an Attribution Incomplete Notice attached,
-that notice will be displayed (with icon) below the initial descriptive metadata for that object.
+On the PUI side, the icons for the labels & notices will be appended to the title of the
+object. Fuller descriptions of the labels (including translations) will be added to the object
+description area.
 
-EAD, EAD3, & PDF exports for the staff & PUI have also been customized to include Institution Notices.
-These display much like the page view in the PUI.
+EAD, EAD3, & PDF exports for the staff & PUI have also been customized. These add a note section
+which includes a link to the public facing description of the project.
 
 See the `samples` directory in the plugin for sample exports and screenshots.
 
 ## Reports
-The plugin adds an additional report: Institution Notices List. The report generates a list of all
-Institution Notices and their associated primary type (resource, accession, archival object, and
+The plugin adds an additional report: Local Contexts List. The report generates a list of all
+project ids and their associated primary type (resource, accession, archival object, and
 digital object), respectively.
 
 ## Core Overrides
