@@ -7,20 +7,14 @@ class LocalContextController < ApplicationController
 set_access_control "view_repository" => [:fetch_lc_project_data]
 
   def fetch_lc_project_data
-    logger = Logger.new($stderr)
-    api_base_url = AppConfig[:local_context_api]
     project_id = params[:project_id]
+    project_json = JSONModel::HTTP::get_json("/plugins/local_context/get_local_contexts_api_data", {:id => project_id, :type => 'project'})
 
-    uri = URI(File.join(api_base_url, 'projects', project_id, '?format=json'))
-    logger.debug("LC URI: #{uri.inspect}")
-    res = Net::HTTP.get_response(uri)
-    logger.debug("LC_RESPONSE: #{res.inspect}")
-    if res.is_a?(Net::HTTPSuccess)
-      render :json => res.body
+    if project_json.nil?
+      render :json => {"error":"Something went wrong. Unable to fetch and/or parse data for this id."}
     else
-      render :json => {"error":"Something went wrong. Unable to fetch and/or parse data for this project id."}
+      render :json => project_json
     end
-  rescue Timeout::Error => e
-    render :json => {"error":"Timeout attempting to fetch data from Local Contexts API. Unable to fetch and/or parse data for this project id. Error message: #{e}"}
+
   end
 end

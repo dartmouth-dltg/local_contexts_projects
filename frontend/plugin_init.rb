@@ -2,8 +2,8 @@ ArchivesSpace::Application.extend_aspace_routes(File.join(File.dirname(__FILE__)
 
 Rails.application.config.after_initialize do
 
-  if !AppConfig.has_key?(:local_context_api) || AppConfig[:local_context_api].blank?
-    AppConfig[:local_context_api] = "https://localcontextshub.org/api/v1/"
+  unless AppConfig.has_key?(:local_context_api_url)
+    AppConfig[:local_context_api_url] = "https://localcontextshub.org/api/v1/"
   end
 
   # only add faceting if configured

@@ -25,13 +25,17 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
     },
     dataType: 'json'
   })
-  .done(function(data) {
-    if (data['unique_id'] == id) {
+  .done( function(data) {
+    if (data !== null && data['unique_id'] == id) {
       self.parseLocalContextData(data);
     }
     else {
       self.renderLocalContextsError();
     }
+    btn.removeClass('fetching');
+  })
+  .fail( function() {
+    self.renderLocalContextsError();
     btn.removeClass('fetching');
   });
 
@@ -93,7 +97,13 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
  *             "default_text": "This SAMPLE Label is being used to acknowledge the relationship between the creative practices of [name] and [community name] and the associated cultural responsibilities. This is a sample Label used for examples only.",
  *             "img_url": "https://storage.googleapis.com/anth-ja77-local-contexts-8985.appspot.com/labels/tklabels/tk-creative.png",
  *             "community": "Sample Community",
- *             "translations": [],
+ *             "translations": [
+ *                  {
+ *                    "title": "TK A - Local Name",
+ *                    "language": "French",
+ *                    "translation": "Cette étiquette est utilisée pour corriger des erreurs historiques ou des exclusions relatives à ce matériel. Ceci est particulièrement lié aux noms des personnes impliquées dans l'exécution ou la réalisation de ce travail et/ou le nom correct de la communauté dont il provient à l'origine. En tant qu'utilisateur, il vous est également demandé d'appliquer l'attribution correcte dans toute utilisation future de ce travail."
+ *                }
+ *              ],
  *             "created": "2021-10-22T18:19:02.104252Z",
  *             "updated": "2021-10-22T18:25:49.578629Z"
  *         },
