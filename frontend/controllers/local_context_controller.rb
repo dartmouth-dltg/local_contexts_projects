@@ -4,9 +4,9 @@ require 'aspace_logger'
 
 class LocalContextController < ApplicationController
 
-set_access_control "view_repository" => [:fetch_lc_data]
+set_access_control "view_repository" => [:fetch_lc_project_data]
 
-  def fetch_lc_data
+  def fetch_lc_project_data
     logger = Logger.new($stderr)
     api_base_url = AppConfig[:local_context_api]
     project_id = params[:project_id]

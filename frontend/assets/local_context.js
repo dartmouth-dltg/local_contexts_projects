@@ -19,7 +19,7 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
   var self = this;
 
   $.ajax({
-    url: "/plugins/local_context/fetch_lc_data",
+    url: "/plugins/local_context/fetch_lc_project_data",
     data: {
       project_id: id
     },
