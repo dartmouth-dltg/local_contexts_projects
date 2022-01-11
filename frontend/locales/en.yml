@@ -8,7 +8,7 @@ en:
           add: Add Local Contexts Project Id
 
   local_context:
-    fetch_btn: See Local Contexts Labels
+    fetch_btn: See Local Contexts Data
     project_id: Project Id
 
   advanced_search:

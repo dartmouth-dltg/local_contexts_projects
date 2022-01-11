@@ -28,3 +28,16 @@ span.local-context-placed-by {
 span.local-context-placed-by-label {
   font-weight: bold;
 }
+
+a.fetching::after {
+  display: inline-block;
+  content: "\e031";
+  font-family: "Glyphicons Halflings";
+  margin-left: 0.5em;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  from { transform: scale(1) rotate(0deg); }
+  to { transform: scale(1) rotate(360deg); }
+}
