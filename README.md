@@ -55,14 +55,14 @@ should additional notices be defined in future.
 ## Configuration
 
 This plugin accepts two configuration options. These options control the visibility of
-Local Contexts associated projects as facets in the staff application, control the visibility of Local Contexts associated projects as facets in the PUI, and sets the Local Contexts API base URL. If the API base URL
-is not  set in the config, the url is assumed to be `https://localcontextshub.org/api/v1/`
+Local Contexts associated projects as facets in the staff application, control the visibility of Local Contexts associated projects as facets in the PUI, and sets the Local Contexts base URL. If the base URL
+is not  set in the config, the url is assumed to be `https://localcontextshub.org/`
 
 Set either `staff_faceting` or `public_faceting` to `true` to
 enable Local Contexts associated projects facets in that area.
 
 ```
-    AppConfig[:local_context_api_url] = "https://localcontextshub.org/api/v1/"
+    AppConfig[:local_context_base_url] = "https://localcontextshub.org/"
 
     AppConfig[:local_context] = {
       'staff_faceting' => true,
