@@ -3,8 +3,7 @@
 An ArchivesSpace plugin that allows staff users to add & display Local Contexts
 Labels (TK & BC), Notices (TK & BC), & Local Contexts Institution
 Notices (Attribution Incomplete) on resources, accessions, archival objects,
-and digital objects. Also provides a configuration option to display Local Contexts
-Institution Notices (Open to Collaborate) on the PUI homepage.
+and digital objects.
 
 Please read the Local Contexts guidelines for using Labels & Notices and contact them for
 additional guidance on best practices.
@@ -48,9 +47,7 @@ See also:
 
   https://github.com/archivesspace/archivesspace/blob/master/UPGRADING.md
 
-This will create the tables required by the plugin, and will pre-populate the
-system with a set of Institution Notices. The controlled value list is editable
-should additional notices be defined in future.
+This will create the tables required by the plugin.
 
 ## Configuration
 
@@ -69,19 +66,6 @@ enable Local Contexts associated projects facets in that area.
       'public_faceting' => true
     }
 ```
-
-## Stylesheet Changes
-
-To accomodate the use of Local Contexts labels & notices in Staff PDF exports, the ead to pdf stylesheet has
-been modified. Please replace your core version in
-```
-    stylesheets/as-ead-pdf.xsl
-```
-
-with the version supplied with the plugin (`local_context/stylesheets/as-ead-pdf.xsl`)
-
-An example EAD to HTML stylesheet based on the one provided in core has also been provided
-(`local_context/stylesheets/as-ead-html.xsl`)
 
 ## Using the Plugin
 This plugin adds a new subrecord to resources, accessions, archival objects, and digital objects:
@@ -119,7 +103,6 @@ This plugin also overrides the following views
     /public/views/pdf/_resource.html.erb
     /public/views/pdf/_archival_object.html.erb
     /public/views/shared/_record_innards.html.erb
-    /public/welcome/show.html.erb    
 ```
 If you are using other plugins which override the same files, you will need to reconcile
 them.

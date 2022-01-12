@@ -14,7 +14,7 @@
         <a href="<%= AppConfig[:local_context_base_url] %>projects/project/<%= project_id %>"><%= I18n.t("local_contexts_project_link_text") %></a>
       </p>
     </div>
-    <div class="local-contexts-live-data" id="lc-project-id-<%= project_id %>">
+    <div class="local-contexts-live-data" id="lc-project-id-<%= project_id %>" aria-live="polite">
     </div>
   </div>
 </div>

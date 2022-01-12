@@ -10,6 +10,11 @@ en:
   local_context:
     fetch_btn: See Local Contexts Data
     project_id: Project Id
+    local_contexts_project_link_text: View this project on the Local Contexts Hub
+    local_contexts_project_information: >
+      This material is related to a Local Contexts project which may have associated various Biocultural Labels,
+      Traditional Knowledge Labels, Notices, and Institution Notices with this material.
+    local_contexts_section_title: Local Contexts Information
 
   advanced_search:
     text:

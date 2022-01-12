@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'aspace_logger'
 class EADSerializer < ASpaceExport::Serializer
 
   # We're patching this method to deal with the local contexts ids
@@ -204,8 +205,26 @@ class EADSerializer < ASpaceExport::Serializer
 
   # custom method to include Local Contexts data
   def serialize_local_contexts_ead(data, xml, fragments)
-    if AppConfig[:plugins].include?('aspace_local_contexts')
-      # TODO: Write retrieval step
+    if AppConfig[:plugins].include?('local_context')
+      if data.local_context && data.local_context['project_id']
+        project_id = data.local_context['project_id']
+        project_url = File.join(AppConfig[:local_context_base_url], 'project/projects', project_id)
+        xml.odd {
+          xml.head {
+            sanitize_mixed_content(I18n.t("local_context.local_contexts_section_title") , xml, fragments)
+          }
+          xml.p {
+            sanitize_mixed_content(I18n.t("local_context.local_contexts_project_information") , xml, fragments)
+          }
+          xml.p {
+            xml.extref ({"xlink:href" => project_url,
+                      "xlink:actuate" => "onLoad",
+                      "xlink:show" => "new",
+                      "xlink:type" => "simple"
+                      }) { xml.text I18n.t("local_context.local_contexts_project_link_text") }
+          }
+        }
+      end
     end
   end
 
@@ -414,8 +433,26 @@ class EAD3Serializer < EADSerializer
 
   # custom method to include Local Contexts data
   def serialize_local_contexts_ead3(data, xml, fragments)
-    if AppConfig[:plugins].include?('aspace_local_contexts')
-      # TODO: write retrieval step
+    if AppConfig[:plugins].include?('local_context')
+      if data.local_context && data.local_context['project_id']
+        project_id = data.local_context['project_id']
+        project_url = File.join(AppConfig[:local_context_base_url], 'project/projects', project_id)
+        xml.odd {
+          xml.head {
+            sanitize_mixed_content(I18n.t("local_context.local_contexts_section_title") , xml, fragments)
+          }
+          xml.p {
+            sanitize_mixed_content(I18n.t("local_context.local_contexts_project_information") , xml, fragments)
+          }
+          xml.p {
+            xml.extref ({"xlink:href" => project_url,
+                      "xlink:actuate" => "onLoad",
+                      "xlink:show" => "new",
+                      "xlink:type" => "simple"
+                      }) { xml.text I18n.t("local_context.local_contexts_project_link_text") }
+          }
+        }
+      end
     end
   end
 
