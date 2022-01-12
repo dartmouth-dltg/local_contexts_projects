@@ -109,17 +109,17 @@ end
                         </ul>
                     </dd>
                 <% end %>
-                <!-- Institution Notices Begin -->
-                <% if AppConfig[:plugins].include?('institution_notices') %>
-                    <% unless record.json['institution_notice'].empty? %>
-                      <% notice_type = record.json['institution_notice']['institution_notice_code'] %>
-                      <dt><%= I18n.t("institution_notice_title.#{notice_type}") %></dt>
+                <!-- Local Context Begin -->
+                <% if AppConfig[:plugins].include?('local_context') %>
+                    <% unless record.json['local_context'].blank? %>
+                      <% project_id = record.json['local_context']['project_id'] %>
+                      <dt><%= I18n.t("local_contexts_section_title") %></dt>
                       <dd>
-                        <%= render(:partial => 'institution_notice', :locals => {:notice_type => notice_type}) %>
+                        <%= render(:partial => 'local_context', :locals => {:project_id => project_id}) %>
                         </dd>
                     <% end %>
                 <% end %>
-                <!-- Institution Notices End -->
+                <!-- Local Context End -->
             </dl>
 
         </div>

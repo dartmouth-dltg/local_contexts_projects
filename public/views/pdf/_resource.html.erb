@@ -84,14 +84,17 @@
 <% end %>
 </ul>
 
-<!-- Institution Notice Begin -->
-<% if AppConfig[:plugins].include?('institution_notices') %>
-  <% if AppConfig.has_key?(:institution_notices) && AppConfig[:institution_notices]['public_faceting'] == true %>
-    <h3><%= I18n.t("institution_notice_title.open_to_collaborate") %></h3>
-    <%= render(:partial => 'open_to_collaborate', :locals => {:record => record}) %>
-  <% end %>
+<!-- Local Context Begin -->
+<% if AppConfig[:plugins].include?('local_context') %>
+    <% unless record.json['local_context'].blank? %>
+      <% project_id = record.json['local_context']['project_id'] %>
+      <h3><%= I18n.t("local_contexts_section_title") %></h3>
+      <ul>
+        <li><%= render(:partial => 'local_context', :locals => {:project_id => project_id}) %></li>
+      </ul>
+    <% end %>
 <% end %>
-<!-- Institution Notice End -->
+<!-- Local Context End -->
 
 <div class="collection-inventory">
 <% if has_children %>
