@@ -1,3 +1,6 @@
+my_routes = File.join(File.dirname(__FILE__), "routes.rb")
+Plugins.extend_aspace_routes(my_routes)
+
 Rails.application.config.after_initialize do
 
   # only add faceting if configured

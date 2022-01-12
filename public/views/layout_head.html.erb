@@ -1,2 +1,3 @@
-<!-- apsace_tk_labels/public/views/layout_head.html.erb -->
-<%= stylesheet_link_tag "/assets/institution_notices.css" %>
+<!-- local_context/public/views/layout_head.html.erb -->
+<%= stylesheet_link_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_context.css" %>
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_context.js" %>

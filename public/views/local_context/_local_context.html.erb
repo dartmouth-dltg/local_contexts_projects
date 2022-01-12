@@ -3,13 +3,19 @@
   # right now there is only one notice type, so this isn't really necessary
   project_id = local_context['project_id']
 %>
-<div class="local-contexts-section">
-  <<%= heading_size %>><%= I18n.t("local_contexts_section_title") %></<%= heading_size %>>
-  <div class="local-context-project-link">
-    <p>
-      <a href="<%= AppConfig[:local_contexts_base_url] %>projects/project/<%= project_id %>"><%= I18n.t("local_contexts_project_link_text") %></a>
-    </p>
-  </div>
-  <div class="local-contexts-live-data">
+<div class="row">
+  <div class="col-sm-12 local-contexts-section">
+    <<%= heading_size %>><%= I18n.t("local_contexts_section_title") %></<%= heading_size %>>
+    <div class="local-context-project-link">
+      <p>
+        <a href="<%= AppConfig[:local_context_base_url] %>projects/project/<%= project_id %>"><%= I18n.t("local_contexts_project_link_text") %></a>
+      </p>
+    </div>
+    <div class="local-contexts-live-data" id="lc-project-id-<%= project_id %>">
+    </div>
   </div>
 </div>
+
+<script>
+  new LocalContexts('<%= project_id %>');
+</script>

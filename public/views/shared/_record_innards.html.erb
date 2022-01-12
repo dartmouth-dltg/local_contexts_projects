@@ -60,13 +60,13 @@
     <% end %>
 </div>
 
-  <!-- institution_notices begin -->
-  <% if AppConfig[:plugins].include?('institution_notices') %>
-    <% unless @result.json['institution_notice'].blank? %>
-     <%= render partial: 'institution_notice/institution_notice', locals: {:institution_notice =>  @result.json['institution_notice']} %>
+  <!-- local_context begin -->
+  <% if AppConfig[:plugins].include?('local_context') %>
+    <% unless @result.json['local_context'].blank? %>
+     <%= render partial: 'local_context/local_context', locals: {:local_context =>  @result.json['local_context']} %>
     <% end %>
   <% end %>
-  <!-- institution_notices end -->
+  <!-- local_context end -->
 
     <div class="acc_holder clear" >
       <div class="panel-group" id="res_accordion">

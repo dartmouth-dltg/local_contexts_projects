@@ -1,0 +1,58 @@
+.local-contexts-live-data {
+  margin: 1em;
+}
+
+.local-contexts-live-data > div {
+  display: table;
+  clear: both;
+}
+
+.local-contexts-live-data p {
+  display: table;
+}
+
+img.local-context-image {
+  display: table-cell;
+  max-width: 5em;
+  margin: 0 1em 1em 0;
+}
+
+span.local-context-description {
+  display: table-cell;
+  vertical-align: top;
+}
+span.local-context-placed-by {
+  display: block;
+}
+
+span.local-context-placed-by-label {
+  font-weight: bold;
+}
+
+#local-contexts-img-wrapper {
+  display: table;
+  clear: both;
+}
+
+#local-contexts-img-wrapper:hover {
+  cursor: pointer;
+}
+
+img.local-contexts-header-image {
+  float: left;
+  max-height: 2.25em;
+  margin-right: 0.25em;
+}
+
+a.fetching::after {
+  display: inline-block;
+  content: "\e031";
+  font-family: "Glyphicons Halflings";
+  margin-left: 0.5em;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  from { transform: scale(1) rotate(0deg); }
+  to { transform: scale(1) rotate(360deg); }
+}
