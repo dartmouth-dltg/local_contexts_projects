@@ -1,0 +1,18 @@
+<%= setup_context :object => @local_context_project, :title => @local_context_project.project_name %>
+
+<div class="row">
+   <div class="col-md-3">
+     <%= render_aspace_partial :partial => "sidebar" %>
+   </div>
+  <div class="col-md-9">
+    <%= render_aspace_partial :partial => "toolbar" %>
+    <div class="record-pane">
+      <h2><%= @local_context_project.project_name %>  <span class="label label-info"><%= I18n.t("local_context_project._singular") %></span></h2>
+      <%= readonly_context :local_context_project, @local_context_project do |readonly| %>
+        <%= readonly.label_and_textfield "project_id" %>
+        <%= readonly.label_and_textfield "project_name" %>
+        <%= readonly.label_and_boolean "project_is_public" %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<!-- local context -->
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/subrecord.crud.js" %>
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/form.js" %>
+
+<%= setup_context :object => @local_context_project %>
+
+<div id="object_container">
+  <%= form_for @local_context_project, :as => "local_context_project", :url => {:action => :create}, :html => {:class => 'form-horizontal aspace-record-form', :id => "local_context_project_form"} do |f| %>
+    <%= form_context :local_context_project, @local_context_project do |form| %>
+      <div class="row">
+         <div class="col-md-3">
+            <%= render_aspace_partial :partial => "local_context_projects/sidebar" %>
+         </div> <!-- col-md-3 -->
+         <div class="col-md-9">
+           <%= render_aspace_partial :partial => "shared/toolbar_new_records" %>
+           <div class="record-pane">
+
+             <%= render_aspace_partial :partial => "local_context_projects/form_container", :locals => {:form => form} %>
+
+             <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><%= I18n.t("actions.save_prefix") %> <%= I18n.t("local_context_project._singular") %></button>
+                <%= link_to I18n.t("actions.cancel"), :back, :class => "btn btn-cancel btn-default" %>
+             </div>
+           </div>
+         </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

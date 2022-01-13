@@ -16,6 +16,18 @@ en:
       Traditional Knowledge Labels, Notices, and Institution Notices with this material.
     local_contexts_section_title: Local Contexts Information
 
+  local_context_project:
+    _singular: Local Contexts Project
+    _plural: Local Context Projects
+    _frontend:
+      action:
+        save: Save Local Contexts Project
+        create: Create a new Project
+      form_header: Local Contexts Project
+
+    related_project_tooltip: Select a Local Contexts project.
+
+
   advanced_search:
     text:
       local_context_u_sbool: Local Contexts Project Id

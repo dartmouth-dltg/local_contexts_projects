@@ -208,7 +208,7 @@ class EADSerializer < ASpaceExport::Serializer
     if AppConfig[:plugins].include?('local_context')
       if data.local_context && data.local_context['project_id']
         project_id = data.local_context['project_id']
-        project_url = File.join(AppConfig[:local_context_base_url], 'project/projects', project_id)
+        project_url = File.join(AppConfig[:local_context_base_url], 'projects/project', project_id)
         xml.odd {
           xml.head {
             sanitize_mixed_content(I18n.t("local_context.local_contexts_section_title") , xml, fragments)
@@ -436,7 +436,7 @@ class EAD3Serializer < EADSerializer
     if AppConfig[:plugins].include?('local_context')
       if data.local_context && data.local_context['project_id']
         project_id = data.local_context['project_id']
-        project_url = File.join(AppConfig[:local_context_base_url], 'project/projects', project_id)
+        project_url = File.join(AppConfig[:local_context_base_url], 'projects/project', project_id)
         xml.odd {
           xml.head {
             sanitize_mixed_content(I18n.t("local_context.local_contexts_section_title") , xml, fragments)
