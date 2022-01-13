@@ -1,22 +1,15 @@
 en:
   plugins:
-    local_context:
+    local_contexts_project:
       _plural: Local Contexts Project
       _singular: Local Contexts Project
       _frontend:
         action:
           add: Add Local Contexts Project Id
+    local_contexts_projects:
+      label: Local Contexts Projects
 
-  local_context:
-    fetch_btn: See Local Contexts Data
-    project_id: Project Id
-    local_contexts_project_link_text: View this project on the Local Contexts Hub
-    local_contexts_project_information: >
-      This material is related to a Local Contexts project which may have associated various Biocultural Labels,
-      Traditional Knowledge Labels, Notices, and Institution Notices with this material.
-    local_contexts_section_title: Local Contexts Information
-
-  local_context_project:
+  local_contexts_project:
     _singular: Local Contexts Project
     _plural: Local Context Projects
     _frontend:
@@ -24,19 +17,34 @@ en:
         save: Save Local Contexts Project
         create: Create a new Project
       form_header: Local Contexts Project
+      messages:
+          created: Local Contexts Project Created
+          deleted: Local Contexts Project Deleted
+          delete_conflict: There was a problem deleting the Local Contexts Project
+          updated: Local Contexts Project Updated
 
+    fetch_btn: See Local Contexts Data
+    project_id: Project Id
+    project_information: >
+      This material is related to a Local Contexts project which may have associated various Biocultural Labels,
+      Traditional Knowledge Labels, Notices, and Institution Notices with this material.
+    project_is_public: Hub Project Public?
+    project_link_text: View this project on the Local Contexts Hub
+    project_name: Project Name
     related_project_tooltip: Select a Local Contexts project.
-
+    section_title: Local Contexts Information
 
   advanced_search:
     text:
-      local_context_u_sbool: Local Contexts Project Id
+      local_contexts_project_u_sbool: Local Contexts Project Id
 
   reports:
-    local_contexts_list_report:
+    local_contexts_projects_list_report:
       title: Local Contexts Projects List Report
       description: List all resources, accession, archival objects and digital objects which have been linked to a Local Contexts Project.
 
   search:
+    local_contexts_project:
+      title: Local Contexts Project
     multi:
-      local_context_u_sbool: Local Contexts Project
+      local_contexts_project_u_sbool: Local Contexts Project

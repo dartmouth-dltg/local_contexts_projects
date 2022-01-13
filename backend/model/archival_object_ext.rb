@@ -1,0 +1,1 @@
+ArchivalObject.include(LocalContextsProjects)

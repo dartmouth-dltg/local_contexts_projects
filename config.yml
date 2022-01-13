@@ -1,13 +1,15 @@
+repository_menu_controller: local_contexts_projects
+no_automatic_routes: true
 parents:
   accession:
-    name: local_context
+    name: local_contexts_projects
     cardinality: zero_to_one
   archival_object:
-    name: local_context
+    name: local_contexts_projects
     cardinality: zero_to_one
   resource:
-    name: local_context
+    name: local_contexts_projects
     cardinality: zero_to_one
   digital_object:
-    name: local_context
+    name: local_contexts_projects
     cardinality: zero_to_one

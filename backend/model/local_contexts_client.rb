@@ -4,8 +4,8 @@ require 'aspace_logger'
 class LocalContextsClient
 
   def initialize
-    @base_url = AppConfig[:local_context_base_url]
-    @api_version_path = AppConfig[:local_context_api_path]
+    @base_url = AppConfig[:local_contexts_base_url]
+    @api_version_path = AppConfig[:local_contexts_api_path]
     @query_data_type = '?format=json'
     @api_paths_map = {
       "project" => "projects",

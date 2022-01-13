@@ -1,0 +1,30 @@
+<!-- local contexts projects -->
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/subrecord.crud.js" %>
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/form.js" %>
+
+<%= setup_context(:object => @local_contexts_project, :title => @local_contexts_project.display_string) %>
+
+<%= form_for @local_contexts_project, :as => "local_contexts_project", :url => {:action => :update}, :html => {:class => 'form-horizontal aspace-record-form', :id => "local_contexts_project_form"}.merge(update_monitor_params(@local_contexts_project)) do |f| %>
+  <%= form_context :local_contexts_project, @local_contexts_project do |form| %>
+    <div class="row">
+      <div class="col-md-3">
+        <%= render_aspace_partial :partial => "sidebar" %>
+      </div>
+
+      <div class="col-md-9">
+        <%= render_aspace_partial :partial => "local_contexts_projects/toolbar" %>
+        <div class="record-pane">
+          <h2><%= I18n.t('local_contexts_project._frontend.form_header', :display_string => @local_contexts_project.display_string) %> <span class="label label-info"><%= I18n.t("local_contexts_project._singular") %></span></h2>
+          <input type="hidden" name="_method" value="put" />
+          <%= render_aspace_partial :partial => "local_contexts_projects/form", :locals => {:form => form} %>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><%= I18n.t("local_contexts_project._frontend.action.save") %></button>
+            <%= link_to I18n.t("actions.cancel"), :back, :class => "btn btn-cancel btn-default" %>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

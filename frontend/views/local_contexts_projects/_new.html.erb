@@ -1,0 +1,6 @@
+<%= form_for @local_contexts_project, :as => "local_contexts_project", :url => {:action => :create}, :html => {:class => 'form-horizontal aspace-record-form'} do |f| %>
+  <%= form_context :local_contexts_project, @local_contexts_project do |form| %>
+    <%= hidden_field "inline", "true" %>
+    <%= render_aspace_partial :partial => "form", :locals => {:form => form} %>
+  <% end %>
+<% end %>

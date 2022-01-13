@@ -1,4 +1,4 @@
-<%= setup_context(:title => I18n.t("plugins.local_context._singular")) %>
+<%= setup_context(:title => I18n.t("plugins.local_contexts_project._singular")) %>
 
 <%
    @show_multiselect_column = false
@@ -15,8 +15,8 @@
       <%= link_to_help :topic => "search" %>
 
       <h2>
-        <%= I18n.t("plugins.local_context._singular") %>
-        <button class="btn btn-sm pull-right"><a href="<%= "#{AppConfig[:frontend_proxy_prefix]}plugins/local_contexts_projects/new" %>"><%= I18n.t("local_context_project._frontend.action.create") %></a></button>
+        <%= I18n.t("plugins.local_contexts_project._singular") %>
+        <button class="btn btn-sm pull-right"><a href="<%= "#{AppConfig[:frontend_proxy_prefix]}plugins/local_contexts_projects/new" %>"><%= I18n.t("local_contexts_project._frontend.action.create") %></a></button>
       </h2>
 
       <%= render_aspace_partial :partial => "shared/flash_messages" %>

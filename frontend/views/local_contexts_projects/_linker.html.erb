@@ -16,7 +16,7 @@
   hide_create = false if hide_create.blank?
 
   if !defined?(linker_label)
-    linker_label = (multiplicity === "many") ? I18n.t("local_context_project._plural") : I18n.t("local_context_project._singular")
+    linker_label = (multiplicity === "many") ? I18n.t("local_contexts_project._plural") : I18n.t("local_contexts_project._singular")
   end
 
 %>
@@ -24,7 +24,7 @@
    <label class="control-label col-sm-2"
           id="<%= form.id_for("ref") %>_label"
           for="<%= form.id_for("ref") %>">
-          <%= wrap_with_tooltip(linker_label, "local_context_project.related_project_tooltip", "control-label initialised") %>
+          <%= wrap_with_tooltip(linker_label, "local_contexts_project.related_project_tooltip", "control-label initialised") %>
   </label>
   <div class="controls col-sm-8">
     <div class="input-group linker-wrapper"
@@ -33,8 +33,8 @@
          id="<%= form.id_for("ref") %>_combobox">
           <input type="text" class="linker"
             id="<%= form.id_for("ref") %>"
-            data-label="<%= I18n.t("local_context_project._singular") %>"
-            data-label_plural="<%= I18n.t("local_context_project._plural") %>"
+            data-label="<%= I18n.t("local_contexts_project._singular") %>"
+            data-label_plural="<%= I18n.t("local_contexts_project._plural") %>"
             data-path="<%= form.path %>"
             data-name="ref"
             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json %>"
@@ -43,7 +43,7 @@
             data-format_property="title"
             data-multiplicity="<%= multiplicity %>"
             <% if multiplicity === "many" %>data-sortable="true"<% end %>
-            data-types='["local_context_project"]'
+            data-types='["local_contexts_project"]'
             data-exclude='<%= exclude_ids.to_json %>'
           />
 
