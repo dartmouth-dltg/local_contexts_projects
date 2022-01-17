@@ -7,12 +7,14 @@
   <div class="col-md-9">
     <%= render_aspace_partial :partial => "toolbar" %>
     <div class="record-pane">
-      <h2><%= @local_contexts_project.project_name %>  <span class="label label-info"><%= I18n.t("local_contexts_project._singular") %></span></h2>
+      <h2><%= @local_contexts_project.project_name %>  <span class="label label-info"><%= I18n.t("local_contexts_project._singular") %></span><a class="btn btn-sm btn-default pull-right" id="fetch-local-contexts-data"><%= I18n.t('local_contexts_project.fetch_btn') %></a></h2>
       <%= readonly_context :local_contexts_project, @local_contexts_project do |readonly| %>
         <%= readonly.label_and_textfield "project_id" %>
         <%= readonly.label_and_textfield "project_name" %>
         <%= readonly.label_and_boolean "project_is_public" %>
       <% end %>
+      <div id="local-contexts-data-holder" class=""></div>
     </div>
   </div>
 </div>
+<%= javascript_tag "new LocalContexts('single');" %>

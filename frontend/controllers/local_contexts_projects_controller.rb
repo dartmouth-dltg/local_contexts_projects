@@ -4,7 +4,7 @@ require 'aspace_logger'
 
 class LocalContextsProjectsController < ApplicationController
 
-  set_access_control "view_repository" => [:fetch_lc_project_data, :index, :show],
+  set_access_control "view_repository" => [:fetch_lc_project_data, :index, :show, :typeahead],
                       "update_local_contexts_project_record" => [:new, :edit, :create, :update, :delete]
 
 
@@ -61,7 +61,7 @@ class LocalContextsProjectsController < ApplicationController
                 },
                 :on_valid => ->(id) {
                   flash[:success] = I18n.t("local_contexts_project._frontend.messages.updated")
-                  redirect_to :controller => :local_contexts_project, :action => :edit, :id => id
+                  redirect_to :controller => :local_contexts_projects, :action => :edit, :id => id
                 })
   end
 
@@ -71,7 +71,7 @@ class LocalContextsProjectsController < ApplicationController
       local_contexts_project.delete
     rescue ConflictException => e
       flash[:error] = I18n.t("local_contexts_project._frontend.messages.delete_conflict", :error => I18n.t("errors.#{e.conflicts}", :default => e.message))
-      return redirect_to(:controller => :local_contexts_project, :action => :show, :id => params[:id])
+      return redirect_to(:controller => :local_contexts_projects, :action => :show, :id => params[:id])
     end
 
     flash[:success] = I18n.t("local_contexts_project._frontend.messages.deleted")

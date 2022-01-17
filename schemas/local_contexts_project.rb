@@ -26,8 +26,7 @@
                        {"type" => "JSONModel(:resource) uri"},
                        {"type" => "JSONModel(:archival_object) uri"},
                        {"type" => "JSONModel(:digital_object) uri"},
-                       {"type" => "JSONModel(:digital_object_component) uri"}
-                     ],
+                       {"type" => "JSONModel(:digital_object_component) uri"}],
             "ifmissing" => "error"
           },
           "_resolved" => {

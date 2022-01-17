@@ -27,8 +27,9 @@ class LocalContextsClient
 
 
   def get(suffix, headers = {})
+    logger = Logger.new($stderr)
     get_url = url(suffix)
-
+logger.debug("GETURL: #{get_url}")
     http_request(get_url) do |http|
       req = Net::HTTP::Get.new(get_url.request_uri)
 

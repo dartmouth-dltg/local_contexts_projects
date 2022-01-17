@@ -5,7 +5,7 @@ en:
       _singular: Local Contexts Project
       _frontend:
         action:
-          add: Add Local Contexts Project Id
+          add: Add Local Contexts Project
     local_contexts_projects:
       label: Local Contexts Projects
 

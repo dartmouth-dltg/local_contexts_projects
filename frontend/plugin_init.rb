@@ -57,7 +57,7 @@ Rails.application.config.after_initialize do
 
     def find_opts
       orig = find_opts_pre_local_contexts_project
-      orig.merge('resolve[]' => orig['resolve[]'] + ['local_contexts_project'])
+      orig.merge('resolve[]' => orig['resolve[]'] + ['local_contexts_projects'])
     end
 
     def browse_columns

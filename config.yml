@@ -3,13 +3,13 @@ no_automatic_routes: true
 parents:
   accession:
     name: local_contexts_projects
-    cardinality: zero_to_one
+    cardinality: zero_to_many
   archival_object:
     name: local_contexts_projects
-    cardinality: zero_to_one
+    cardinality: zero_to_many
   resource:
     name: local_contexts_projects
-    cardinality: zero_to_one
+    cardinality: zero_to_many
   digital_object:
     name: local_contexts_projects
-    cardinality: zero_to_one
+    cardinality: zero_to_many

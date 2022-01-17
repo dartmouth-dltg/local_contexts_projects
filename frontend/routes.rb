@@ -5,8 +5,6 @@ ArchivesSpace::Application.routes.draw do
   resources :local_contexts_projects
   match('/plugins/local_contexts_projects/create' => 'local_contexts_projects#create', :via => [:post])
   match('/plugins/local_contexts_projects/new' => 'local_contexts_projects#new', :via => [:get])
-  #match('/plugins/local_contexts_projects/edit' => 'local_contexts_projects#edit', :via => [:get])
   match('/plugins/local_contexts_projects/show' => 'local_contexts_projects#show', :via => [:get])
-  #match('/plugins/local_contexts_projects/:id' => 'local_contexts_projects#update', :via => [:post])
   match('/plugins/local_contexts_projects/:id/delete' => 'local_contexts_projects#delete', :via => [:post])
 end

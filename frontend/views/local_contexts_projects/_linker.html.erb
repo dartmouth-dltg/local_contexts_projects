@@ -1,6 +1,6 @@
 <%
   # Allow multiple subjects to be linked if it's an empty linker
-  multiplicity = "many" if multiplicity.blank?
+  multiplicity = "one" if multiplicity.blank?
 
   if form.obj['ref'].blank?
     selected_json = (multiplicity === "many") ? "[]" : "{}"

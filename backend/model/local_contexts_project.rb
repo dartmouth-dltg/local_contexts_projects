@@ -8,13 +8,14 @@ class LocalContextsProject < Sequel::Model(:local_contexts_project)
 
   include Relationships
 
-  # ArchivesSpaceService.loaded_hook do
-  #   LocalContextsProject.define_relationship(:name => :local_contexts_project,
-  #                               :contains_references_to_types => proc {LocalContextsProject.relationship_dependencies[:local_contexts_project]})
-  # end
+  define_relationship(:name => :local_contexts_project,
+                      :json_property => 'linked_records',
+                      :contains_references_to_types => proc {[
+                        Accession, ArchivalObject, Resource, DigitalObject, DigitalObjectComponent
+                      ]})
 
   def display_string
-    "#{project_id} - #{project_name}"
+    "#{project_id} : #{project_name}"
   end
 
   def self.sequel_to_jsonmodel(objs, opts = {})

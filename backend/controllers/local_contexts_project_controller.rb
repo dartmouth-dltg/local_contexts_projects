@@ -24,7 +24,7 @@ class ArchivesSpaceService < Sinatra::Base
     handle_update(LocalContextsProject, params[:id], params[:local_contexts_project])
   end
 
-  
+
   Endpoint.post('/local_contexts_projects')
     .description("Create an Local Contexts Project")
     .params(["local_contexts_project", JSONModel(:local_contexts_project), "The record to create", :body => true])

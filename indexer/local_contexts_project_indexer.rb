@@ -1,5 +1,9 @@
 class IndexerCommon
 
+  @@record_types << :local_contexts_project
+  @@global_types << :local_contexts_project
+  @@resolved_attributes << :local_contexts_projects
+
   add_indexer_initialize_hook do |indexer|
     if AppConfig[:plugins].include?('local_contexts_project')
       indexer.add_document_prepare_hook {|doc, record|
@@ -11,8 +15,6 @@ class IndexerCommon
       }
     end
   end
-
-  @@record_types << :local_contexts_project
 
   self.add_indexer_initialize_hook do |indexer|
     indexer.add_document_prepare_hook {|doc, record|

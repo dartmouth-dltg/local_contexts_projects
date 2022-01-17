@@ -6,7 +6,7 @@ end
 
 AppConfig[:local_contexts_api_path] = "api/v1"
 
-Permission.define("update_local_contexts_project_record",
+Permission.define("manage_local_contexts_project_record",
                   "The ability to create/update/delete Local Contexts Project records",
                   :level => "global")
 

@@ -1,7 +1,7 @@
 /* local_context/frontend/assets/local_context.js */
-function LocalContexts() {
-  this.new_json = {};
+function LocalContexts(type = "multi") {
   this.lc_data_el = $('#local-contexts-data-holder');
+  this.fetch_type = type;
 	this.setupLocalContextsAction();
 }
 
@@ -10,8 +10,21 @@ LocalContexts.prototype.setupLocalContextsAction = function() {
 
   $('#fetch-local-contexts-data').click( function() {
     $(this).addClass('fetching');
-    var projectId = $(this).closest('section').find('.label-only').text();
-    self.fetchLocalContextData(projectId, $(this));
+    self.lc_data_el.html('');
+    if (self.fetch_type == "single") {
+      var projectId = $(this).closest('.record-pane').find('label[for=local_contexts_project_project_id_]').siblings('div.label-only').text();
+      self.fetchLocalContextData(projectId, $(this))
+    }
+    else {
+      var projectIdsClass = $(this).closest('section').find('[class*=local-contexts-project-id]');
+      var btn = $(this);
+      $.each(projectIdsClass, function() {
+        var projectId = $(this).attr("class").match(/local-contexts-project-id-(.*)/i)[1];
+        if (projectId) {
+          self.fetchLocalContextData(projectId, btn)
+        }
+      });
+    }
   });
 }
 
@@ -19,7 +32,7 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
   var self = this;
 
   $.ajax({
-    url: "/plugins/local_context/fetch_lc_project_data",
+    url: "/plugins/local_contexts_projects/fetch_lc_project_data",
     data: {
       project_id: id
     },
@@ -30,12 +43,12 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
       self.parseLocalContextData(data);
     }
     else {
-      self.renderLocalContextsError();
+      self.renderLocalContextsError(id);
     }
     btn.removeClass('fetching');
   })
   .fail( function() {
-    self.renderLocalContextsError();
+    self.renderLocalContextsError(id);
     btn.removeClass('fetching');
   });
 
@@ -161,6 +174,7 @@ LocalContexts.prototype.parseLocalContextData = function(json) {
   var self = this;
   var lcNestedKeys = ['bc_labels','tk_labels'];
   var lcFlatKeys = ['notice','institution_notice'];
+  var new_json = {};
 
   var header_html = "";
   var expanded_html = "";
@@ -168,25 +182,25 @@ LocalContexts.prototype.parseLocalContextData = function(json) {
   // labels
   $.each(lcNestedKeys, function() {
     if (json[this]) {
-      self.new_json[this] = json[this];
+      new_json[this] = json[this];
     }
   });
 
   // notices
   $.each(lcFlatKeys, function() {
     if (json[this]) {
-      self.new_json[this] = [];
-      self.fixLocalContextsNoticesJson(json[this], this);
+      new_json[this] = [];
+      self.fixLocalContextsNoticesJson(json[this], new_json, this);
     }
   });
 
-  this.renderLocalContextsData();
+  this.renderLocalContextsData(new_json);
 }
 
 /**
  * Assumes that the presence of an img_url key implies a default_text
  */
-LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, type) {
+LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, new_json, type) {
   var self = this;
 
   var map = {
@@ -198,7 +212,7 @@ LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, type) {
 
   $.each(map, function(k,v) {
     if (json[0] && json[0][k + "_img_url"]) {
-      self.new_json[type].push({
+      new_json[type].push({
         "name" : v,
         "img_url" : json[0][k + "_img_url"],
         "default_text" : json[0][k + "_default_text"],
@@ -206,6 +220,7 @@ LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, type) {
       });
     }
   });
+  return new_json;
 }
 
 LocalContexts.prototype.placedBy = function (json) {
@@ -224,25 +239,25 @@ LocalContexts.prototype.placedBy = function (json) {
   return '';
 }
 
-LocalContexts.prototype.renderLocalContextsData = function() {
+LocalContexts.prototype.renderLocalContextsData = function(new_json) {
   var self = this;
 
   var lc_data_html = "";
 
-  $.each(this.new_json, function(k,v) {
+  $.each(new_json, function(k,v) {
     if (v[0]) {
       lc_data_html += AS.renderTemplate("template_local_context_data", {label: v[0]});
     }
   });
 
-  this.lc_data_el.html('').html(lc_data_html);
+  this.lc_data_el.append(lc_data_html);
 
 }
 
-LocalContexts.prototype.renderLocalContextsError = function() {
+LocalContexts.prototype.renderLocalContextsError = function(id) {
   var self = this;
 
   var target_el = $('#local-contexts-data-holder');
-  var error_msg = AS.renderTemplate("template_local_context_error");
-  this.lc_data_el.html('').html(error_msg);
+  var error_msg = AS.renderTemplate("template_local_context_error", {id: id});
+  this.lc_data_el.append(error_msg);
 }

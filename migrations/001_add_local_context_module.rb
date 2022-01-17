@@ -18,7 +18,7 @@ Sequel.migration do
       apply_mtime_columns
     end
 
-    create_table(:local_contexts_project_link_rlshp) do
+    create_table(:local_contexts_project_rlshp) do
       primary_key :id
 
       Integer :local_contexts_project_id
@@ -32,7 +32,7 @@ Sequel.migration do
       apply_mtime_columns(false)
     end
 
-    alter_table(:local_contexts_project_link_rlshp) do
+    alter_table(:local_contexts_project_rlshp) do
       add_foreign_key([:local_contexts_project_id], :local_contexts_project, :key => :id)
       add_foreign_key([:accession_id], :accession, :key => :id)
       add_foreign_key([:resource_id], :resource, :key => :id)
