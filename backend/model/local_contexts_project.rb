@@ -23,23 +23,9 @@ class LocalContextsProject < Sequel::Model(:local_contexts_project)
 
     jsons.zip(objs).each do |json, obj|
       json['display_string'] = obj.display_string
-      # json['linked_record'] = {
-      #   'ref' => obj.linked_record_uri
-      # }
     end
 
     jsons
   end
-
-  def linked_record_uri
-    linked_record && linked_record.uri
-  end
-
-  private
-
-  def linked_record
-    @linked_record ||= related_records(:local_contexts_project)[0]
-  end
-
 
 end

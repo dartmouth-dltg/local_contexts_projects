@@ -1,3 +1,6 @@
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/embedded_search.js" %>
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_project_show.js" %>
+
 <%= setup_context :object => @local_contexts_project, :title => @local_contexts_project.project_name %>
 
 <div class="row">
@@ -14,6 +17,11 @@
         <%= readonly.label_and_boolean "project_is_public" %>
       <% end %>
       <div id="local-contexts-data-holder" class=""></div>
+      <%= render_aspace_partial :partial => "search/embedded", :locals => {
+        :filter_term => {"local_contexts_project_uris_u_sstr" => @local_contexts_project.uri}.to_json,
+        :section_id => "linked_local_contexts_projects",
+        :heading_text => I18n.t("local_contexts_project._frontend.section.search_embedded")
+      } %>
     </div>
   </div>
 </div>

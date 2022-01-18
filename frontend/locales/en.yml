@@ -22,6 +22,8 @@ en:
           deleted: Local Contexts Project Deleted
           delete_conflict: There was a problem deleting the Local Contexts Project
           updated: Local Contexts Project Updated
+      section:
+        search_embedded: Linked Records
 
     fetch_btn: See Local Contexts Data
     project_id: Project Id
