@@ -109,17 +109,21 @@ end
                         </ul>
                     </dd>
                 <% end %>
-                <!-- Local Context Begin -->
-                <% if AppConfig[:plugins].include?('local_context') %>
-                    <% unless record.json['local_context'].blank? %>
-                      <% project_id = record.json['local_context']['project_id'] %>
-                      <dt><%= I18n.t("local_contexts_section_title") %></dt>
-                      <dd>
-                        <%= render(:partial => 'local_context', :locals => {:project_id => project_id}) %>
-                        </dd>
+                <!-- Local Contexts Project Begin -->
+                <% if AppConfig[:plugins].include?('local_contexts_project') %>
+                    <% unless record.json['local_contexts_projects'].blank? %>
+                      <% record.json['local_contexts_projects'].each do |lcp| %>
+                        <% if lcp['project_is_public'] %>
+                          <% project_id = record.json['local_contexts_project']['project_id'] %>
+                          <dt><%= I18n.t("local_contexts_section_title") %></dt>
+                          <dd>
+                            <%= render(:partial => 'local_contexts_project', :locals => {:project_id => project_id}) %>
+                          </dd>
+                        <% end %>
+                      <% end %>
                     <% end %>
                 <% end %>
-                <!-- Local Context End -->
+                <!-- Local Context Project End -->
             </dl>
 
         </div>

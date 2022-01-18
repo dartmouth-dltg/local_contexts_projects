@@ -41,7 +41,7 @@ Rails.application.config.after_initialize do
     def render(context, options, block)
       result = render_pre_local_contexts_project(context, options, block);
 
-      # Add our cart-specific templates to shared/templates
+      # Add our local contexts project specific templates to shared/templates
       if options[:partial] == "shared/templates"
         result += render(context, options.merge(:partial => "local_contexts_projects/render_templates"), nil)
       end
@@ -60,13 +60,14 @@ Rails.application.config.after_initialize do
       orig.merge('resolve[]' => orig['resolve[]'] + ['local_contexts_projects'])
     end
 
-    def browse_columns
-      browse_columns = browse_columns_pre_local_contexts_project
-      browse_columns["local_contexts_project_browse_column_1"] = "title"
-      browse_columns["local_contexts_project_sort_column"] = "title"
-      browse_columns["local_contexts_project_sort_direction"] = "asc"
-      @browse_columns = browse_columns
-    end
+     def browse_columns
+       browse_columns = browse_columns_pre_local_contexts_project
+       browse_columns["local_contexts_project_browse_column_1"] = "title"
+       browse_columns["local_contexts_project_sort_column"] = "title"
+       browse_columns["local_contexts_project_sort_direction"] = "asc"
+
+       @browse_columns = browse_columns
+     end
 
   end
 
@@ -82,7 +83,18 @@ Rails.application.config.after_initialize do
 
     def column_opts
       column_opts = column_opts_pre_local_contexts_project
-      column_opts['local_contexts_project'] = {"title" => {:field => "title", :sortable => true, :sort_by => "title_sort"}}
+      column_opts['local_contexts_project'] = {
+          "title" => {
+            :field => "display_string",
+            :sortable => true,
+            :sort_by => "title_sort"},
+          "audit_info": {
+            :field => "audit_info",
+            :sort_by => [
+                "create_time",
+                "user_mtime"
+            ]}
+          }
       @@column_opts = column_opts
     end
 

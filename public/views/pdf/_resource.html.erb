@@ -85,13 +85,17 @@
 </ul>
 
 <!-- Local Context Begin -->
-<% if AppConfig[:plugins].include?('local_context') %>
-    <% unless record.json['local_context'].blank? %>
-      <% project_id = record.json['local_context']['project_id'] %>
-      <h3><%= I18n.t("local_contexts_section_title") %></h3>
-      <ul>
-        <li><%= render(:partial => 'local_context', :locals => {:project_id => project_id}) %></li>
-      </ul>
+<% if AppConfig[:plugins].include?('local_contexts_project') %>
+    <% unless record.json['local_contexts_projects'].blank? %>
+      <% record.json['local_contexts_projects'].each do |lcp| %>
+        <% if lcp['project_is_public'] %>
+          <% project_id = lcp['project_id'] %>
+          <h3><%= I18n.t("local_contexts_section_title") %></h3>
+          <ul>
+            <li><%= render(:partial => 'local_contexts_project', :locals => {:project_id => project_id}) %></li>
+          </ul>
+        <% end %>
+      <% end %>
     <% end %>
 <% end %>
 <!-- Local Context End -->

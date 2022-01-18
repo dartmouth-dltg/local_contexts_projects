@@ -1,5 +1,5 @@
 <div id="template_local_context_data"><!--
-  <div>
+  <div class="lc-project-data-container">
     <h4>${label.name}</h4>
     <p>
       <img class="local-context-image" src="${label.img_url}" />
@@ -14,10 +14,10 @@
 --></div>
 
 <div id="template_local_context_error"><!--
-  <div>
+  <div class="lc-project-fetch-error">
     <h4>Problem Fetching Data</h4>
     <p>
-      An error occurred while fetching the data from the Local Contexts Hub for project id: ${id}. Try again or consult the logs.
+      An error occurred while fetching the data from the Local Contexts Hub for project id: <b>${id}</b>. Try again or consult the logs.
     </p>
   </div>
 --></div>

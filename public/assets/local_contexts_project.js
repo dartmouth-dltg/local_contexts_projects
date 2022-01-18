@@ -1,8 +1,10 @@
 /* local_context/public/assets/local_context.js */
-function LocalContexts(project_id) {
-  this.new_json = {};
-  this.lc_data_el = $('#lc-project-id-' + project_id);
+function LocalContexts(project_ids) {
+  this.lc_data_el_prefix = "lc-project-live-data-";
+  $('[id^=' + this.lc_data_el_prefix + ']').html('');
   this.lc_img_el = $('#main-content h1');
+  this.img_urls = Array();
+  this.img_html = "";
 
   this.fullDataTemplate = '<div>' +
                           '<h4>${label_name}</h4>' +
@@ -17,30 +19,36 @@ function LocalContexts(project_id) {
                           '</p>' +
                           '</div>';
 
-	this.fetchLocalContextData(project_id);
+  ids = JSON.parse(project_ids);
+  if (ids.length > 0) {
+     this.fetchLocalContextData(ids);
+  }
 }
 
-LocalContexts.prototype.fetchLocalContextData = function(id) {
+LocalContexts.prototype.fetchLocalContextData = function(ids) {
   var self = this;
-  console.log(id);
-  $.ajax({
-    url: APP_PATH + "local_context/fetch/fetch_lc_project_data",
-    data: {
-      id: id,
-      type: 'project'
-    },
-    dataType: 'json'
-  })
-  .done( function(data) {
-    if (data !== null && data['unique_id'] == id) {
-      self.parseLocalContextData(data);
-    }
-    else {
-      self.renderLocalContextsError();
-    }
-  })
-  .fail( function() {
-    self.renderLocalContextsError();
+
+  $.each(ids, function() {
+    var current_id = this;
+    $.ajax({
+      url: APP_PATH + "local_contexts_projects/fetch/fetch_lc_project_data",
+      data: {
+        id: current_id,
+        type: 'project'
+      },
+      dataType: 'json'
+    })
+    .done( function(data) {
+      if (data !== null && data['unique_id'] == current_id) {
+        self.parseLocalContextData(data, current_id);
+      }
+      else {
+        self.renderLocalContextsError(current_id);
+      }
+    })
+    .fail( function() {
+      self.renderLocalContextsError(current_id);
+    });
   });
 
   /**
@@ -160,10 +168,11 @@ LocalContexts.prototype.fetchLocalContextData = function(id) {
  *     ]
  * }
  */
-LocalContexts.prototype.parseLocalContextData = function(json) {
+LocalContexts.prototype.parseLocalContextData = function(json, id) {
   var self = this;
   var lcNestedKeys = ['bc_labels','tk_labels'];
   var lcFlatKeys = ['notice','institution_notice'];
+  var new_json = {};
 
   var header_html = "";
   var expanded_html = "";
@@ -171,25 +180,25 @@ LocalContexts.prototype.parseLocalContextData = function(json) {
   // labels
   $.each(lcNestedKeys, function() {
     if (json[this]) {
-      self.new_json[this] = json[this];
+      new_json[this] = json[this];
     }
   });
 
   // notices
   $.each(lcFlatKeys, function() {
     if (json[this]) {
-      self.new_json[this] = [];
-      self.fixLocalContextsNoticesJson(json[this], this);
+      new_json[this] = [];
+      self.fixLocalContextsNoticesJson(json[this], new_json, this);
     }
   });
 
-  this.renderLocalContextsData();
+  this.renderLocalContextsData(new_json, id);
 }
 
 /**
  * Assumes that the presence of an img_url key implies a default_text
  */
-LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, type) {
+LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, new_json, type) {
   var self = this;
 
   var map = {
@@ -201,7 +210,7 @@ LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, type) {
 
   $.each(map, function(k,v) {
     if (json[0] && json[0][k + "_img_url"]) {
-      self.new_json[type].push({
+      new_json[type].push({
         "name" : v,
         "img_url" : json[0][k + "_img_url"],
         "default_text" : json[0][k + "_default_text"],
@@ -209,9 +218,11 @@ LocalContexts.prototype.fixLocalContextsNoticesJson = function(json, type) {
       });
     }
   });
+
+  return new_json;
 }
 
-LocalContexts.prototype.placedBy = function (json) {
+LocalContexts.prototype.placedBy = function(json) {
   if (json['institution']) {
     return json['institution']['institution_name'];
   }
@@ -227,30 +238,41 @@ LocalContexts.prototype.placedBy = function (json) {
   return '';
 }
 
-LocalContexts.prototype.renderLocalContextsData = function() {
+LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
   var self = this;
 
   var lc_data_html = "";
-  var lc_img_html = $('<div id="local-contexts-img-wrapper"><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Click an image to find out more about these Local Contexts Labels &amp; Notices."></i></div>');
+  var lc_img_html = "";
+  var lc_img_wrapper = $('<div id="local-contexts-img-wrapper"><span id="lc-label-images-wrapper"></span><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Click an image to find out more about these Local Contexts Labels &amp; Notices."></i></div>');
 
-  $.each(this.new_json, function(k,v) {
+  if ($('#local-contexts-img-wrapper').length == 0) {
+    this.lc_img_el.after(lc_img_wrapper);
+  }
+
+  $.each(new_json, function(k,v) {
     if (v[0]) {
       lc_data_html += self.renderFullDataTemplate(v[0]);
-      lc_img_html.append(self.renderImageDataTemplate(v[0]));
+      if (!self.img_urls.includes(v[0].img_url)) {
+        self.img_urls.push(v[0].img_url);
+        lc_img_html += self.renderImageDataTemplate(v[0]);
+      }
     }
   });
 
-  this.lc_data_el.html('').html(lc_data_html);
-  this.lc_img_el.after(lc_img_html);
+  $('#' + this.lc_data_el_prefix + id).append(lc_data_html);
+  this.img_html += lc_img_html;
+  $('#lc-label-images-wrapper').html('').html(this.img_html);
+
   $('[data-toggle="tooltip"]').tooltip();
 }
 
-LocalContexts.prototype.renderLocalContextsError = function() {
-  var self = this;
+LocalContexts.prototype.renderImageWrapper = function() {
 
-  var target_el = $('#local-contexts-data-holder');
-  var error_msg = '<div><h4>Unable to Fetch Local Contexts Data</h4><p>Click the link above to see more about this  project.</p></div>';
-  this.lc_data_el.html('').html(error_msg);
+}
+
+LocalContexts.prototype.renderLocalContextsError = function(id) {
+  var error_msg = '<span class="local-contexts-error-msg bg-danger">Unable to Fetch Local Contexts Data for this project.</span>';
+  $('a#lc-project-id-' + id).after(error_msg);
 }
 
 LocalContexts.prototype.renderFullDataTemplate = function(data) {

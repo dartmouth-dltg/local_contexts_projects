@@ -25,6 +25,7 @@ en:
       section:
         search_embedded: Linked Records
 
+    display_string: Display String
     fetch_btn: See Local Contexts Data
     project_id: Project Id
     project_information: >
@@ -47,6 +48,7 @@ en:
 
   search:
     local_contexts_project:
+      display_string: Display String
       title: Local Contexts Project
     multi:
       local_contexts_project_u_sbool: Local Contexts Project

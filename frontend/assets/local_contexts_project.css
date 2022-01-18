@@ -7,6 +7,10 @@
   clear: both;
 }
 
+#local-contexts-data-holder > div:first-of-type {
+  margin-top: 0;
+}
+
 #local-contexts-data-holder p {
   display: table;
 }
@@ -27,6 +31,19 @@ span.local-context-placed-by {
 
 span.local-context-placed-by-label {
   font-weight: bold;
+}
+
+.lc-project-data-label,
+.lc-project-fetch-error {
+  margin-top: 3em;
+}
+
+.lc-json {
+  display: none;
+}
+
+.lc-json.shown {
+  display: block;
 }
 
 a.fetching::after {

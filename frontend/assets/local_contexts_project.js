@@ -40,7 +40,7 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
   })
   .done( function(data) {
     if (data !== null && data['unique_id'] == id) {
-      self.parseLocalContextData(data);
+      self.parseLocalContextData(data, id);
     }
     else {
       self.renderLocalContextsError(id);
@@ -170,7 +170,7 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
  *     ]
  * }
  */
-LocalContexts.prototype.parseLocalContextData = function(json) {
+LocalContexts.prototype.parseLocalContextData = function(json, id) {
   var self = this;
   var lcNestedKeys = ['bc_labels','tk_labels'];
   var lcFlatKeys = ['notice','institution_notice'];
@@ -194,7 +194,7 @@ LocalContexts.prototype.parseLocalContextData = function(json) {
     }
   });
 
-  this.renderLocalContextsData(new_json);
+  this.renderLocalContextsData(new_json, json, id);
 }
 
 /**
@@ -239,18 +239,19 @@ LocalContexts.prototype.placedBy = function (json) {
   return '';
 }
 
-LocalContexts.prototype.renderLocalContextsData = function(new_json) {
+LocalContexts.prototype.renderLocalContextsData = function(new_json, json, id) {
   var self = this;
 
-  var lc_data_html = "";
+  var lc_data_html = '<div class="lc-project-data-label">Project Id: <b>' + id + '</b><br /> Local Contexts Hub Project Name: <b>' + json.title + '</b></div>';
 
   $.each(new_json, function(k,v) {
     if (v[0]) {
-      lc_data_html += AS.renderTemplate("template_local_context_data", {label: v[0]});
+      lc_data_html += AS.renderTemplate("template_local_context_data", {label: v[0], id: id});
     }
   });
 
   this.lc_data_el.append(lc_data_html);
+  this.lc_data_el.append('<div><span class="btn btn-sm btn-default show-lc-json">Hide/Show JSON data</span></div><pre class="lc-json">' + JSON.stringify(json, undefined, 2) + '</pre>');
 
 }
 
@@ -261,3 +262,13 @@ LocalContexts.prototype.renderLocalContextsError = function(id) {
   var error_msg = AS.renderTemplate("template_local_context_error", {id: id});
   this.lc_data_el.append(error_msg);
 }
+
+$().ready( function() {
+  $('body').on('click', '.show-lc-json', function() {
+    var json_container = $(this).parent('div').siblings('pre');
+    if (json_container.hasClass('shown')) {
+      json_container.removeClass('shown');
+    }
+    else json_container.addClass("shown");
+  });
+});
