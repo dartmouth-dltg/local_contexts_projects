@@ -28,7 +28,7 @@ en:
     display_string: Display String
     fetch_btn: See Local Contexts Data
     project_id: Project Id
-    project_information:    
+    project_information:
       _singular: >
         This material is related to a Local Contexts project which may have associated various Biocultural Labels,
         Traditional Knowledge Labels, Notices, and Institution Notices with this material.
@@ -48,11 +48,17 @@ en:
   reports:
     local_contexts_projects_list_report:
       title: Local Contexts Projects List Report
-      description: List all resources, accession, archival objects and digital objects which have been linked to a Local Contexts Project.
+      description: List all resources, accession, archival objects, digital objects, and digital object components which have been linked to a Local Contexts Project.
 
   search:
     local_contexts_project:
       display_string: Display String
       title: Local Contexts Project
     multi:
-      local_contexts_project_u_sbool: Local Contexts Project
+      local_contexts_project_u_sbool: Has Local Contexts Project
+      local_contexts_project_uris_u_sstr: Local Contexts Project URI
+
+  search_results:
+    filter:
+      local_contexts_project_u_sbool: Has Local Contexts Project
+      local_contexts_project_uris_u_sstr: Local Contexts Project URI
