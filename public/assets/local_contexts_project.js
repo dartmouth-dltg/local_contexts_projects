@@ -258,7 +258,10 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
   $.each(new_json, function(k,v) {
     if (v[0]) {
       lc_data_html += self.renderFullDataTemplate(v[0]);
-      lc_data_html += self.renderTranslations(v[0]);
+
+      if (v[0].translations && v[0].translations.length > 0) {
+        lc_data_html += self.renderTranslations(v[0]);
+      }
 
       if (!self.img_urls.includes(v[0].img_url)) {
         self.img_urls.push(v[0].img_url);
@@ -276,13 +279,9 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
 
 LocalContexts.prototype.renderTranslations = function(data) {
 
-  console.log(data.translations);
   var self = this;
 
-  var translations_html  = '';
-  if (data.translations && data.translations.length > 0) {
-    translations_html += '<span class="local-context-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
-  }
+  var translations_html  = '<span class="local-context-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
 
   $.each(data.translations, function() {
     translations_html += self.translationsTemplate
