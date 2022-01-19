@@ -7,5 +7,6 @@ en:
     _plural: >
       This material is related to Local Contexts projects which may have associated various Biocultural Labels,
       Traditional Knowledge Labels, Notices, and Institution Notices with this material.
+    inherited: Project information inherited from the parent 
   local_contexts_section_title: Local Contexts Information
   local_contexts_more_html: For more information about implementing Institution Notices, contact Local Contexts at <a href="http://localcontexts.org">https://localcontexts.org</a> or <a href="mailto:support@localcontexts.org">support@localcontexts.org</a>

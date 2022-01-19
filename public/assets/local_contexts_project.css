@@ -39,6 +39,9 @@ span.local-context-placed-by {
 span.local-context-placed-by-label {
   font-weight: bold;
 }
+span.local-contexts-inherited {
+  display: block;
+}
 
 #local-contexts-img-wrapper {
   display: table;

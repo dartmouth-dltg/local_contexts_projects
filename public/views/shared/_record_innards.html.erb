@@ -62,8 +62,8 @@
 
   <!-- Local Contexts Project begin -->
   <% if AppConfig[:plugins].include?('local_contexts_project') %>
-    <% unless @result.json['local_contexts_projects'].blank? %>
-     <%= render partial: 'local_contexts_project/local_contexts_project', locals: {:local_contexts_projects =>  @result.json['local_contexts_projects']} %>
+    <% if !@result.json['local_contexts_projects'].blank? || !@result['inherited_local_contexts_projects_u_sstr'].blank? %>
+     <%= render partial: 'local_contexts_project/local_contexts_project', locals: {:local_contexts_projects =>  @result.json['local_contexts_projects'], :inherited_local_contexts_projects => @result['inherited_local_contexts_projects_u_sstr']} %>
     <% end %>
   <% end %>
   <!-- local_context end -->

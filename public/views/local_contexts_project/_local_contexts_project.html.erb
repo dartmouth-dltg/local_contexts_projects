@@ -1,6 +1,35 @@
 <%
   heading_size = 'h3' if heading_size.blank?
   project_ids = []
+  inherited_level = nil
+  inherited_parent_uri = nil
+
+  # we'll either have a local_contexts_projects array OR an inherited_local_contexts_projects array
+  # NEVER both
+
+  unless local_contexts_projects.blank?
+    local_contexts_projects.each do |lcp|
+      if lcp['_resolved'] && lcp['_resolved']['project_is_public']
+        project_id = lcp['_resolved']['project_id']
+        project_ids << project_id
+      end
+    end
+  end
+
+  unless inherited_local_contexts_projects.blank?
+    inherited_local_contexts_projects.each do |ilcp|
+      parsed_ilcp = ASUtils.json_parse(ilcp)
+      inherited_level = parsed_ilcp['level']
+      inherited_parent_uri = parsed_ilcp['parent_uri']
+      parsed_ilcp['local_contexts_projects'].each do |lcp|
+        if lcp['project_is_public']
+          project_id = lcp['project_id']
+          project_ids << project_id
+        end
+      end
+    end
+  end
+
 %>
 <div class="row">
   <div class="col-sm-12 local-contexts-section">
@@ -13,18 +42,15 @@
           <%= I18n.t("local_contexts_project_information._singular") %>
         <% end %>
       </p>
-      <% local_contexts_projects.each do |lcp| %>
-        <% if lcp['_resolved'] && lcp['_resolved']['project_is_public'] %>
-          <%
-            project_id = lcp['_resolved']['project_id']
-            project_ids << project_id
-          %>
-          <p>
-            <a id="lc-project-id-<%= project_id %>" href="<%= AppConfig[:local_contexts_base_url] %>projects/project/<%= project_id %>"><%= I18n.t("local_contexts_project_link_text") %> (ID: <%= project_id %>)</a>
-          </p>
-          <div class="local-contexts-live-data" id="lc-project-live-data-<%= project_id %>" aria-live="polite">
-          </div>
-        <% end %>
+      <% project_ids.each do |pid| %>
+        <p>
+          <a id="lc-project-id-<%= pid %>" href="<%= AppConfig[:local_contexts_base_url] %>projects/project/<%= pid %>"><%= I18n.t("local_contexts_project_link_text") %> (ID: <%= pid %>)</a>
+          <% if inherited_level %>
+            <span class="local-contexts-inherited"><%= I18n.t("local_contexts_project_information.inherited") %> <a href="<%= inherited_parent_uri %>"><%= inherited_level %></a>.</span>
+          <% end %>
+        </p>
+        <div class="local-contexts-live-data" id="lc-project-live-data-<%= pid %>" aria-live="polite">
+        </div>
       <% end %>
     </div>
 
