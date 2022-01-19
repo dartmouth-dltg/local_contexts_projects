@@ -53,10 +53,7 @@ class ArchivesSpaceService < Sinatra::Base
     .permissions([])
     .returns([200, "(:local_contexts_project)"]) \
   do
-      logger=Logger.new($stderr)
-      logger.debug("BACKEND_HERE: #{params}")
     json = LocalContextsProject.to_jsonmodel(params[:id])
-logger.debug("BACKEND_JSON: #{json}")
     json_response(resolve_references(json, params[:resolve]))
   end
 
