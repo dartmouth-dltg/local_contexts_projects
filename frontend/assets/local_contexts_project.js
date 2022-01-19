@@ -251,7 +251,7 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, json, id) {
   });
 
   this.lc_data_el.append(lc_data_html);
-  this.lc_data_el.append('<div><span class="btn btn-sm btn-default show-lc-json">Hide/Show JSON data</span></div><pre class="lc-json">' + JSON.stringify(json, undefined, 2) + '</pre>');
+  this.lc_data_el.append('<div><span class="btn btn-sm btn-primary show-lc-json">Hide/Show JSON data for this project</span></div><pre class="lc-json">' + JSON.stringify(json, undefined, 2) + '</pre>');
 
 }
 
@@ -264,11 +264,23 @@ LocalContexts.prototype.renderLocalContextsError = function(id) {
 }
 
 $().ready( function() {
+  // toggle json
   $('body').on('click', '.show-lc-json', function() {
     var json_container = $(this).parent('div').siblings('pre');
     if (json_container.hasClass('shown')) {
       json_container.removeClass('shown');
     }
     else json_container.addClass("shown");
+  });
+
+  // toggle translations
+  $('body').on('click', '.local-context-translation-toggle', function() {
+    var translation_container = $(this).siblings('.local-context-translation-wrapper');
+
+    if (translation_container.hasClass('shown')) {
+      translation_container.removeClass('shown');
+    }
+
+    else translation_container.addClass("shown");
   });
 });

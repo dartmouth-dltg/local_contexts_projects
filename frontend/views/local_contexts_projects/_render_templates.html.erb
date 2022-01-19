@@ -6,8 +6,24 @@
       <span class="local-context-description">
         ${label.default_text}
         <span class="local-context-placed-by">
-          <span class="local-context-placed-by-label">Placed by:</span> ${label.community}
+          <span class="local-context-placed-by-label"><%= I18n.t("local_contexts_project.placed_by_txt") %></span> ${label.community}
         </span>
+        {if label.translations && label.translations.length > 0}
+          <span class="local-context-translation-toggle btn btn-xs btn-default"><%= I18n.t("local_contexts_project.translations_toggle") %></span>
+          {for translation in label.translations}
+            <span class="local-context-translation-wrapper well">
+              {if translation.language.length > 0}
+                <span class="local-context-translation-title">${translation.title}</span>
+              {/if}
+              {if translation.language.length > 0}
+                <span class="local-context-translation-language">(${translation.language})</span>
+              {/if }
+              {if translation.translation.length > 0}
+                <span class="local-context-translation-translation">${translation.translation}</span>
+              {/if}
+            <span>
+          {/for}
+        {/if}
       </span>
     </p>
   </div>
@@ -15,9 +31,9 @@
 
 <div id="template_local_context_error"><!--
   <div class="lc-project-fetch-error">
-    <h4>Problem Fetching Data</h4>
+    <h4><%= I18n.t("local_contexts_project.fetch_error.title") %></h4>
     <p>
-      An error occurred while fetching the data from the Local Contexts Hub for project id: <b>${id}</b>. Try again or consult the logs.
+      <%= I18n.t("local_contexts_project.fetch_error.message") %>: <b>${id})</b>. <%= I18n.t("local_contexts_project.fetch_error.message_append") %>
     </p>
   </div>
 --></div>

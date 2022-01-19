@@ -19,6 +19,12 @@ function LocalContexts(project_ids) {
                           '</p>' +
                           '</div>';
 
+  this.translationsTemplate = '<span class="local-context-translation-wrapper well">' +
+                              '<span class="local-context-translation-title">${translation_title}</span>' +
+                              '<span class="local-context-translation-language">(${translation_language})</span>' +
+                              '<span class="local-context-translation-translation">${translation_translation}</span>'  +
+                              '</span>';
+
   ids = JSON.parse(project_ids);
   if (ids.length > 0) {
      this.fetchLocalContextData(ids);
@@ -252,6 +258,8 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
   $.each(new_json, function(k,v) {
     if (v[0]) {
       lc_data_html += self.renderFullDataTemplate(v[0]);
+      lc_data_html += self.renderTranslations(v[0]);
+
       if (!self.img_urls.includes(v[0].img_url)) {
         self.img_urls.push(v[0].img_url);
         lc_img_html += self.renderImageDataTemplate(v[0]);
@@ -266,8 +274,24 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
   $('[data-toggle="tooltip"]').tooltip();
 }
 
-LocalContexts.prototype.renderImageWrapper = function() {
+LocalContexts.prototype.renderTranslations = function(data) {
 
+  console.log(data.translations);
+  var self = this;
+
+  var translations_html  = '';
+  if (data.translations && data.translations.length > 0) {
+    translations_html += '<span class="local-context-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
+  }
+
+  $.each(data.translations, function() {
+    translations_html += self.translationsTemplate
+                             .replace('${translation_title}', this.title + '&nbsp;')
+                             .replace('${translation_language}', this.language)
+                             .replace('${translation_translation}', this.translation);
+  });
+
+  return translations_html;
 }
 
 LocalContexts.prototype.renderLocalContextsError = function(id) {
@@ -294,5 +318,15 @@ $().ready(function() {
   $('body').on('click', '#local-contexts-img-wrapper img', function() {
     offsetTop = $('.local-contexts-section').offset().top;
     window.scrollTo({top: offsetTop, behavior: 'smooth'})
+  });
+
+  $('body').on('click', '.local-context-translation-toggle', function() {
+    var translation_container = $(this).siblings('.local-context-translation-wrapper');
+
+    if (translation_container.hasClass('shown')) {
+      translation_container.removeClass('shown');
+    }
+
+    else translation_container.addClass("shown");
   });
 });

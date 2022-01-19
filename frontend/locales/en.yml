@@ -27,6 +27,7 @@ en:
 
     display_string: Display String
     fetch_btn: See Local Contexts Data
+    placed_by_txt: Placed By
     project_id: Project Id
     project_information:
       _singular: >
@@ -40,6 +41,14 @@ en:
     project_name: Project Name
     related_project_tooltip: Select a Local Contexts project.
     section_title: Local Contexts Information
+    translations_toggle: Hide/Show Translations for this label
+    fetch_error:
+      title: Problem Fetching Data
+      message: An error occurred while fetching the data from the Local Contexts Hub for project id
+      message_append: Try again or consult the logs.
+
+  permission_types:
+    manage_local_contexts_project_record: create/modify/delete local contexts records
 
   advanced_search:
     text:
@@ -62,3 +71,7 @@ en:
     filter:
       local_contexts_project_u_sbool: Has Local Contexts Project
       local_contexts_project_uris_u_sstr: Local Contexts Project URI
+    filter_terms:
+      local_contexts_project_u_sbool:
+        "true": "Yes"
+        "false": "No"

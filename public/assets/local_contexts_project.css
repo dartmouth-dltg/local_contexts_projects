@@ -1,3 +1,4 @@
+/* errors */
 .local-contexts-error-msg {
   margin-left: 0.5em;
   padding: 0.25em;
@@ -9,6 +10,7 @@
   font-family: "FontAwesome";
 }
 
+/* data */
 .local-contexts-live-data {
   margin: -10px 2em 2em 2em;
 }
@@ -58,15 +60,25 @@ img.local-contexts-header-image {
   margin-right: 0.25em;
 }
 
-a.fetching::after {
-  display: inline-block;
-  content: "\e031";
-  font-family: "Glyphicons Halflings";
-  margin-left: 0.5em;
-  animation: spin 1s infinite linear;
+/* translations */
+.local-context-translation-wrapper {
+  display: none;
+  margin-top: 0.5em;
 }
 
-@keyframes spin {
-  from { transform: scale(1) rotate(0deg); }
-  to { transform: scale(1) rotate(360deg); }
+.local-context-translation-wrapper.shown {
+  display: block;
+}
+
+.local-context-translation-title {
+  font-weight: bold
+}
+
+.local-context-translation-translation {
+  display: block;
+  margin-bottom: 1em;
+}
+
+.local-context-translation-translation:last-of-type {
+  margin-bottom: 0;
 }
