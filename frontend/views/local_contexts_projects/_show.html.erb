@@ -8,14 +8,13 @@
           <div class="subrecord-form-fields">
             <div class="row">
               <div class="col-md-4 token-list">
-                <!-- we use the icon_class prefixed to identify the project id -->
-              <% local_contexts_projects.each do | local_contexts_project | %>
-                <%= render_token :object => local_contexts_project,
-                :label => local_contexts_project["_resolved"]["display_string"],
-                :type => local_contexts_project["_resolved"]["jsonmodel_type"],
-                :uri => local_contexts_project["_resolved"]["uri"],
-                :icon_class => "local-contexts-project-id-" + local_contexts_project["_resolved"]["project_id"]%>
-              <% end %>
+                <% local_contexts_projects.each do | local_contexts_project | %>
+                  <%= render_token :object => local_contexts_project,
+                  :label => local_contexts_project["_resolved"]["display_string"],
+                  :type => local_contexts_project["_resolved"]["jsonmodel_type"],
+                  :uri => local_contexts_project["_resolved"]["uri"],
+                  :icon_class => "local-contexts-project-id-" + local_contexts_project["_resolved"]["project_id"]%>
+                <% end %>
               </div>
             </div>
           </div>

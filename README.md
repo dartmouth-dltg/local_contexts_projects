@@ -80,9 +80,8 @@ This new record contains three fields.
 ```
   Project ID - the id of the project from the Local Contexts Hub (required)
   Project Name - a user supplied name for easy linking (required)
-  Hub Project Public? - a boolean which indicates whether the Local Contexts Hub project has a public facing view
+  Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
 ```
-
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 
 To link a project to an object, this plugin adds a new subrecord to resources, accessions, archival objects, digital objects, and digital object components: Local Contexts Projects.
@@ -104,6 +103,11 @@ which includes a link to the public facing description of the project if the
 `Hub Project Public` field is checked for that project.
 
 See the `samples` directory in the plugin for sample exports and screenshots.
+
+## Notes
+The Local Contexts API does not support authentication at this time so LC Hub data for private projects
+cannot be displayed in ArchivesSpace. Should the LC API support authentication, the proposed
+plan is to authenticate and display the private project data only in the ArchivesSpace staff view.
 
 ## Reports
 The plugin adds an additional report: Local Contexts List. The report generates a list of all

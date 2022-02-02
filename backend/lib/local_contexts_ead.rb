@@ -229,7 +229,7 @@ class EADSerializer < ASpaceExport::Serializer
             end
             if lcp['_resolved'] && lcp['_resolved']['project_is_public'] && lcp['_resolved']['project_id']
               project_id = lcp['_resolved']['project_id']
-              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects/project', project_id)
+              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
                 xml.p {
                   xml.extref ({"xlink:href" => project_url,
                             "xlink:actuate" => "onLoad",
@@ -473,7 +473,7 @@ class EAD3Serializer < EADSerializer
             end
             if lcp['_resolved'] && lcp['_resolved']['project_id']
               project_id = lcp['_resolved']['project_id']
-              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects/project', project_id)
+              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
                 xml.p {
                   xml.extref ({"xlink:href" => project_url,
                             "xlink:actuate" => "onLoad",
