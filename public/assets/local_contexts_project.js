@@ -5,8 +5,10 @@ function LocalContexts(project_ids) {
   this.lc_img_el = $('#main-content h1');
   this.img_urls = Array();
   this.img_html = "";
+  this.mainLanguage = typeof($('html').attr('lang')) !== 'undefined' ? $('html').attr('lang') : '';
 
-  this.fullDataTemplate = '<div>' +
+
+  this.fullDataTemplate = '<div {$label_language_tag}>' +
                           '<h4>${label_name}</h4>' +
                           '<p>' +
                           '<img class="local-context-image" src="${label_img_url}" />' +
@@ -72,6 +74,7 @@ LocalContexts.prototype.fetchLocalContextData = function(ids) {
  *
  * Labels have the following keys
  * name (string),
+ * langauge_tag (string),
  * default_text (string),
  * image_url (string),
  * translations (array) - TODO: investigate array structure and render options,
@@ -81,6 +84,7 @@ LocalContexts.prototype.fetchLocalContextData = function(ids) {
  *
  * Notice
  * bc_img_url (string),
+ * bc_language_tag (string),
  * bc_default_text (string),
  * tk_img_url (string),
  * tk_default_text (string)
@@ -257,10 +261,11 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
 
   $.each(new_json, function(k,v) {
     if (v[0]) {
-      lc_data_html += self.renderFullDataTemplate(v[0]);
+      var labelLanguage = v[0].language_tag;
+      lc_data_html += self.renderFullDataTemplate(v[0], labelLanguage);
 
       if (v[0].translations && v[0].translations.length > 0) {
-        lc_data_html += self.renderTranslations(v[0]);
+        lc_data_html += self.renderTranslations(v[0], labelLanguage);
       }
 
       if (!self.img_urls.includes(v[0].img_url)) {
@@ -277,17 +282,17 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
   $('[data-toggle="tooltip"]').tooltip();
 }
 
-LocalContexts.prototype.renderTranslations = function(data) {
+LocalContexts.prototype.renderTranslations = function(data, labelLanguage) {
 
   var self = this;
-  var mainLanguage = $('html').attr('lang');
   var translations_html  = '<span class="local-context-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
 
   $.each(data.translations, function() {
     var translationLanguageTag = '';
 
-    if (this.language_tag != mainLanguage && this.language_tag != '') {
-       translationLanguageTag = 'lang="' + this.language_tag + '"';
+    // check enclosing label language and then main language
+    if (this.language_tag != '' && this.language_tag != labelLanguage) {
+      translationLanguageTag = 'lang="' + this.language_tag + '"'
     }
     translations_html += self.translationsTemplate
                              .replace('${translation_language_tag}', translationLanguageTag)
@@ -304,8 +309,14 @@ LocalContexts.prototype.renderLocalContextsError = function(id) {
   $('a#lc-project-id-' + id).after(error_msg);
 }
 
-LocalContexts.prototype.renderFullDataTemplate = function(data) {
+LocalContexts.prototype.renderFullDataTemplate = function(data, labelLanguage) {
+  var labelLanguageTag = '';
+
+  if (labelLanguage != this.mainLanguage && labelLanguage != '') {
+     labelLanguageTag = 'lang="' + data.language_tag + '"';
+  }
   var data_html = this.fullDataTemplate
+                      .replace('${label_language_tag}', labelLanguageTag)
                       .replace('${label_name}', data.name)
                       .replace('${label_default_text}',data.default_text)
                       .replace('${label_img_url}', data.img_url)
