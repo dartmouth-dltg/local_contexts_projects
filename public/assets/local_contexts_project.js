@@ -280,13 +280,17 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id) {
 LocalContexts.prototype.renderTranslations = function(data) {
 
   var self = this;
-
+  var mainLanguage = $('html').attr('lang');
   var translations_html  = '<span class="local-context-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
 
   $.each(data.translations, function() {
-    var languageTag = this.language_tag != '' ? 'lang="' + this.language_tag + '"' : '';
+    var translationLanguageTag = '';
+
+    if (this.language_tag != mainLanguage && this.language_tag != '') {
+       translationLanguageTag = 'lang="' + this.language_tag + '"';
+    }
     translations_html += self.translationsTemplate
-                             .replace('${translation_language_tag}', languageTag)
+                             .replace('${translation_language_tag}', translationLanguageTag)
                              .replace('${translation_title}', this.title + '&nbsp;')
                              .replace('${translation_language}', this.language)
                              .replace('${translation_translation}', this.translation);
