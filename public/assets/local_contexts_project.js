@@ -19,7 +19,7 @@ function LocalContexts(project_ids) {
                           '</p>' +
                           '</div>';
 
-  this.translationsTemplate = '<span class="local-context-translation-wrapper well">' +
+  this.translationsTemplate = '<span class="local-context-translation-wrapper well" {$translation_language_tag}>' +
                               '<span class="local-context-translation-title">${translation_title}</span>' +
                               '<span class="local-context-translation-language">(${translation_language})</span>' +
                               '<span class="local-context-translation-translation">${translation_translation}</span>'  +
@@ -284,7 +284,9 @@ LocalContexts.prototype.renderTranslations = function(data) {
   var translations_html  = '<span class="local-context-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
 
   $.each(data.translations, function() {
+    var languageTag = this.language_tag != '' ? 'lang="' + this.language_tag + '"' : '';
     translations_html += self.translationsTemplate
+                             .replace('${translation_language_tag}', languageTag)
                              .replace('${translation_title}', this.title + '&nbsp;')
                              .replace('${translation_language}', this.language)
                              .replace('${translation_translation}', this.translation);
