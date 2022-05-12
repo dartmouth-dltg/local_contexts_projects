@@ -8,7 +8,7 @@ function LocalContexts(project_ids) {
   this.mainLanguage = typeof($('html').attr('lang')) !== 'undefined' ? $('html').attr('lang') : '';
 
 
-  this.fullDataTemplate = '<div {$label_language_tag}>' +
+  this.fullDataTemplate = '<div ${label_language_tag}>' +
                           '<h4>${label_name}</h4>' +
                           '<p>' +
                           '<img class="local-context-image" src="${label_img_url}" />' +
@@ -21,7 +21,7 @@ function LocalContexts(project_ids) {
                           '</p>' +
                           '</div>';
 
-  this.translationsTemplate = '<span class="local-context-translation-wrapper well" {$translation_language_tag}>' +
+  this.translationsTemplate = '<span class="local-context-translation-wrapper well" ${translation_language_tag}>' +
                               '<span class="local-context-translation-title">${translation_title}</span>' +
                               '<span class="local-context-translation-language">(${translation_language})</span>' +
                               '<span class="local-context-translation-translation">${translation_translation}</span>'  +

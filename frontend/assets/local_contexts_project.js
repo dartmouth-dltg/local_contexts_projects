@@ -2,6 +2,7 @@
 function LocalContexts(type = "multi") {
   this.lc_data_el = $('#local-contexts-data-holder');
   this.fetch_type = type;
+  this.mainLanguage = typeof($('html').attr('lang')) !== 'undefined' ? $('html').attr('lang') : '';
 	this.setupLocalContextsAction();
 }
 
@@ -68,6 +69,7 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
  *
  * Labels have the following keys
  * name (string),
+ * language_tag (string),
  * default_text (string),
  * image_url (string),
  * translations (array) - TODO: investigate array structure and render options,
@@ -241,12 +243,11 @@ LocalContexts.prototype.placedBy = function (json) {
 
 LocalContexts.prototype.renderLocalContextsData = function(new_json, json, id) {
   var self = this;
-
   var lc_data_html = '<div class="lc-project-data-label">Project Id: <b>' + id + '</b><br /> Local Contexts Hub Project Name: <b>' + json.title + '</b></div>';
 
   $.each(new_json, function(k,v) {
     if (v[0]) {
-      lc_data_html += AS.renderTemplate("template_local_context_data", {label: v[0], id: id});
+      lc_data_html += AS.renderTemplate("template_local_context_data", {label: v[0], id: id, main_language: this.main_language});
     }
   });
 

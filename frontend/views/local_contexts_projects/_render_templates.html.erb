@@ -1,5 +1,9 @@
 <div id="template_local_context_data"><!--
-  <div class="lc-project-data-container">
+  {if label.language_tag != '' && label.language_tag != main_language}
+    <div class="lc-project-data-container" lang="${label.language_tag}">
+  {else}
+    <div class="lc-project-data-container">
+  {/if}
     <h4>${label.name}</h4>
     <p>
       <img class="local-context-image" src="${label.img_url}" />
@@ -11,8 +15,12 @@
         {if label.translations && label.translations.length > 0}
           <span class="local-context-translation-toggle btn btn-xs btn-default"><%= I18n.t("local_contexts_project.translations_toggle") %></span>
           {for translation in label.translations}
-            <span class="local-context-translation-wrapper well">
-              {if translation.language.length > 0}
+            {if translation.language_tag != '' && translation.language_tag != label.language_tag}
+              <span class="local-context-translation-wrapper well" lang="${translation.language_tag}">
+            {else}
+              <span class="local-context-translation-wrapper well">
+            {/if}
+              {if translation.title.length > 0}
                 <span class="local-context-translation-title">${translation.title}</span>
               {/if}
               {if translation.language.length > 0}
