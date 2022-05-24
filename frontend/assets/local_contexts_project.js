@@ -1,5 +1,6 @@
 /* local_context/frontend/assets/local_context.js */
 function LocalContexts(type = "multi") {
+  this.frontendPrefix = LOCALCONTEXTS_FRONTEND_PREFIX;
   this.lc_data_el = $('#local-contexts-data-holder');
   this.fetch_type = type;
   this.mainLanguage = typeof($('html').attr('lang')) !== 'undefined' ? $('html').attr('lang') : '';
@@ -33,7 +34,7 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
   var self = this;
 
   $.ajax({
-    url: "/plugins/local_contexts_projects/fetch_lc_project_data",
+    url: self.frontendPrefix + "plugins/local_contexts_projects/fetch_lc_project_data",
     data: {
       project_id: id
     },

@@ -1,5 +1,6 @@
 /* local_context/public/assets/local_context.js */
 function LocalContexts(project_ids) {
+  this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX;
   this.lc_data_el_prefix = "lc-project-live-data-";
   $('[id^=' + this.lc_data_el_prefix + ']').html('');
   this.lc_img_el = $('#main-content h1');
@@ -39,7 +40,7 @@ LocalContexts.prototype.fetchLocalContextData = function(ids) {
   $.each(ids, function() {
     var current_id = this;
     $.ajax({
-      url: APP_PATH + "local_contexts_projects/fetch/fetch_lc_project_data",
+      url: self.publicPrefix + "local_contexts_projects/fetch/fetch_lc_project_data",
       data: {
         id: current_id,
         type: 'project'
