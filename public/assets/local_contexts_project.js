@@ -12,24 +12,30 @@ function LocalContexts(project_ids) {
   this.fullDataTemplate = '<div ${label_language_tag}>' +
                           '<h4>${label_name}</h4>' +
                           '<p>' +
-                          '<img class="local-context-image" src="${label_img_url}" />' +
-                          '<span class="local-context-description">' +
+                          '<img class="local-contexts-image" src="${label_img_url}" alt="${label_img_alt}" />' +
+                          '<span class="local-contexts-description">' +
+                          '${label_audio}' +
                           '${label_default_text}' +
                           '${label_placed_by}' +
+                          '${label_translations}' +
                           '</span>' +
                           '</p>' +
                           '</div>';
 
-  this.translationsTemplate = '<span class="local-context-translation-wrapper well" ${translation_language_tag}>' +
-                              '<span class="local-context-translation-title">${translation_title}</span>' +
-                              '<span class="local-context-translation-language">(${translation_language})</span>' +
-                              '<span class="local-context-translation-translation">${translation_translation}</span>'  +
+  this.translationsTemplate = '<span class="local-contexts-translation-wrapper well" ${translation_language_tag}>' +
+                              '<span class="local-contexts-translation-title">${translation_title}</span>' +
+                              '${translation_language}' +
+                              '<span class="local-contexts-translation-translation">${translation_translation}</span>'  +
                               '</span>';
 
-  this.placedByTemplate = '<span class="local-context-placed-by">' +
-                          '<span class="local-context-placed-by-label">Placed by:</span> ${label_community}' +
+  this.placedByTemplate = '<span class="local-contexts-placed-by">' +
+                          '<span class="local-contexts-placed-by-label">Placed by:</span> ${label_community}' +
                           '</span>';
 
+  this.audioTemplate = '<span class="local-contexts-audio">' +
+                        '<audio controls><src="${audioSrc}" />' +
+                        'Your browser does not support HTML5 audio. Here is a <a href="${audioSrc}">link to the audio</a> instead.' +
+                        '</audio></span>';
 
   ids = JSON.parse(project_ids);
   if (ids.length > 0) {
@@ -95,15 +101,19 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id, project
 
   $.each(new_json, function(k,v) {
     $.each(v, function(idx, label) {
+      var translations = '';
       if (typeof(label.default_text) !== 'undefined' && k == 'notice') {
         label['label_text'] = label.default_text;
       }
-      var labelLanguage = label.language_tag;
-      lc_data_html += self.renderFullDataTemplate(label, labelLanguage);
 
       if (label.translations && label.translations.length > 0) {
-        lc_data_html += self.renderTranslations(label, labelLanguage);
+        translations = self.renderTranslations(label, labelLanguage);
       }
+
+      var labelLanguage = label.language_tag;
+
+      lc_data_html += self.renderFullDataTemplate(label, labelLanguage, translations);
+
 
       if (!self.img_urls.includes(label.img_url)) {
         self.img_urls.push(label.img_url);
@@ -122,19 +132,23 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id, project
 LocalContexts.prototype.renderTranslations = function(data, labelLanguage) {
 
   var self = this;
-  var translations_html  = '<span class="local-context-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
+  var translations_html  = '<span class="local-contexts-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
 
   $.each(data.translations, function() {
     var translationLanguageTag = '';
-
+    var language = '';
     // check enclosing label language and then main language
     if (this.language_tag != '' && this.language_tag != labelLanguage) {
       translationLanguageTag = 'lang="' + this.language_tag + '"'
     }
+    
+    if (this.language != '') {
+      language = self.renderTranslationLanguage(this.language);
+    }
     translations_html += self.translationsTemplate
                              .replace('${translation_language_tag}', translationLanguageTag)
                              .replace('${translation_title}', this.translated_name + '&nbsp;')
-                             .replace('${translation_language}', this.language)
+                             .replace('${translation_language}', language)
                              .replace('${translation_translation}', this.translated_text);
   });
 
@@ -146,9 +160,10 @@ LocalContexts.prototype.renderLocalContextsError = function(id) {
   $('a#lc-project-id-' + id).after(error_msg);
 }
 
-LocalContexts.prototype.renderFullDataTemplate = function(data, labelLanguage) {
+LocalContexts.prototype.renderFullDataTemplate = function(data, labelLanguage, translations) {
   var labelLanguageTag = '';
   var placedBy = '';
+  var audio = '';
 
   if (labelLanguage != this.mainLanguage && labelLanguage != '') {
      labelLanguageTag = 'lang="' + data.language_tag + '"';
@@ -158,22 +173,30 @@ LocalContexts.prototype.renderFullDataTemplate = function(data, labelLanguage) {
     placedBy = this.placedByTemplate.replace('${label_community}', data.community);
   }
 
-  console.log(placedBy)
-
-
+  if (typeof(data.audiofile) != 'undefined' && data.audiofile != null) {
+    audio = this.audioTemplate.replace(/\${audioSrc}/gi, data.audiofile);
+  }
+console.log(audio)
   var data_html = this.fullDataTemplate
                       .replace('${label_language_tag}', labelLanguageTag)
                       .replace('${label_placed_by}', placedBy)
+                      .replace('${label_audio}', audio)
                       .replace('${label_name}', data.name)
                       .replace('${label_default_text}',data.label_text)
                       .replace('${label_img_url}', data.img_url)
-                      .replace('${label_community}', data.community);
+                      .replace('${label_img_alt}', data.name)
+                      .replace('${label_community}', data.community)
+                      .replace('${label_translations}', translations);
 
   return data_html;
 }
 
 LocalContexts.prototype.renderImageDataTemplate = function(data) {
-  return '<img src="' + data.img_url + '" alt="' + data.name + '" class="local-contexts-header-image" />';
+  return '<img src="' + data.img_url + '" alt="' + data.name + '" title="Local Contexts Label: ' + data.name + '" class="local-contexts-header-image" />';
+}
+
+LocalContexts.prototype.renderTranslationLanguage = function(language) {
+  return '<span class="local-contexts-translation-language">(' + language + '</span>';
 }
 
 function OpenToCollaborate(about_lc_text) {
@@ -196,8 +219,8 @@ function OpenToCollaborate(about_lc_text) {
 OpenToCollaborate.prototype.parse_open_to_collaborate = function(json, about_lc_text) {
   var otcHtml = '<h3>' + json.name + '</h3>' +
                 '<div><p>' +
-                '<img class="local-context-image" src="' + json.img_url + '" />' +
-                '<span class="local-context-description">' +
+                '<img class="local-contexts-image" src="' + json.img_url + '" />' +
+                '<span class="local-contexts-description">' +
                 json.default_text + 
                 '<br /><br />' +
                 about_lc_text + 
@@ -214,8 +237,8 @@ $().ready(function() {
     window.scrollTo({top: offsetTop, behavior: 'smooth'})
   });
 
-  $('body').on('click', '.local-context-translation-toggle', function() {
-    var translation_container = $(this).siblings('.local-context-translation-wrapper');
+  $('body').on('click', '.local-contexts-translation-toggle', function() {
+    var translation_container = $(this).siblings('.local-contexts-translation-wrapper');
 
     if (translation_container.hasClass('shown')) {
       translation_container.removeClass('shown');

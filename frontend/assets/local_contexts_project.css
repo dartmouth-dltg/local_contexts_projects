@@ -16,48 +16,48 @@
   display: table;
 }
 
-img.local-context-image {
+img.local-contexts-image {
   display: table-cell;
   max-width: 5em;
   margin: 0 1em 1em 0;
 }
 
-span.local-context-description {
+span.local-contexts-description {
   display: table-cell;
   vertical-align: top;
 }
-span.local-context-placed-by {
+span.local-contexts-placed-by {
   display: block;
 }
 
-span.local-context-placed-by-label {
+span.local-contexts-placed-by-label {
   font-weight: bold;
 }
 
-span.local-context-placed-by-label::after {
+span.local-contexts-placed-by-label::after {
   content: ":";
 }
 
 /* translations */
-.local-context-translation-wrapper {
+.local-contexts-translation-wrapper {
   display: none;
   margin-top: 0.5em;
 }
 
-.local-context-translation-wrapper.shown {
+.local-contexts-translation-wrapper.shown {
   display: block;
 }
 
-.local-context-translation-title {
+.local-contexts-translation-title {
   font-weight: bold
 }
 
-.local-context-translation-translation {
+.local-contexts-translation-translation {
   display: block;
   margin-bottom: 1em;
 }
 
-.local-context-translation-translation:last-of-type {
+.local-contexts-translation-translation:last-of-type {
   margin-bottom: 0;
 }
 

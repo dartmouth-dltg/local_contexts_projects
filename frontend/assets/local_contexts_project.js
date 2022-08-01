@@ -210,8 +210,8 @@ $().ready( function() {
   });
 
   // toggle translations
-  $('body').on('click', '.local-context-translation-toggle', function() {
-    var translation_container = $(this).siblings('.local-context-translation-wrapper');
+  $('body').on('click', '.local-contexts-translation-toggle', function() {
+    var translation_container = $(this).siblings('.local-contexts-translation-wrapper');
 
     if (translation_container.hasClass('shown')) {
       translation_container.removeClass('shown');
