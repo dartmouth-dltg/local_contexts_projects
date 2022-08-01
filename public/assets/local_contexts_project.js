@@ -160,6 +160,37 @@ LocalContexts.prototype.renderImageDataTemplate = function(data) {
   return '<img src="' + data.img_url + '" alt="' + data.name + '" class="local-contexts-header-image" />';
 }
 
+function OpenToCollaborate(about_lc_text) {
+  var self = this
+  this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX
+  $.ajax({
+    url: this.publicPrefix + "local_contexts_projects/fetch/fetch_lc_project_data",
+    data: {
+      id: 'no_id',
+      type: 'open_to_collaborate'
+    },
+    dataType: 'json'
+  })
+  .done( function(data) {
+    var otc = self.parse_open_to_collaborate(data, about_lc_text)
+    $('#open-to-collaborate').html(otc);
+  })
+}
+
+OpenToCollaborate.prototype.parse_open_to_collaborate = function(json, about_lc_text) {
+  var otcHtml = '<h3>' + json.name + '</h3>' +
+                '<div><p>' +
+                '<img class="local-context-image" src="' + json.img_url + '" />' +
+                '<span class="local-context-description">' +
+                json.default_text + 
+                '<br /><br />' +
+                about_lc_text + 
+                '</span>' +
+                '</p></div>';
+
+  return otcHtml;
+}
+
 
 $().ready(function() {
   $('body').on('click', '#local-contexts-img-wrapper img', function() {

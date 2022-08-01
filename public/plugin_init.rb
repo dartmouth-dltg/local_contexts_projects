@@ -4,6 +4,7 @@ Rails.application.config.after_initialize do
 
   unless AppConfig.has_key?(:local_contexts_base_url)
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org"
+    AppConfig[:local_contexts_open_to_collab_url] = AppConfig[:local_contexts_base_url] + 'notice'
   end
 
   # only add faceting if configured
@@ -18,7 +19,7 @@ Rails.application.config.after_initialize do
   end
 
   class ArchivesSpaceClient
-    def get_data_from_api(id, type)
+    def get_data_from_local_contexts_api(id, type)
       uri = "/local_contexts_projects/get_local_contexts_api_data"
       params = {:id => id, :type => type}
       url = build_url(uri, params)

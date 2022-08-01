@@ -15,12 +15,14 @@
   margin: -10px 2em 2em 2em;
 }
 
-.local-contexts-live-data > div {
+.local-contexts-live-data > div,
+#open-to-collaborate > div {
   display: table;
   clear: both;
 }
 
-.local-contexts-live-data p {
+.local-contexts-live-data p,
+#open-to-collaborate p {
   display: table;
 }
 
@@ -32,6 +34,7 @@ img.local-context-image {
 
 span.local-context-description {
   display: table-cell;
+  max-width: 970px;
   vertical-align: top;
 }
 span.local-context-placed-by {

@@ -9,7 +9,7 @@ class ArchivesSpaceService < Sinatra::Base
   .returns([200, "json from the local contexts api"]) \
   do
     client = LocalContextsClient.new
-    api_response = client.get_data_from_api(params[:id], params[:type])
+    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type])
     json_response(api_response)
   end
 

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ead xmlns="urn:isbn:1-931666-22-9" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="urn:isbn:1-931666-22-9 http://www.loc.gov/ead/ead.xsd">
+  <eadheader countryencoding="iso3166-1" dateencoding="iso8601" langencoding="iso639-2b"
+    repositoryencoding="iso15511">
+    <eadid/>
+    <filedesc>
+      <titlestmt>
+        <titleproper>Test Resource<num>T-1</num></titleproper>
+      </titlestmt>
+      <publicationstmt>
+        <publisher>Test Me Repo</publisher>
+        <p id="logostmt"><extref xlink:actuate="onLoad"
+            xlink:href="http://www.dartmouth.edu/library/rauner/image.jpg" xlink:show="embed"
+            xlink:type="simple"/></p>
+      </publicationstmt>
+    </filedesc>
+    <profiledesc>
+      <creation>This finding aid was produced using ArchivesSpace on <date>2022-08-01 11:08:17
+          -0400</date>.</creation>
+      <langusage>Description is written in: <language langcode="eng" scriptcode="Latn">English,
+          Latin script</language>.</langusage>
+    </profiledesc>
+  </eadheader>
+  <archdesc level="collection">
+    <did>
+      <repository>
+        <corpname>Test Me Repo</corpname>
+      </repository>
+      <unittitle>Test Resource</unittitle>
+      <unitid>T-1</unitid>
+      <physdescstructured coverage="whole" physdescstructuredtype="spaceoccupied">
+        <quantity>1</quantity>
+        <unittype>Linear Feet</unittype>
+      </physdescstructured>
+      <unitdatestructured datechar="creation" unitdatetype="inclusive">
+        <datesingle standarddate="2021-11-17">2021-11-17</datesingle>
+      </unitdatestructured>
+      <langmaterial>
+        <language langcode="eng">English</language>
+      </langmaterial>
+    </did>
+    <odd>
+      <head>Local Contexts Information</head>
+      <p>This material is related to a Local Contexts project which may have associated various
+        Biocultural Labels, Traditional Knowledge Labels, Notices, and Institution Notices with this
+        material. </p>
+      <p>
+        <extref xlink:actuate="onLoad"
+          xlink:href="https://anth-ja77-lc-dev-42d5.uc.r.appspot.com/projects/d96b9857-4563-4676-b513-ba5032e4ea9e"
+          xlink:show="new" xlink:type="simple">View this project on the Local Contexts Hub (Project
+          ID: d96b9857-4563-4676-b513-ba5032e4ea9e)</extref>
+      </p>
+    </odd>
+    <dsc>
+      <c id="aspace_310dcaca0ae5ec0a3fdc000d100133c1" level="file">
+        <did>
+          <unittitle>Test AO with TK Labels</unittitle>
+          <abstract id="aspace_5f86273704f85831b9a96d2cd786e3fd">I'm a note on an AO that has an LC
+            Project directly associated.</abstract>
+        </did>
+        <odd>
+          <head>Local Contexts Information</head>
+          <p>This material is related to a Local Contexts project which may have associated various
+            Biocultural Labels, Traditional Knowledge Labels, Notices, and Institution Notices with
+            this material. </p>
+          <p><extref xlink:actuate="onLoad"
+              xlink:href="https://anth-ja77-lc-dev-42d5.uc.r.appspot.com/projects/f23b9b66-8620-412b-b4f5-93433615629c"
+              xlink:show="new" xlink:type="simple">View this project on the Local Contexts Hub
+              (Project ID: f23b9b66-8620-412b-b4f5-93433615629c)</extref></p>
+        </odd>
+      </c>
+      <c id="aspace_a6a0cb822e3a3502bac92de40942097e" level="file">
+        <did>
+          <unittitle>Test AO with Notices</unittitle>
+        </did>
+        <odd>
+          <head>Local Contexts Information</head>
+          <p>This material is related to a Local Contexts project which may have associated various
+            Biocultural Labels, Traditional Knowledge Labels, Notices, and Institution Notices with
+            this material. </p>
+          <p><extref xlink:actuate="onLoad"
+              xlink:href="https://anth-ja77-lc-dev-42d5.uc.r.appspot.com/projects/e3968984-636c-4ded-b594-28f31bb735cc"
+              xlink:show="new" xlink:type="simple">View this project on the Local Contexts Hub
+              (Project ID: e3968984-636c-4ded-b594-28f31bb735cc)</extref></p>
+        </odd>
+      </c>
+      <c id="aspace_bc636de420fc3a63e39bc69f6b17ff2b" level="file">
+        <did>
+          <unittitle>AO With BC &amp; TK</unittitle>
+        </did>
+        <odd>
+          <head>Local Contexts Information</head>
+          <p>This material is related to a Local Contexts project which may have associated various
+            Biocultural Labels, Traditional Knowledge Labels, Notices, and Institution Notices with
+            this material. </p>
+          <p><extref xlink:actuate="onLoad"
+              xlink:href="https://anth-ja77-lc-dev-42d5.uc.r.appspot.com/projects/8b19b421-f50e-4d96-9b31-c926b750dc8b"
+              xlink:show="new" xlink:type="simple">View this project on the Local Contexts Hub
+              (Project ID: 8b19b421-f50e-4d96-9b31-c926b750dc8b)</extref></p>
+        </odd>
+      </c>
+      <c id="aspace_a43c193f1b6a815ee51ce4f14e7427dc" level="file">
+        <did>
+          <unittitle>AO without LCP</unittitle>
+          <abstract id="aspace_7aed49ea091809e3b34a383d2a439ad2">I'm an AO that does *not* have an
+            LC Project directly associated.</abstract>
+        </did>
+      </c>
+      <c id="aspace_2f9fb3dd19380bb44e08898eb26357a6" level="series">
+        <did>
+          <unittitle>Series with LCP</unittitle>
+          <abstract id="aspace_9375863bf2cb804c11f5888c97b4bcc8">I'm a note on an AO (SERIES) that
+            has an LC Project directly associated.</abstract>
+        </did>
+        <odd>
+          <head>Local Contexts Information</head>
+          <p>This material is related to a Local Contexts project which may have associated various
+            Biocultural Labels, Traditional Knowledge Labels, Notices, and Institution Notices with
+            this material. </p>
+          <p><extref xlink:actuate="onLoad"
+              xlink:href="https://anth-ja77-lc-dev-42d5.uc.r.appspot.com/projects/d96b9857-4563-4676-b513-ba5032e4ea9e"
+              xlink:show="new" xlink:type="simple">View this project on the Local Contexts Hub
+              (Project ID: d96b9857-4563-4676-b513-ba5032e4ea9e)</extref></p>
+        </odd>
+        <c id="aspace_69d318451984b7037380cb85f5a0ac1d" level="file">
+          <did>
+            <unittitle>Ao of Series wo LCP</unittitle>
+            <abstract id="aspace_64e139c00d0d23433b21b5538b0798d2">I'm a note on another AO that
+              does *not* have an LC Project directly associated.</abstract>
+          </did>
+        </c>
+      </c>
+    </dsc>
+  </archdesc>
+</ead>

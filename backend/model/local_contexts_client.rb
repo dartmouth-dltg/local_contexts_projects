@@ -11,7 +11,8 @@ class LocalContextsClient
       "project" => "projects",
       "user" => "users",
       "researcher" => "researchers",
-      "institution" => "institutions"
+      "institution" => "institutions",
+      "open_to_collaborate" => "notices/open_to_collaborate"
     }
   end
 
@@ -26,10 +27,10 @@ class LocalContextsClient
   end
 
 
-  def get(suffix, headers = {})
+  def get(suffix, type, headers = {})
     logger = Logger.new($stderr)
-    get_url = url(suffix)
-logger.debug("GETURL: #{get_url}")
+    get_url = url(suffix, type)
+    logger.debug("GETURL: #{get_url}")
     http_request(get_url) do |http|
       req = Net::HTTP::Get.new(get_url.request_uri)
 
@@ -46,21 +47,29 @@ logger.debug("GETURL: #{get_url}")
   end
 
 
-  def get_json(suffix)
-    res = get(suffix)
+  def get_json(suffix, type)
+    res = get(suffix, type)
     maybe_parse_json(res)
   end
 
 
-  def get_data_from_api(id, type)
-    lc_api_path_for_type = File.join(@api_paths_map[type], id)
-    get_json(lc_api_path_for_type)
+  def get_data_from_local_contexts_api(id, type)
+    if type == 'open_to_collaborate'
+      get_json(@api_paths_map[type], type)
+    else
+      lc_api_path_for_type = File.join(@api_paths_map[type], id)
+      get_json(lc_api_path_for_type, type)
+    end
   end
 
   private
 
-  def url(suffix, params = {})
-    URI(File.join(@base_url, @api_version_path, suffix, @query_data_type))
+  def url(suffix, type, params = {})
+    if type == "open_to_collaborate"
+      URI(File.join(@base_url, @api_version_path, suffix + @query_data_type))
+    else
+      URI(File.join(@base_url, @api_version_path, suffix, @query_data_type))
+    end
   end
 
   def http_request(url)
