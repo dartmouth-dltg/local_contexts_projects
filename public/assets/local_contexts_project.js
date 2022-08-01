@@ -117,7 +117,9 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id, project
 
       if (!self.img_urls.includes(label.img_url)) {
         self.img_urls.push(label.img_url);
-        lc_img_html += self.renderImageDataTemplate(label);
+        var label_type = typeof(label.notice_type) !== 'undefined' ? 'Notice' : 'Label';
+
+        lc_img_html += self.renderImageDataTemplate(label, label_type);
       }
     })
   });
@@ -191,8 +193,8 @@ console.log(audio)
   return data_html;
 }
 
-LocalContexts.prototype.renderImageDataTemplate = function(data) {
-  return '<img src="' + data.img_url + '" alt="' + data.name + '" title="Local Contexts Label: ' + data.name + '" class="local-contexts-header-image" />';
+LocalContexts.prototype.renderImageDataTemplate = function(data, label_type) {
+  return '<img src="' + data.img_url + '" alt="' + data.name + '" title="Local Contexts ' + label_type + ': ' + data.name + '" class="local-contexts-header-image" />';
 }
 
 LocalContexts.prototype.renderTranslationLanguage = function(language) {

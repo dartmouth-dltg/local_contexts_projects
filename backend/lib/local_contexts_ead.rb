@@ -77,7 +77,7 @@ class EADSerializer < ASpaceExport::Serializer
           }# </did>
 
           # This is it. The patch. All one lines of it
-          serialize_local_contexts_ead(data, xml, @fragments)
+          LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EADSerializer)
           # end the patch
 
           data.digital_objects.each do |dob|
@@ -180,7 +180,7 @@ class EADSerializer < ASpaceExport::Serializer
       }
 
       # This is it. The patch. All one line of it for AOs
-      serialize_local_contexts_ead(data, xml, @fragments)
+      LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EADSerializer)
       # end the patch
 
       serialize_nondid_notes(data, xml, fragments)
@@ -201,47 +201,6 @@ class EADSerializer < ASpaceExport::Serializer
         )
       end
     }
-  end
-
-  # custom method to include Local Contexts data
-  def serialize_local_contexts_ead(data, xml, fragments)
-    if AppConfig[:plugins].include?('local_contexts_project')
-      if data.local_contexts_projects && data.local_contexts_projects.length > 0
-        xml.odd {
-          xml.head {
-            sanitize_mixed_content(I18n.t("local_contexts_project.section_title") , xml, fragments)
-          }
-          if data.local_contexts_projects.length > 1
-            xml.p {
-              sanitize_mixed_content(I18n.t("local_contexts_project.project_information._plural") , xml, fragments)
-            }
-          else
-            xml.p {
-              sanitize_mixed_content(I18n.t("local_contexts_project.project_information._singular") , xml, fragments)
-            }
-          end
-          data.local_contexts_projects.each do |lcp|
-            unless lcp['_resolved']
-              id = JSONModel.parse_reference(lcp['ref'])[:id]
-              lc_obj = LocalContextsProject.get_or_die(id)
-              resolved = URIResolver.resolve_references(LocalContextsProject.to_jsonmodel(lc_obj), [])
-              lcp['_resolved'] = resolved.to_hash
-            end
-            if lcp['_resolved'] && lcp['_resolved']['project_is_public'] && lcp['_resolved']['project_id']
-              project_id = lcp['_resolved']['project_id']
-              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
-                xml.p {
-                  xml.extref ({"xlink:href" => project_url,
-                            "xlink:actuate" => "onLoad",
-                            "xlink:show" => "new",
-                            "xlink:type" => "simple"
-                            }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
-                }
-            end
-          end
-          }
-      end
-    end
   end
 
 end
@@ -319,7 +278,7 @@ class EAD3Serializer < EADSerializer
           }# </did>
 
           # This is it. The patch. All one line of it
-          serialize_local_contexts_ead3(data, xml, @fragments)
+          LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer)
           # end the patch
 
           data.digital_objects.each do |dob|
@@ -423,7 +382,7 @@ class EAD3Serializer < EADSerializer
         }
 
         # This is it. The patch. All one line of it for AOs
-        serialize_local_contexts_ead3(data, xml, @fragments)
+        LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer)
         # end the patch
 
         serialize_nondid_notes(data, xml, fragments)
@@ -447,8 +406,54 @@ class EAD3Serializer < EADSerializer
     end
   end
 
+end
+
+class LocalContextsEAD
+
   # custom method to include Local Contexts data
-  def serialize_local_contexts_ead3(data, xml, fragments)
+  def self.serialize_local_contexts_ead(data, xml, fragments, ead_serializer_class)
+    if AppConfig[:plugins].include?('local_contexts_project')
+      ead_serializer_caller = ead_serializer_class.new
+      if data.local_contexts_projects && data.local_contexts_projects.length > 0
+        xml.odd {
+          xml.head {
+            ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") , xml, fragments)
+          }
+          if data.local_contexts_projects.length > 1
+            xml.p {
+              ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_information._plural") , xml, fragments)
+            }
+          else
+            xml.p {
+              ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_information._singular") , xml, fragments)
+            }
+          end
+          data.local_contexts_projects.each do |lcp|
+            unless lcp['_resolved']
+              id = JSONModel.parse_reference(lcp['ref'])[:id]
+              lc_obj = LocalContextsProject.get_or_die(id)
+              resolved = URIResolver.resolve_references(LocalContextsProject.to_jsonmodel(lc_obj), [])
+              lcp['_resolved'] = resolved.to_hash
+            end
+            if lcp['_resolved'] && lcp['_resolved']['project_id']
+              project_id = lcp['_resolved']['project_id']
+              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
+                xml.p {
+                  xml.extref ({"xlink:href" => project_url,
+                            "xlink:actuate" => "onLoad",
+                            "xlink:show" => "new",
+                            "xlink:type" => "simple"
+                            }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
+                }
+            end
+          end
+          }
+      end
+    end
+  end
+
+   # custom method to include Local Contexts data
+   def serialize_local_contexts_ead(data, xml, fragments)
     if AppConfig[:plugins].include?('local_contexts_project')
       if data.local_contexts_projects && data.local_contexts_projects.length > 0
         xml.odd {
@@ -471,7 +476,7 @@ class EAD3Serializer < EADSerializer
               resolved = URIResolver.resolve_references(LocalContextsProject.to_jsonmodel(lc_obj), [])
               lcp['_resolved'] = resolved.to_hash
             end
-            if lcp['_resolved'] && lcp['_resolved']['project_id']
+            if lcp['_resolved'] && lcp['_resolved']['project_is_public'] && lcp['_resolved']['project_id']
               project_id = lcp['_resolved']['project_id']
               project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
                 xml.p {
