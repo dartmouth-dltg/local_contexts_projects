@@ -34,6 +34,10 @@ span.local-context-placed-by-label {
   font-weight: bold;
 }
 
+span.local-context-placed-by-label::after {
+  content: ":";
+}
+
 /* translations */
 .local-context-translation-wrapper {
   display: none;

@@ -15,6 +15,7 @@ function LocalContexts(project_ids) {
                           '<img class="local-context-image" src="${label_img_url}" />' +
                           '<span class="local-context-description">' +
                           '${label_default_text}' +
+                          '${label_placed_by}' +
                           '</span>' +
                           '</p>' +
                           '</div>';
@@ -24,6 +25,11 @@ function LocalContexts(project_ids) {
                               '<span class="local-context-translation-language">(${translation_language})</span>' +
                               '<span class="local-context-translation-translation">${translation_translation}</span>'  +
                               '</span>';
+
+  this.placedByTemplate = '<span class="local-context-placed-by">' +
+                          '<span class="local-context-placed-by-label">Placed by:</span> ${label_community}' +
+                          '</span>';
+
 
   ids = JSON.parse(project_ids);
   if (ids.length > 0) {
@@ -142,12 +148,22 @@ LocalContexts.prototype.renderLocalContextsError = function(id) {
 
 LocalContexts.prototype.renderFullDataTemplate = function(data, labelLanguage) {
   var labelLanguageTag = '';
+  var placedBy = '';
 
   if (labelLanguage != this.mainLanguage && labelLanguage != '') {
      labelLanguageTag = 'lang="' + data.language_tag + '"';
   }
+
+  if (typeof(data.community) !== 'undefined') {
+    placedBy = this.placedByTemplate.replace('${label_community}', data.community);
+  }
+
+  console.log(placedBy)
+
+
   var data_html = this.fullDataTemplate
                       .replace('${label_language_tag}', labelLanguageTag)
+                      .replace('${label_placed_by}', placedBy)
                       .replace('${label_name}', data.name)
                       .replace('${label_default_text}',data.label_text)
                       .replace('${label_img_url}', data.img_url)
