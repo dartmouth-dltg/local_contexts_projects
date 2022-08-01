@@ -1,5 +1,6 @@
 require 'securerandom'
 require 'aspace_logger'
+require 'date'
 class EADSerializer < ASpaceExport::Serializer
 
   # We're patching this method to deal with the local contexts ids
@@ -412,7 +413,9 @@ class LocalContextsEAD
 
   # custom method to include Local Contexts data
   def self.serialize_local_contexts_ead(data, xml, fragments, ead_serializer_class)
+    logger = Logger.new($stderr)
     if AppConfig[:plugins].include?('local_contexts_project')
+      current_date = Time.now.strftime("%d/%m/%Y %H:%M")
       ead_serializer_caller = ead_serializer_class.new
       if data.local_contexts_projects && data.local_contexts_projects.length > 0
         xml.odd {
@@ -428,6 +431,9 @@ class LocalContextsEAD
               ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_information._singular") , xml, fragments)
             }
           end
+          xml.p {
+            ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_date_information") + current_date + '. ' + I18n.t("local_contexts_project.project_date_see_current"), xml, fragments)
+          }
           data.local_contexts_projects.each do |lcp|
             unless lcp['_resolved']
               id = JSONModel.parse_reference(lcp['ref'])[:id]
@@ -438,6 +444,8 @@ class LocalContextsEAD
             if lcp['_resolved'] && lcp['_resolved']['project_id']
               project_id = lcp['_resolved']['project_id']
               project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
+              project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project')
+              logger.debug("PROJECT_DATA: #{project_json}")
                 xml.p {
                   xml.extref ({"xlink:href" => project_url,
                             "xlink:actuate" => "onLoad",
@@ -445,47 +453,7 @@ class LocalContextsEAD
                             "xlink:type" => "simple"
                             }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
                 }
-            end
-          end
-          }
-      end
-    end
-  end
-
-   # custom method to include Local Contexts data
-   def serialize_local_contexts_ead(data, xml, fragments)
-    if AppConfig[:plugins].include?('local_contexts_project')
-      if data.local_contexts_projects && data.local_contexts_projects.length > 0
-        xml.odd {
-          xml.head {
-            sanitize_mixed_content(I18n.t("local_contexts_project.section_title") , xml, fragments)
-          }
-          if data.local_contexts_projects.length > 1
-            xml.p {
-              sanitize_mixed_content(I18n.t("local_contexts_project.project_information._plural") , xml, fragments)
-            }
-          else
-            xml.p {
-              sanitize_mixed_content(I18n.t("local_contexts_project.project_information._singular") , xml, fragments)
-            }
-          end
-          data.local_contexts_projects.each do |lcp|
-            unless lcp['_resolved']
-              id = JSONModel.parse_reference(lcp['ref'])[:id]
-              lc_obj = LocalContextsProject.get_or_die(id)
-              resolved = URIResolver.resolve_references(LocalContextsProject.to_jsonmodel(lc_obj), [])
-              lcp['_resolved'] = resolved.to_hash
-            end
-            if lcp['_resolved'] && lcp['_resolved']['project_is_public'] && lcp['_resolved']['project_id']
-              project_id = lcp['_resolved']['project_id']
-              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
-                xml.p {
-                  xml.extref ({"xlink:href" => project_url,
-                            "xlink:actuate" => "onLoad",
-                            "xlink:show" => "new",
-                            "xlink:type" => "simple"
-                            }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
-                }
+                
             end
           end
           }

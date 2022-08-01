@@ -28,6 +28,8 @@ en:
     display_string: Display String
     fetch_btn: See Local Contexts Data
     placed_by_txt: Placed By
+    project_date_information: 'Local Contexts Labels and Notices for this material as of: '
+    project_date_see_current: Please check the project in the Local Contexts Hub for current information.
     project_id: Project Id
     project_information:
       _singular: >

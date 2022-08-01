@@ -14,6 +14,16 @@ class LocalContextsClient
       "institution" => "institutions",
       "open_to_collaborate" => "notices/open_to_collaborate"
     }
+    @HTTP_ERRORS = [
+      EOFError,
+      Errno::ECONNRESET,
+      Errno::EINVAL,
+      Errno::ECONNREFUSED,
+      Net::HTTPBadResponse,
+      Net::HTTPHeaderSyntaxError,
+      Net::ProtocolError,
+      Timeout::Error
+    ]
   end
 
 
@@ -22,24 +32,21 @@ class LocalContextsClient
       ASUtils.json_parse(response.body)
     rescue JSON::ParserError
       Log.error("Couldn't parse response as JSON: #{response.inspect} -- #{response.body}")
-      raise ReferenceError.new("Unrecognized response from Local Conexts API")
+      raise ReferenceError.new("Unrecognized response from Local Contexts API")
     end
   end
 
 
   def get(suffix, type, headers = {})
-    logger = Logger.new($stderr)
     get_url = url(suffix, type)
-    logger.debug("GETURL: #{get_url}")
     http_request(get_url) do |http|
       req = Net::HTTP::Get.new(get_url.request_uri)
 
       headers.each {|k,v| req[k] = v }
-
-      response = http.request(req)
-
-      if response.code != "200"
-        raise ConflictException.new("Failure in GET request from Local Contexts: #{response.body}")
+      begin
+        response = http.request(req)
+      rescue *HTTP_ERRORS => e
+        Log.error("Not a valid response from the Local Contexts API")
       end
 
       response
@@ -49,7 +56,9 @@ class LocalContextsClient
 
   def get_json(suffix, type)
     res = get(suffix, type)
-    maybe_parse_json(res)
+    if res
+      maybe_parse_json(res)
+    end
   end
 
 
