@@ -31,31 +31,33 @@
   end
 
 %>
-<div class="row">
-  <div class="col-sm-12 local-contexts-section">
-    <<%= heading_size %>><%= I18n.t("local_contexts_section_title") %></<%= heading_size %>>
-    <div class="local-context-project-link">
-      <p>
-        <% if local_contexts_projects.length > 1 %>
-          <%= I18n.t("local_contexts_project_information._plural") %>
-        <% else %>
-          <%= I18n.t("local_contexts_project_information._singular") %>
-        <% end %>
-      </p>
-      <% project_ids.each do |pid| %>
+<% if project_ids.length > 0 %>
+  <div class="row">
+    <div class="col-sm-12 local-contexts-section">
+      <<%= heading_size %>><%= I18n.t("local_contexts_section_title") %></<%= heading_size %>>
+      <div class="local-context-project-link">
         <p>
-          <a id="lc-project-id-<%= pid %>" href="<%= AppConfig[:local_contexts_base_url] %>projects/<%= pid %>"><%= I18n.t("local_contexts_project_link_text") %> (ID: <%= pid %>)</a>
-          <% if inherited_level %>
-            <span class="local-contexts-inherited"><%= I18n.t("local_contexts_project_information.inherited") %> <a href="<%= inherited_parent_uri %>"><%= inherited_level %></a>.</span>
+          <% if local_contexts_projects.length > 1 %>
+            <%= I18n.t("local_contexts_project_information._plural") %>
+          <% else %>
+            <%= I18n.t("local_contexts_project_information._singular") %>
           <% end %>
         </p>
-        <div class="local-contexts-live-data" id="lc-project-live-data-<%= pid %>" aria-live="polite">
-        </div>
-      <% end %>
-    </div>
+        <% project_ids.each do |pid| %>
+          <p>
+            <a id="lc-project-id-<%= pid %>" href="<%= AppConfig[:local_contexts_base_url] %>projects/<%= pid %>"><%= I18n.t("local_contexts_project_link_text") %> (ID: <%= pid %>)</a>
+            <% if inherited_level %>
+              <span class="local-contexts-inherited"><%= I18n.t("local_contexts_project_information.inherited") %> <a href="<%= inherited_parent_uri %>"><%= inherited_level %></a>.</span>
+            <% end %>
+          </p>
+          <div class="local-contexts-live-data" id="lc-project-live-data-<%= pid %>" aria-live="polite">
+          </div>
+        <% end %>
+      </div>
 
+    </div>
   </div>
-</div>
-<script>
-  new LocalContexts('<%= raw(project_ids.to_json) %>');
-</script>
+  <script>
+    new LocalContexts('<%= raw(project_ids.to_json) %>');
+  </script>
+<% end %>
