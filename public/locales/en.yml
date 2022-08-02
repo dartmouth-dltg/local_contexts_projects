@@ -10,5 +10,11 @@ en:
       This material is related to Local Contexts projects which may have associated various Biocultural Labels,
       Traditional Knowledge Labels, and Notices with this material.
     inherited: Project information inherited from the parent 
+    _dig_obj_singular: >
+      This digital object is related to a Local Contexts project which may have associated various Biocultural Labels,
+      Traditional Knowledge Labels, and Notices with this material.
+    _dig_obj_plural: >
+      This digital object is related to Local Contexts projects which may have associated various Biocultural Labels,
+      Traditional Knowledge Labels, and Notices with this material.
   local_contexts_section_title: Local Contexts Information
   local_contexts_more_html: For more more information about this notice, please <a href="https://localcontexts.org/notices/cultural-institution-notices/">read more at Local Contexts</a>
