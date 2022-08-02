@@ -204,6 +204,78 @@ class EADSerializer < ASpaceExport::Serializer
     }
   end
 
+  # Override this method to include Local Contexts data
+  def serialize_digital_object(digital_object, xml, fragments)
+    return if digital_object["publish"] === false && !@include_unpublished
+    return if digital_object["suppressed"] === true
+
+    # ANW-285: Only serialize file versions that are published, unless include_unpublished flag is set
+    file_versions_to_display = digital_object['file_versions'].select {|fv| fv['publish'] == true || @include_unpublished }
+
+    title = digital_object['title']
+    date = digital_object['dates'][0] || {}
+
+    atts = {}
+
+    content = ""
+    content << title if title
+    content << ": " if date['expression'] || date['begin']
+    if date['expression']
+      content << date['expression']
+    elsif date['begin']
+      content << date['begin']
+      if date['end'] != date['begin']
+        content << "-#{date['end']}"
+      end
+    end
+
+    atts['xlink:title'] = digital_object['title'] if digital_object['title']
+
+
+    if file_versions_to_display.empty?
+      atts['xlink:type'] = 'simple'
+      atts['xlink:href'] = digital_object['digital_object_id']
+      atts['xlink:actuate'] = 'onRequest'
+      atts['xlink:show'] = 'new'
+      atts['audience'] = 'internal' unless is_digital_object_published?(digital_object)
+      xml.dao(atts) {
+        xml.daodesc { sanitize_mixed_content(content, xml, fragments, true) } if content
+      }
+    elsif file_versions_to_display.length == 1
+      file_version = file_versions_to_display.first
+
+      atts['xlink:type'] = 'simple'
+      atts['xlink:actuate'] = file_version['xlink_actuate_attribute'] || 'onRequest'
+      atts['xlink:show'] = file_version['xlink_show_attribute'] || 'new'
+      atts['xlink:role'] = file_version['use_statement'] if file_version['use_statement']
+      atts['xlink:href'] = file_version['file_uri']
+      atts['audience'] = 'internal' unless is_digital_object_published?(digital_object, file_version)
+      xml.dao(atts) {
+        xml.daodesc { sanitize_mixed_content(content, xml, fragments, true) } if content
+      }
+    else
+      atts['xlink:type'] = 'extended'
+      atts['audience'] = 'internal' unless is_digital_object_published?(digital_object)
+      xml.daogrp( atts ) {
+        xml.daodesc { sanitize_mixed_content(content, xml, fragments, true) } if content
+        file_versions_to_display.each do |file_version|
+          atts = {}
+          atts['xlink:type'] = 'locator'
+          atts['xlink:href'] = file_version['file_uri']
+          atts['xlink:role'] = file_version['use_statement'] if file_version['use_statement']
+          atts['xlink:title'] = file_version['caption'] if file_version['caption']
+          atts['audience'] = 'internal' unless is_digital_object_published?(digital_object, file_version)
+          xml.daoloc(atts)
+        end
+      }
+    end
+    # Local Contexts start
+    if digital_object['local_contexts_projects'] && digital_object['local_contexts_projects'].length > 0
+      LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EADSerializer)
+    end
+    # Local Contexts end}
+  end
+
 end
 
 class EAD3Serializer < EADSerializer
@@ -407,6 +479,65 @@ class EAD3Serializer < EADSerializer
     end
   end
 
+  # Override this method to include Local Contexts data
+  def serialize_digital_object(digital_object, xml, fragments)
+    return if digital_object["publish"] === false && !@include_unpublished
+    return if digital_object["suppressed"] === true
+
+    file_versions = digital_object['file_versions']
+    title = digital_object['title']
+    date = digital_object['dates'][0] || {}
+
+    atts = {}
+
+    content = ""
+    content << title if title
+    content << ": " if date['expression'] || date['begin']
+    if date['expression']
+      content << date['expression']
+    elsif date['begin']
+      content << date['begin']
+      if date['end'] != date['begin']
+        content << "-#{date['end']}"
+      end
+    end
+
+    atts['linktitle'] = digital_object['title'] if digital_object['title']
+
+    if digital_object['digital_object_type']
+      atts['daotype'] = 'otherdaotype'
+      atts['otherdaotype'] = digital_object['digital_object_type']
+    else
+      atts['daotype'] = 'unknown'
+    end
+
+    if file_versions.empty?
+      atts['href'] = digital_object['digital_object_id']
+      atts['actuate'] = 'onrequest'
+      atts['show'] = 'new'
+      atts['audience'] = 'internal' unless is_digital_object_published?(digital_object)
+      xml.dao(atts) {
+        xml.descriptivenote { sanitize_mixed_content(content, xml, fragments, true) } if content
+      }
+    else
+      file_versions.each do |file_version|
+        atts['href'] = file_version['file_uri'] || digital_object['digital_object_id']
+        atts['actuate'] = (file_version['xlink_actuate_attribute'].respond_to?(:downcase) && file_version['xlink_actuate_attribute'].downcase) || 'onrequest'
+        atts['show'] = (file_version['xlink_show_attribute'].respond_to?(:downcase) && file_version['xlink_show_attribute'].downcase) || 'new'
+        atts['localtype'] = file_version['use_statement'] if file_version['use_statement']
+        atts['audience'] = 'internal' unless is_digital_object_published?(digital_object, file_version)
+        xml.dao(atts) {
+          xml.descriptivenote { sanitize_mixed_content(content, xml, fragments, true) } if content
+        }
+      end
+    end
+    # Local Contexts start
+    if digital_object['local_contexts_projects'] && digital_object['local_contexts_projects'].length > 0
+      LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EAD3Serializer)
+    end
+    # Local Contexts end}
+  end
+
 end
 
 class LocalContextsEAD
@@ -414,126 +545,160 @@ class LocalContextsEAD
   # custom method to include Local Contexts data
   def self.serialize_local_contexts_ead(data, xml, fragments, ead_serializer_class)
     if AppConfig[:plugins].include?('local_contexts_project')
-      lc_labels = ['bc_labels', 'tk_labels']
       current_date = Time.now.strftime("%d/%m/%Y %H:%M")
       ead_serializer_caller = ead_serializer_class.new
-      if data.local_contexts_projects && data.local_contexts_projects.length > 0
+      lcps = data.local_contexts_projects
+      if lcps && lcps.length > 0
         xml.odd {
           xml.head {
             ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") , xml, fragments)
           }
-          if data.local_contexts_projects.length > 1
-            xml.p {
-              ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_information._plural") , xml, fragments)
-            }
-          else
-            xml.p {
-              ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_information._singular") , xml, fragments)
-            }
-          end
-          xml.p {
-            ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_date_information") + current_date + '. ' + I18n.t("local_contexts_project.project_date_see_current"), xml, fragments)
-          }
+          construct_lc_intro(lcps, xml, fragments, ead_serializer_caller)
 
           # loop through each attached id
           data.local_contexts_projects.each do |lcp|
-            unless lcp['_resolved']
-              id = JSONModel.parse_reference(lcp['ref'])[:id]
-              lc_obj = LocalContextsProject.get_or_die(id)
-              resolved = URIResolver.resolve_references(LocalContextsProject.to_jsonmodel(lc_obj), [])
-              lcp['_resolved'] = resolved.to_hash
-            end
-            if lcp['_resolved'] && lcp['_resolved']['project_id']
-
-              project_id = lcp['_resolved']['project_id']
-              project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
-              project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project')
-
-              # for each fetched project, render the data
-              if project_json['title'] && project_json['title'].length > 0
-                xml.p {
-                  ead_serializer_caller.sanitize_mixed_content(project_json['title'], xml, fragments)
-                }
-                xml.p {
-                  xml.extref ({"xlink:href" => project_url,
-                              "xlink:actuate" => "onLoad",
-                              "xlink:show" => "new",
-                              "xlink:type" => "simple"
-                              }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
-                }
-
-                # render labels and notices slightly differently
-                project_json.each do |k,v|
-
-                  # labels
-                  if lc_labels.include?(k)
-                    v.each do |label|
-                      xml.p {
-                        ead_serializer_caller.sanitize_mixed_content(label['name'] + " (" + label['language'] + ")", xml, fragments)
-                      }
-                      xml.p {
-                        xml.extref ({"xlink:href" => label['img_url'],
-                                    "xlink:actuate" => xlink_load,
-                                    "xlink:show" => "embed",
-                                    "xlink:type" => "simple"
-                        })
-                      }
-                      xml.p {
-                        ead_serializer_caller.sanitize_mixed_content(label['label_text'], xml, fragments)
-                      }
-                      if label['community']
-                        xml.p {
-                          ead_serializer_caller.sanitize_mixed_content("Placed By: " + label['community'], xml, fragments)
-                        }
-                      end
-                      if label['translations'].length > 0
-                        label['translations'].each do |translation|
-                          xml.p {
-                            ead_serializer_caller.sanitize_mixed_content(translation['translated_name']  + " (" + translation['language'] + ")", xml, fragments)
-                          }
-                          xml.p {
-                            ead_serializer_caller.sanitize_mixed_content(translation['translated_text'], xml, fragments)
-                          }
-                        end
-                      end
-                    end
-                  # notices
-                  elsif k == 'notice'
-                    v.each do |notice|
-                      xml.p {
-                        ead_serializer_caller.sanitize_mixed_content(notice['name'], xml, fragments)
-                      }
-                      xml.p {
-                        xml.extref ({"xlink:href" => notice['img_url'],
-                                    "xlink:actuate" => "onLoad",
-                                    "xlink:show" => "embed",
-                                    "xlink:type" => "simple"
-                        })
-                      }
-                      xml.p {
-                        ead_serializer_caller.sanitize_mixed_content(notice['default_text'], xml, fragments)
-                      }
-                    end
-                  end
-                end
-              
-              # render error message if the project could not be fetched
-              else
-                xml.p {
-                  ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.fetch_error.ead_message"), xml, fragments)
-                }
-                xml.p {
-                  xml.extref ({"xlink:href" => project_url,
-                              "xlink:actuate" => "onLoad",
-                              "xlink:show" => "new",
-                              "xlink:type" => "simple"
-                              }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
-                }
-              end
-            end
+            construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
           end
           }
       end
+    end
+  end
+
+  def self.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, ead_serializer_class)
+    if AppConfig[:plugins].include?('local_contexts_project')
+      ead_serializer_caller = ead_serializer_class.new
+      lcps = digital_object['local_contexts_projects']
+      xml.note {
+        xml.p {
+          ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") + '. ' + I18n.t("local_contexts_project.digital_object_note", :title => digital_object['title']) , xml, fragments)
+        }
+
+        construct_lc_intro(lcps, xml, fragments, ead_serializer_caller)
+
+        # loop through each attached id
+        lcps.each do |lcp|
+          construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
+        end
+      }
+    end
+  end
+
+  def self.construct_lc_intro(lcps, xml, fragments, ead_serializer_caller)
+    current_date = Time.now.strftime("%B %d, %Y")
+
+    if lcps.length > 1
+      xml.p {
+        ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_information._plural") , xml, fragments)
+      }
+    else
+      xml.p {
+        ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_information._singular") , xml, fragments)
+      }
+    end
+    xml.p {
+      ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_date_information") + current_date + '. ' + I18n.t("local_contexts_project.project_date_see_current"), xml, fragments)
+    }
+  end
+
+  def self.construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
+    lc_labels = ['bc_labels', 'tk_labels']
+    unless lcp['_resolved']
+      id = JSONModel.parse_reference(lcp['ref'])[:id]
+      lc_obj = LocalContextsProject.get_or_die(id)
+      resolved = URIResolver.resolve_references(LocalContextsProject.to_jsonmodel(lc_obj), [])
+      lcp['_resolved'] = resolved.to_hash
+    end
+    if lcp['_resolved'] && lcp['_resolved']['project_id'] && lcp['_resolved']['project_is_public'] === true
+      project_id = lcp['_resolved']['project_id']
+      project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
+      project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project')
+
+      # for each fetched project, render the data
+      if project_json['title'] && project_json['title'].length > 0
+        xml.p {
+          ead_serializer_caller.sanitize_mixed_content(project_json['title'], xml, fragments)
+        }
+        xml.p {
+          xml.extref ({"xlink:href" => project_url,
+                      "xlink:actuate" => "onLoad",
+                      "xlink:show" => "new",
+                      "xlink:type" => "simple"
+                      }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
+        }
+
+        # render labels and notices slightly differently
+        project_json.each do |k,v|
+
+          # labels
+          if lc_labels.include?(k)
+            v.each do |label|
+              xml.p {
+                ead_serializer_caller.sanitize_mixed_content(label['name'] + " (" + label['language'] + ")", xml, fragments)
+              }
+              xml.p {
+                xml.extref ({"xlink:href" => label['img_url'],
+                            "xlink:actuate" => "onLoad",
+                            "xlink:show" => "embed",
+                            "xlink:type" => "simple"
+                })
+              }
+              xml.p {
+                ead_serializer_caller.sanitize_mixed_content(label['label_text'], xml, fragments)
+              }
+              if label['community']
+                xml.p {
+                  ead_serializer_caller.sanitize_mixed_content("Placed By: " + label['community'], xml, fragments)
+                }
+              end
+              if label['translations'].length > 0
+                label['translations'].each do |translation|
+                  xml.p {
+                    ead_serializer_caller.sanitize_mixed_content(translation['translated_name']  + " (" + translation['language'] + ")", xml, fragments)
+                  }
+                  xml.p {
+                    ead_serializer_caller.sanitize_mixed_content(translation['translated_text'], xml, fragments)
+                  }
+                end
+              end
+            end
+          # notices
+          elsif k == 'notice'
+            v.each do |notice|
+              xml.p {
+                ead_serializer_caller.sanitize_mixed_content(notice['name'], xml, fragments)
+              }
+              xml.p {
+                xml.extref ({"xlink:href" => notice['img_url'],
+                            "xlink:actuate" => "onLoad",
+                            "xlink:show" => "embed",
+                            "xlink:type" => "simple"
+                })
+              }
+              xml.p {
+                ead_serializer_caller.sanitize_mixed_content(notice['default_text'], xml, fragments)
+              }
+            end
+          end
+        end
+      
+      # render error message if the project could not be fetched
+      else
+        xml.p {
+          ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.fetch_error.ead_message"), xml, fragments)
+        }
+        xml.p {
+          xml.extref ({"xlink:href" => project_url,
+                      "xlink:actuate" => "onLoad",
+                      "xlink:show" => "new",
+                      "xlink:type" => "simple"
+                      }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
+        }
+      end
+    # the project is not public
+    else
+      xml.p {
+        ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_not_public_message"), xml, fragments)
+      }
     end
   end
 

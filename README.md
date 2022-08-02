@@ -107,9 +107,18 @@ If an archival object has not been directly associated with a project, but has a
 has been, the Local Contexts data will also be added to the display with an additional note
 indicating where the inheritance comes from.
 
-EAD, EAD3, & PDF exports for the staff & PUI have also been customized. These add a note section
+EAD, EAD3, & PDF exports for the staff & PUI have also been customized. These add a section
 which includes a link to the public facing description of the project if the
-`Hub Project is Public` field is checked for that project.
+`Hub Project is Public` field is checked for that project as well as the Local Contexts data for the project
+at the time of export.
+
+### Staff PDF Exports Note
+
+PDF Exports on the staff side rely on an updated EAD to PDF stylesheet. Please replace the core file in
+```
+  ARCHIVESSPACE_BASE_DIRECTORY/stylesheets/as-ead-psd.xsl
+```
+with the version found in the `stylesheets` directory of this plugin.
 
 See the `samples` directory in the plugin for sample exports and screenshots.
 
@@ -131,8 +140,10 @@ are using plugins that also modify these methods, you will need to reconcile the
 ```
     EADSerializer::stream
     EADSerializer::serialize_child
+    EADSerializer::serialize_digital_object
     EAD3Serializer::stream
     EAD3Serializer::serialize_child
+    EAD3Serializer::serialize_digital_object
 ```    
 This plugin also overrides the following views
 ```

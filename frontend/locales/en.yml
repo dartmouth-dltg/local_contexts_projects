@@ -25,6 +25,7 @@ en:
       section:
         search_embedded: Linked Records
 
+    digital_object_note: The following provides information about %{title} (related digital object)
     display_string: Display String
     fetch_btn: See Local Contexts Data
     placed_by_txt: Placed By
@@ -41,6 +42,7 @@ en:
     project_is_public: Hub Project Public or Discoverable?
     project_link_text: View this project on the Local Contexts Hub
     project_name: Project Name
+    project_not_public_message: The information for the Local Contexts project is not publicly available.
     related_project_tooltip: Select a Local Contexts project.
     section_title: Local Contexts Information
     translations_toggle: Hide/Show Translations for this label
