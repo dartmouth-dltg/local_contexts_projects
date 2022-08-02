@@ -1,5 +1,7 @@
 en:
   local_contexts_project_link_text: View this project on the Local Contexts Hub
+  local_contexts_project_date_information: 'Local Contexts Labels and Notices for this material as of: '
+  local_contexts_project_date_see_current: Please check the project in the Local Contexts Hub for current information.
   local_contexts_project_information:
     _singular: >
       This material is related to a Local Contexts project which may have associated various Biocultural Labels,

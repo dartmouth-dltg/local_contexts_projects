@@ -1,7 +1,52 @@
+<%# fetch the lc data for this project #%>
+<% 
+  lcp = ArchivesSpaceClient.instance.get_data_from_local_contexts_api(project_id, "project")
+  current_date = Time.now.strftime("%B %d, %Y")
+  lc_labels = ["bc_labels", "tk_labels"]
+%>
+
 <ul style="list-style: none;">
-    <li>
+  <li>
+    <p style="font-size: 0.8em; margin-top: 0.5em">
+      <%= I18n.t("local_contexts_project_date_information") %><%= current_date %> <%= I18n.t("local_contexts_project_date_see_current") %>
+    </p>
+    <% if lcp['title'] %>
+      <p style="font-size: 0.8em; margin-top: 0.5em"><b><%= lcp['title'] %></b></p>
       <p style="font-size: 0.8em; margin-top: 0.5em">
-        <a href="<%= AppConfig[:local_contexts_base_url] %>projects/project/<%= project_id %>"><%= I18n.t("local_contexts_project_link_text") %> (Project ID: <%= project_id %>)</a>
+        <a href="<%= lcp['project_page'] %>"><%= I18n.t("local_contexts_project_link_text") %> (Project ID: <%= project_id %>)</a>
       </p>
-    </li>
+      <% lcp.each do |k,v| %>
+        <% if lc_labels.include?(k) %>
+          <% v.each do |label| %>
+            <p style="font-size: 0.8em; margin-top: 0.5em"><%= label['name'].html_safe %> (<%= label['language'].html_safe %>)</p>
+            <p style="font-size: 0.8em; margin-top: 0.5em"><img style="height: 3em" src="<%= label['img_url'].html_safe %>" /></p>
+            <p style="font-size: 0.8em; margin-top: 0.5em"><%= label['label_text'].html_safe %></p>
+            <% if label['community'] %>
+              <p style="font-size: 0.8em; margin-top: 0.5em"><b>Placed By</b>: <%= label['community'].html_safe %></p>
+            <% end %>
+            <% if label['translations'].length > 0 %>
+              <% label['translations'].each do |translation| %>
+                <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_name'].html_safe %> (<%= translation['language'].html_safe %>)</p>
+                <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_text'].html_safe %></p>
+              <% end %>
+            <% end %>
+          <% end %>
+        <%# notices #%>
+        <% elsif k == 'notice' %>
+          <% v.each do |notice| %>
+            <p style="font-size: 0.8em; margin-top: 0.5em"><%= notice['name'].html_safe %></p>
+            <p style="font-size: 0.8em; margin-top: 0.5em"><img style="height: 3em" src="<%= notice['img_url'].html_safe %>" /></p>
+            <p style="font-size: 0.8em; margin-top: 0.5em"><%= notice['default_text'].html_safe %></p>
+          <% end %>
+        <% end %>
+      <% end %>
+    <%# render error message if the project could not be fetched #%>
+    <% else %>
+      <p style="font-size: 0.8em; margin-top: 0.5em"><%= I18n.t("local_contexts_project.fetch_error.ead_message") %></p>
+      <p style="font-size: 0.8em; margin-top: 0.5em"><a href="<%= AppConfig[:local_contexts_base_url].html_safe %>projects/project/<%= project_id %>"><%= I18n.t("local_contexts_project_link_text") %> (Project ID: <%= project_id %>)</a></p>
+    <% end %>
+  </li>
 </ul>
+
+
+          

@@ -703,11 +703,13 @@ class LocalContextsEAD
       
       # render error message if the project could not be fetched
       else
+        constructed_project_url = AppConfig[:local_contexts_base_url] + "projects/project/" + project_id
+
         xml.p {
           ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.fetch_error.ead_message"), xml, fragments)
         }
         xml.p {
-          xml.extref ({"xlink:href" => project_url,
+          xml.extref ({"xlink:href" => constructed_project_url,
                       "xlink:actuate" => "onLoad",
                       "xlink:show" => "new",
                       "xlink:type" => "simple"
