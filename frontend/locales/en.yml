@@ -45,6 +45,7 @@ en:
     section_title: Local Contexts Information
     translations_toggle: Hide/Show Translations for this label
     fetch_error:
+      ead_message: Unable to fetch the Local Contexts data for this project. Try viewing the project on the Local Contexts Hub.
       title: Problem Fetching Data
       message: An error occurred while fetching the data from the Local Contexts Hub for project id
       message_append: Try again or consult the logs.
