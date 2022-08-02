@@ -542,13 +542,30 @@ end
 
 class LocalContextsEAD
 
+  def self.include_lcps?(lcps)
+    return false if lcps.empty?
+    lcps.each do |lcp|
+      unless lcp['_resolved']
+        id = JSONModel.parse_reference(lcp['ref'])[:id]
+        lc_obj = LocalContextsProject.get_or_die(id)
+        resolved = URIResolver.resolve_references(LocalContextsProject.to_jsonmodel(lc_obj), [])
+        lcp['_resolved'] = resolved.to_hash
+      end
+      if lcp['_resolved']['project_is_public'] === true
+        return true
+      end
+    end
+    return false
+  end
+
   # custom method to include Local Contexts data
   def self.serialize_local_contexts_ead(data, xml, fragments, ead_serializer_class)
     if AppConfig[:plugins].include?('local_contexts_project')
       current_date = Time.now.strftime("%d/%m/%Y %H:%M")
       ead_serializer_caller = ead_serializer_class.new
       lcps = data.local_contexts_projects
-      if lcps && lcps.length > 0
+      include_lcps = include_lcps?(lcps)
+      if include_lcps
         xml.odd {
           xml.head {
             ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") , xml, fragments)
@@ -568,18 +585,21 @@ class LocalContextsEAD
     if AppConfig[:plugins].include?('local_contexts_project')
       ead_serializer_caller = ead_serializer_class.new
       lcps = digital_object['local_contexts_projects']
-      xml.note {
-        xml.p {
-          ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") + '. ' + I18n.t("local_contexts_project.digital_object_note", :title => digital_object['title']) , xml, fragments)
+      include_lcps = include_lcps?(lcps)
+      if include_lcps
+        xml.note {
+          xml.p {
+            ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") + '. ' + I18n.t("local_contexts_project.digital_object_note", :title => digital_object['title']) , xml, fragments)
+          }
+
+          construct_lc_intro(lcps, xml, fragments, ead_serializer_caller)
+
+          # loop through each attached id
+          lcps.each do |lcp|
+            construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
+          end
         }
-
-        construct_lc_intro(lcps, xml, fragments, ead_serializer_caller)
-
-        # loop through each attached id
-        lcps.each do |lcp|
-          construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
-        end
-      }
+      end
     end
   end
 
