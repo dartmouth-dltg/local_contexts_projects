@@ -130,7 +130,7 @@ PDF Exports on the staff side rely on (and require) an updated EAD to PDF styles
   AppConfig[:local_contexts_replace_xsl] = false
 ```
 
-the plugin will move the current version of `as-ead-pdf.xsl` aside (renaming it to `as-ead-pdf-orig.xsl`)
+the plugin will move the current version of `as-ead-pdf.xsl` aside (renaming it to `as-ead-pdf-lc-moved-orig.xsl`)
 and copy the plugin version into the stylesheet directory
 
 ```
