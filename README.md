@@ -52,7 +52,7 @@ This will create the tables required by the plugin.
 
 ## Configuration
 
-This plugin accepts two configuration options. These options 
+This plugin accepts three configuration options. These options 
 
 1. control the visibility of Local Contexts associated projects as facets in the staff application 
 1. control the visibility of Local Contexts associated projects as facets in the PUI
