@@ -57,7 +57,7 @@ This plugin accepts two configuration options. These options
 1. control the visibility of Local Contexts associated projects as facets in the staff application 
 1. control the visibility of Local Contexts associated projects as facets in the PUI
 1. control the visibility of the Open to Collaborate Notice on the home page
-1. sets the Local Contexts base URL
+1. set the Local Contexts base URL
 
 If the base URL is not set in the config, the url is assumed to be `https://localcontextshub.org/`
 
@@ -151,6 +151,7 @@ This plugin also overrides the following views
     /public/views/pdf/_resource.html.erb
     /public/views/pdf/_archival_object.html.erb
     /public/views/pdf/_digital_object_links.html.erb
+    /public/views/pdf/_titlepage.html.erb
     /public/views/shared/_record_innards.html.erb
     /public/views/welcome/show.html.erb
 ```

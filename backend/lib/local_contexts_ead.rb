@@ -73,11 +73,15 @@ class EADSerializer < ASpaceExport::Serializer
               serialize_container(instance, xml, @fragments)
             end
 
+            # Patch for Open to Collaborate Notice
+            LocalContextsEAD.serialize_local_contexts_collaborate(data, xml, @fragments, EADSerializer)
+            # end
+
             EADSerializer.run_serialize_step(data, xml, @fragments, :did)
 
           }# </did>
 
-          # This is it. The patch. All one lines of it
+          # This is it. The patch. All one line of it
           LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EADSerializer)
           # end the patch
 
@@ -346,6 +350,10 @@ class EAD3Serializer < EADSerializer
               serialize_container(instance, xml, @fragments)
             end
 
+            # Patch for Open to Collaborate Notice
+            LocalContextsEAD.serialize_local_contexts_collaborate(data, xml, @fragments, EAD3Serializer)
+            # end
+
             EADSerializer.run_serialize_step(data, xml, @fragments, :did)
 
           }# </did>
@@ -556,6 +564,30 @@ class LocalContextsEAD
       end
     end
     return false
+  end
+
+  def self.serialize_local_contexts_collaborate(data, xml, fragments, ead_serializer_class)
+    if AppConfig[:plugins].include?('local_contexts_project') && AppConfig[:local_contexts_project]['open_to_collaborate'] == true
+      otc = LocalContextsClient.new.get_data_from_local_contexts_api("no_id", 'open_to_collaborate')
+      ead_serializer_caller = ead_serializer_class.new
+      if otc['name']
+        xml.note {
+          xml.p {
+            ead_serializer_caller.sanitize_mixed_content(otc['name'] , xml, fragments)
+          }
+          xml.p {
+            xml.extref ({"xlink:href" => otc['img_url'],
+                        "xlink:actuate" => "onLoad",
+                        "xlink:show" => "embed",
+                        "xlink:type" => "simple"
+            })
+          }
+          xml.p {
+            ead_serializer_caller.sanitize_mixed_content(otc['default_text'] , xml, fragments)
+          }
+        }
+      end
+    end
   end
 
   # custom method to include Local Contexts data

@@ -1,0 +1,40 @@
+<div class="title-page">
+    <div class="logo"><%= image_tag( record.resolved_repository['image_url'] || asset_path("archivesspace.small.png") ) %></div>
+    <div class="title-block">
+    <% if record.finding_aid['title'] %>
+        <h3 class="title"><%== process_mixed_content(record.finding_aid['title'], :preserve_newlines => true) %></h3>
+        <h4 class="subtitle"><%== if record.finding_aid['subtitle'] then process_mixed_content(record.finding_aid['subtitle'], :preserve_newlines => true) end %></h4>
+    <% else %>
+        <h3 class="title"><%== process_mixed_content(record.display_string, :preserve_newlines => true) %></h3>
+    <% end %>
+    </div>
+
+    <p><%= I18n.t('pdf_reports.finding_aid_date_prefix') %> <%= Date.today %></p>
+    <% if record.finding_aid['language'] %>
+        <p><%= I18n.t('pdf_reports.finding_aid_written_in') %> <%= t('enumerations.language_iso639_2.' + record.finding_aid['language']) %></p>
+    <% end %>
+
+    <% if record.finding_aid['description_rules'] %>
+        <p><%= I18n.t('enumerations.resource_finding_aid_description_rules.' + record.finding_aid['description_rules'], :default => record.finding_aid['description_rules']) %></p>
+    <% end %>
+
+    <p><%= record.finding_aid['edition_statement'] %></p>
+
+    <!-- Local Contexts Begin -->
+    <% if AppConfig.has_key?(:local_contexts_project) && AppConfig[:local_contexts_project]['open_to_collaborate'] == true %>
+        <% lcp = ArchivesSpaceClient.instance.get_data_from_local_contexts_api("no_id", "open_to_collaborate") %>
+        <% if lcp['name'] %>
+            <h3><%= lcp['name'].html_safe %></h3>
+            <p><img style="height: 3em" src="<%= lcp['img_url'] %>" /></p>
+            <p><%= lcp['default_text'] %></p>
+            <p><%= I18n.t('local_contexts_more_html') %></p>
+        <% end %>
+    <% end %>
+    <!-- Local Contexts end -->
+
+    <%= render(:partial => 'publication_statement', :locals => {
+        :repository_name => record.resolved_repository['name'],
+        :repository_information => record.repository_information
+    })
+    %>
+</div>
