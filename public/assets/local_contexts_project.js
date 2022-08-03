@@ -2,8 +2,10 @@
 function LocalContexts(project_ids) {
   this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX;
   this.lc_data_el_prefix = "lc-project-live-data-";
+  this.spinner = '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>';
   $('[id^=' + this.lc_data_el_prefix + ']').html('');
   this.lc_img_el = $('#main-content h1');
+  this.lc_img_el.after(this.spinner)
   this.img_urls = Array();
   this.img_html = "";
   this.mainLanguage = typeof($('html').attr('lang')) !== 'undefined' ? $('html').attr('lang') : '';
@@ -96,6 +98,7 @@ LocalContexts.prototype.renderLocalContextsData = function(new_json, id, project
   var lc_img_wrapper = $('<div id="local-contexts-img-wrapper"><span id="lc-label-images-wrapper"></span><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Click an image to find out more about these Local Contexts Labels &amp; Notices."></i></div>');
 
   if ($('#local-contexts-img-wrapper').length == 0) {
+    $('.lds-ellipsis').remove()
     this.lc_img_el.after(lc_img_wrapper);
   }
 
