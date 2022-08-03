@@ -9,7 +9,7 @@ class IndexerCommon
     if AppConfig[:plugins].include?('local_contexts_project')
       indexer.add_document_prepare_hook {|doc, record|
         doc['local_contexts_project_uris_u_sstr'] = []
-        if ['accession','resource', 'archival_object', 'digital_object', 'digital_object_component'].include?(doc['primary_type']) && record['record']['local_contexts_projects']
+        if ['accession', 'resource', 'archival_object', 'digital_object', 'digital_object_component'].include?(doc['primary_type']) && record['record']['local_contexts_projects']
           if record['record']['local_contexts_projects'].length > 0
             doc['local_contexts_project_u_sbool'] = true
           else
@@ -20,7 +20,7 @@ class IndexerCommon
           end
         end
 
-        if doc['primary_type'] == 'archival_object'
+        if ['archival_object', 'digital_object_component'].include?(doc['primary_type'])
           doc['inherited_local_contexts_projects_u_sstr'] = []
           # only check if the object is not already tagged
           if doc['local_contexts_project_uris_u_sstr'].empty?
@@ -28,6 +28,8 @@ class IndexerCommon
               get_parent_local_context_uris(record['record']['parent']['ref'], doc)
             elsif record['record']['resource']
               get_parent_local_context_uris(record['record']['resource']['ref'], doc)
+            elsif record['record']['digital_object']
+              get_parent_local_context_uris(record['record']['digital_object']['ref'], doc)
             end
           end
         end
@@ -54,6 +56,11 @@ class IndexerCommon
       inherited_lcps << JSONModel::HTTP.get_json(lcp['ref'])
     end
     if inherited_lcps.length > 0
+      if parent['jsonmodel_type'] == 'digital_object'
+        parent['level'] = 'digital object'
+      elsif parent['jsonmodel_type'] == 'digital_object_component'
+        parent['level'] = 'digital object component'
+      end
       doc['inherited_local_contexts_projects_u_sstr'] << {'local_contexts_projects' => inherited_lcps, 'level' => parent['level'], 'parent_uri' => parent['uri']}.to_json
     end
     if doc['inherited_local_contexts_projects_u_sstr'].empty?
@@ -61,6 +68,8 @@ class IndexerCommon
         get_parent_local_context_uris(parent['parent']['ref'], doc)
       elsif parent['resource']
         get_parent_local_context_uris(parent['resource']['ref'], doc)
+      elsif parent['digital_object']
+        get_parent_local_context_uris(record['record']['digital_object']['ref'], doc)
       end
     end
   end

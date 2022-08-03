@@ -13,3 +13,6 @@ parents:
   digital_object:
     name: local_contexts_projects
     cardinality: zero_to_many
+  digital_object_component:
+    name: local_contexts_projects
+    cardinality: zero_to_many

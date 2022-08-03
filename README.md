@@ -3,7 +3,7 @@
 An ArchivesSpace plugin that allows staff users to add & display Local Contexts
 Labels (TK & BC), Notices (TK & BC), & Local Contexts Institution
 Notices (Attribution Incomplete) on resources, accessions, archival objects,
-and digital objects by linking a Local Contexts Hub
+digital objects, and digital object components by linking a Local Contexts Hub
 Project to an object via the project id.
 
 Please read the Local Contexts guidelines for using Labels & Notices and contact them for
@@ -93,7 +93,8 @@ This new record contains three fields.
 ```
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 
-To link a project to an object, this plugin adds a new subrecord to resources, accessions, archival objects, and digital objects: Local Contexts Projects.
+To link a project to an object, this plugin adds a new subrecord to resources, accessions, archival objects,
+digital objects, and digital object components: Local Contexts Projects.
 
 The subrecord contains one field - a link to a Local Contexts Project as defined above. In view mode,
 there is also a button which fetches the data associated with the project id(s) and displays all
@@ -129,7 +130,8 @@ plan is to authenticate and display the private project data only in the Archive
 
 ## Reports
 The plugin adds an additional report: Local Contexts List. The report generates a list of all
-projects and their associated primary type (resource, accession, archival object, and digital object), respectively.
+projects and their associated primary type (resource, accession, archival object, digital objects, 
+and digital object components), respectively.
 
 ## Core Overrides
 
