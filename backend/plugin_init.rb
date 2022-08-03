@@ -5,6 +5,10 @@ unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
 end
 
+unless AppConfig.has_key?(:local_contexts_replace_xsl)
+  AppConfig[:local_contexts_replace_xsl] = true
+end
+
 AppConfig[:local_contexts_api_path] = "api/v1"
 
 Permission.define("manage_local_contexts_project_record",
@@ -13,10 +17,18 @@ Permission.define("manage_local_contexts_project_record",
 
 # create the pui sitemaps directory if it does not already exist
 ArchivesSpaceService.loaded_hook do
-  dirname = File.join(AppConfig[:data_directory], "local_contexts_cache")
-  unless File.directory?(dirname)
-    FileUtils.mkdir_p(dirname)
-  end  
+  cache_dirname = File.join(AppConfig[:data_directory], "local_contexts_cache")
+  unless File.directory?(cache_dirname)
+    FileUtils.mkdir_p(cache_dirname)
+  end 
+  
+  pdf_xsl_file = File.join(ASUtils.find_base_directory, 'stylesheets', 'as-ead-pdf.xsl')
+  lc_pdf_xsl_file = File.join(ASUtils.find_local_directories(nil, 'local_contexts_project').shift, 'stylesheets', 'as-ead-pdf.xsl')
+  unless AppConfig[:local_contexts_replace_xsl] == false
+    FileUtils.mv(pdf_xsl_file, File.join(ASUtils.find_base_directory, 'stylesheets', 'as-ead-pdf-orig.xsl'))
+    FileUtils.cp(lc_pdf_xsl_file, File.join(ASUtils.find_base_directory, 'stylesheets', 'as-ead-pdf.xsl'))
+  end 
+  
 end
 
 Solr.add_search_hook do |query|

@@ -70,17 +70,19 @@ Set either `staff_faceting` or `public_faceting` to `true` to
 enable Local Contexts associated projects facets in that area.
 
 Set `open_to_collaborate` to `true` to display an Open to Collaborate Notice on the homepage.
-Please <a href="https://localcontexts.org/notices/cultural-institution-notices/">read more about using the Open to Collaborate Notice</a> at Local Contexts: 
+Please <a href="https://localcontexts.org/notices/cultural-institution-notices/">read more about using the 
+Open to Collaborate Notice</a> at Local Contexts: 
 
+Default Values
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
 
     AppConfig[:local_contexts_replace_xsl] = true
 
     AppConfig[:local_contexts_project] = {
-      'staff_faceting' => true,
-      'public_faceting' => true,
-      'open_to_collaborate' => true
+      'staff_faceting' => false,
+      'public_faceting' => false,
+      'open_to_collaborate' => false
     }
 ```
 
