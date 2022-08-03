@@ -58,8 +58,13 @@ This plugin accepts two configuration options. These options
 1. control the visibility of Local Contexts associated projects as facets in the PUI
 1. control the visibility of the Open to Collaborate Notice on the home page
 1. set the Local Contexts base URL
+1. controls the automatic replacement of the `as-ead-pdf.xsl` stylsheet with the plugin version
 
 If the base URL is not set in the config, the url is assumed to be `https://localcontextshub.org/`
+
+If `AppConfig[:local_contexts_replace_xsl]` is not set it is assumed to be true and the `as-ead-pdf.xsl`
+stylesheet found in `ARCHIVESSPACE_BASE_DIRECTORY/stylesheets` will automatically be moved aside in favor 
+of the plugin version. See the [Staff PDF Exports Note](#staff-pdf-exports-note) for more information.
 
 Set either `staff_faceting` or `public_faceting` to `true` to
 enable Local Contexts associated projects facets in that area.
@@ -69,6 +74,8 @@ Please <a href="https://localcontexts.org/notices/cultural-institution-notices/"
 
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
+
+    AppConfig[:local_contexts_replace_xsl] = true
 
     AppConfig[:local_contexts_project] = {
       'staff_faceting' => true,
@@ -113,15 +120,41 @@ which includes a link to the public facing description of the project if the
 `Hub Project is Public` field is checked for that project as well as the Local Contexts data for the project
 at the time of export.
 
-### Staff PDF Exports Note
+### <a name="staff-pdf-exports-note"></a>Staff PDF Exports Note
 
-PDF Exports on the staff side rely on an updated EAD to PDF stylesheet. Please replace the core file in
+PDF Exports on the staff side rely on (and require) an updated EAD to PDF stylesheet. If you have **NOT** set 
+
 ```
-  ARCHIVESSPACE_BASE_DIRECTORY/stylesheets/as-ead-psd.xsl
+  AppConfig[:local_contexts_replace_xsl] = false
 ```
-with the version found in the `stylesheets` directory of this plugin.
+
+the plugin will move the current version of `as-ead-pdf.xsl` aside (renaming it to `as-ead-pdf-orig.xsl`)
+and copy the plugin version into the stylesheet directory
+
+```
+  ARCHIVESSPACE_BASE_DIRECTORY/stylesheets
+```
+
+If you have already customized this stylesheet, set 
+
+```
+  AppConfig[:local_contexts_replace_xsl] = false
+```
+
+and then merge and reconcile the changes present in the plugin version of the stylesheet with your 
+local customizations. Display of the Local Contexts data must meet certain display requirements (specifically
+rendering of images inline) which the plugin stylesheet provides.
 
 See the `samples` directory in the plugin for sample exports and screenshots.
+
+### Caching
+
+The plugin implements a simple caching mechanism to prevent overloading the Local Contexts API. Caching
+is turned on for expoorts, but not for on-demand views in the staff UI or PUI. Requests for views in the staff UI
+or PUI will update the cache, though.
+
+Cache files are located in a new directory in the ArchivesSpace data directory named `local_contexts_cache`. This
+directory is created by the plugin during ArchivesSpace startup if it is not present.
 
 ## Notes
 The Local Contexts API does not support authentication at this time so LC Hub data for private projects
