@@ -19,9 +19,9 @@ Rails.application.config.after_initialize do
   end
 
   class ArchivesSpaceClient
-    def get_data_from_local_contexts_api(id, type)
+    def get_data_from_local_contexts_api(id, type, use_cache)
       uri = "/local_contexts_projects/get_local_contexts_api_data"
-      params = {:id => id, :type => type}
+      params = {:id => id, :type => type, :use_cache => use_cache}
       url = build_url(uri, params)
       if id && type
         request = Net::HTTP::Get.new(url)

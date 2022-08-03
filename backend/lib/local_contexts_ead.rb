@@ -568,7 +568,7 @@ class LocalContextsEAD
 
   def self.serialize_local_contexts_collaborate(data, xml, fragments, ead_serializer_class)
     if AppConfig[:plugins].include?('local_contexts_project') && AppConfig[:local_contexts_project]['open_to_collaborate'] == true
-      otc = LocalContextsClient.new.get_data_from_local_contexts_api("no_id", 'open_to_collaborate')
+      otc = LocalContextsClient.new.get_data_from_local_contexts_api("open_to_collaborate", 'open_to_collaborate', true)
       ead_serializer_caller = ead_serializer_class.new
       if otc['name']
         xml.note {
@@ -663,7 +663,7 @@ class LocalContextsEAD
     if lcp['_resolved'] && lcp['_resolved']['project_id'] && lcp['_resolved']['project_is_public'] === true
       project_id = lcp['_resolved']['project_id']
       project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
-      project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project')
+      project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project', true)
 
       # for each fetched project, render the data
       if project_json['title'] && project_json['title'].length > 0

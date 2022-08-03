@@ -210,7 +210,7 @@ function OpenToCollaborate(about_lc_text) {
   $.ajax({
     url: this.publicPrefix + "local_contexts_projects/fetch/fetch_lc_project_data",
     data: {
-      id: 'no_id',
+      id: 'open_to_collaborate',
       type: 'open_to_collaborate'
     },
     dataType: 'json'

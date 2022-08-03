@@ -22,7 +22,7 @@
 
     <!-- Local Contexts Begin -->
     <% if AppConfig.has_key?(:local_contexts_project) && AppConfig[:local_contexts_project]['open_to_collaborate'] == true %>
-        <% lcp = ArchivesSpaceClient.instance.get_data_from_local_contexts_api("no_id", "open_to_collaborate") %>
+        <% lcp = ArchivesSpaceClient.instance.get_data_from_local_contexts_api("open_to_collaborate", "open_to_collaborate", true) %>
         <% if lcp['name'] %>
             <h3><%= lcp['name'].html_safe %></h3>
             <p><img style="height: 3em" src="<%= lcp['img_url'] %>" /></p>

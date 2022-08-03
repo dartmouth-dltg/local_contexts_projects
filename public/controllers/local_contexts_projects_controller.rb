@@ -5,7 +5,8 @@ class LocalContextsProjectsController < ApplicationController
   def fetch_lc_project_data
     unless params[:id].nil?
       type = params[:type].nil? ? 'project' : params[:type]
-      res = archivesspace.get_data_from_local_contexts_api(params[:id], type)
+      use_cache = params[:use_cache].nil? ? false : params[:use_cache]
+      res = archivesspace.get_data_from_local_contexts_api(params[:id], type, use_cache)
       render :json => res
     end
   end

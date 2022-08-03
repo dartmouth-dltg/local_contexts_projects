@@ -36,8 +36,16 @@ class LocalContextsClient
     end
   end
 
+  def maybe_parse_cached_json(response)
+    begin
+      ASUtils.json_parse(response)
+    rescue JSON::ParserError
+      Log.error("Couldn't parse response as JSON: #{response}")
+      raise ReferenceError.new("Cached file data is not recognized")
+    end
+  end
 
-  def get(suffix, type, headers = {})
+  def do_http_request(suffix, type, headers = {})
     get_url = url(suffix, type)
     http_request(get_url) do |http|
       req = Net::HTTP::Get.new(get_url.request_uri)
@@ -53,21 +61,37 @@ class LocalContextsClient
     end
   end
 
-
-  def get_json(suffix, type)
-    res = get(suffix, type)
-    if res
-      maybe_parse_json(res)
+  def write_lcp_cache(cache_file, response)
+    if response.body
+      File.open(cache_file,"w"){ |f| f << response.body }
+    else
+      File.open(cache_file,"w"){ |f| f << '' }
     end
   end
 
+  def get_json(suffix, type, id, use_cache)
+    cache_file = File.join(AppConfig[:data_directory], "local_contexts_cache", id + '.json')
 
-  def get_data_from_local_contexts_api(id, type)
+    if use_cache
+      if !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - 300))
+        res = do_http_request(suffix, type)
+        write_lcp_cache(cache_file, res)
+      end
+      maybe_parse_cached_json(File.open(cache_file).read)
+    else
+      response = do_http_request(suffix, type)
+      write_lcp_cache(cache_file, response)
+      maybe_parse_json(response)
+    end
+    
+  end
+
+  def get_data_from_local_contexts_api(id, type, use_cache = false)
     if type == 'open_to_collaborate'
-      get_json(@api_paths_map[type], type)
+      get_json(@api_paths_map[type], type, id, use_cache)
     else
       lc_api_path_for_type = File.join(@api_paths_map[type], id)
-      get_json(lc_api_path_for_type, type)
+      get_json(lc_api_path_for_type, type, id, use_cache)
     end
   end
 

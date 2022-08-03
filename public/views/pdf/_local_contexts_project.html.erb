@@ -1,6 +1,6 @@
 <%# fetch the lc data for this project #%>
 <% 
-  lcp = ArchivesSpaceClient.instance.get_data_from_local_contexts_api(project_id, "project")
+  lcp = ArchivesSpaceClient.instance.get_data_from_local_contexts_api(project_id, "project", true)
   current_date = Time.now.strftime("%B %d, %Y")
   lc_labels = ["bc_labels", "tk_labels"]
 %>
