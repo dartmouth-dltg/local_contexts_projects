@@ -1,30 +1,82 @@
 en:
   plugins:
-    local_context:
+    local_contexts_project:
       _plural: Local Contexts Project
       _singular: Local Contexts Project
       _frontend:
         action:
-          add: Add Local Contexts Project Id
+          add: Add Local Contexts Project
+    local_contexts_projects:
+      label: Local Contexts Projects
 
-  local_context:
+  local_contexts_project:
+    _singular: Local Contexts Project
+    _plural: Local Context Projects
+    _frontend:
+      action:
+        save: Save Local Contexts Project
+        create: Create a new Project
+      form_header: Local Contexts Project
+      messages:
+          created: Local Contexts Project Created
+          deleted: Local Contexts Project Deleted
+          delete_conflict: There was a problem deleting the Local Contexts Project
+          updated: Local Contexts Project Updated
+      section:
+        search_embedded: Linked Records
+
+    digital_object_note: The following provides information about %{title} (related digital object)
+    display_string: Display String
     fetch_btn: See Local Contexts Data
+    placed_by_txt: Placed By
+    project_date_information: 'Local Contexts Labels and Notices for this material as of: '
+    project_date_see_current: Please check the project in the Local Contexts Hub for current information.
     project_id: Project Id
-    local_contexts_project_link_text: View this project on the Local Contexts Hub
-    local_contexts_project_information: >
-      This material is related to a Local Contexts project which may have associated various Biocultural Labels,
-      Traditional Knowledge Labels, Notices, and Institution Notices with this material.
-    local_contexts_section_title: Local Contexts Information
+    project_information:
+      _singular: >
+        This material is related to a Local Contexts project which may have associated various Biocultural Labels,
+        Traditional Knowledge Labels, Notices, and Institution Notices with this material.
+      _plural: >
+        This material is related to Local Contexts projects which may have associated various Biocultural Labels,
+        Traditional Knowledge Labels, Notices, and Institution Notices with this material.
+    project_is_public: Hub Project Public or Discoverable?
+    project_link_text: View this project on the Local Contexts Hub
+    project_name: Project Name
+    project_not_public_message: The information for the Local Contexts project is not publicly available.
+    related_project_tooltip: Select a Local Contexts project.
+    section_title: Local Contexts Information
+    translations_toggle: Hide/Show Translations for this label
+    fetch_error:
+      ead_message: Unable to fetch the Local Contexts data for this project. Try viewing the project on the Local Contexts Hub.
+      title: Problem Fetching Data
+      message: An error occurred while fetching the data from the Local Contexts Hub for project id
+      message_append: Try again or consult the logs.
+
+  permission_types:
+    manage_local_contexts_project_record: create/modify/delete local contexts records
 
   advanced_search:
     text:
-      local_context_u_sbool: Local Contexts Project Id
+      local_contexts_project_u_sbool: Local Contexts Project Id
 
   reports:
-    local_contexts_list_report:
+    local_contexts_projects_list_report:
       title: Local Contexts Projects List Report
-      description: List all resources, accession, archival objects and digital objects which have been linked to a Local Contexts Project.
+      description: List all resources, accession, archival objects, digital objects, and digital object components which have been linked to a Local Contexts Project.
 
   search:
+    local_contexts_project:
+      display_string: Display String
+      title: Local Contexts Project
     multi:
-      local_context_u_sbool: Local Contexts Project
+      local_contexts_project_u_sbool: Has Local Contexts Project
+      local_contexts_project_uris_u_sstr: Local Contexts Project URI
+
+  search_results:
+    filter:
+      local_contexts_project_u_sbool: Has Local Contexts Project
+      local_contexts_project_uris_u_sstr: Local Contexts Project URI
+    filter_terms:
+      local_contexts_project_u_sbool:
+        "true": "Yes"
+        "false": "No"

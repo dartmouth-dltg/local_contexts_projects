@@ -60,10 +60,10 @@
     <% end %>
 </div>
 
-  <!-- local_context begin -->
-  <% if AppConfig[:plugins].include?('local_context') %>
-    <% unless @result.json['local_context'].blank? %>
-     <%= render partial: 'local_context/local_context', locals: {:local_context =>  @result.json['local_context']} %>
+  <!-- Local Contexts Project begin -->
+  <% if AppConfig[:plugins].include?('local_contexts_project') %>
+    <% if !@result.json['local_contexts_projects'].blank? || !@result['inherited_local_contexts_projects_u_sstr'].blank? %>
+     <%= render partial: 'local_contexts_project/local_contexts_project', locals: {:local_contexts_projects =>  @result.json['local_contexts_projects'], :inherited_local_contexts_projects => @result['inherited_local_contexts_projects_u_sstr']} %>
     <% end %>
   <% end %>
   <!-- local_context end -->

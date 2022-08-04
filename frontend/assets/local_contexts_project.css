@@ -1,0 +1,92 @@
+/* data */
+#local-contexts-data-holder {
+  margin: 1em;
+}
+
+#local-contexts-data-holder > div {
+  display: table;
+  clear: both;
+}
+
+#local-contexts-data-holder > div:first-of-type {
+  margin-top: 0;
+}
+
+#local-contexts-data-holder p {
+  display: table;
+}
+
+img.local-contexts-image {
+  display: table-cell;
+  max-width: 5em;
+  margin: 0 1em 1em 0;
+}
+
+span.local-contexts-description {
+  display: table-cell;
+  vertical-align: top;
+}
+span.local-contexts-placed-by {
+  display: block;
+}
+
+span.local-contexts-placed-by-label {
+  font-weight: bold;
+}
+
+span.local-contexts-placed-by-label::after {
+  content: ":";
+}
+
+/* translations */
+.local-contexts-translation-wrapper {
+  display: none;
+  margin-top: 0.5em;
+}
+
+.local-contexts-translation-wrapper.shown {
+  display: block;
+}
+
+.local-contexts-translation-title {
+  font-weight: bold
+}
+
+.local-contexts-translation-translation {
+  display: block;
+  margin-bottom: 1em;
+}
+
+.local-contexts-translation-translation:last-of-type {
+  margin-bottom: 0;
+}
+
+/* general layout */
+.lc-project-data-label,
+.lc-project-fetch-error {
+  margin-top: 3em;
+}
+
+/* json */
+.lc-json {
+  display: none;
+}
+
+.lc-json.shown {
+  display: block;
+}
+
+/* fetch button */
+a.fetching::after {
+  display: inline-block;
+  content: "\e031";
+  font-family: "Glyphicons Halflings";
+  margin-left: 0.5em;
+  animation: spin 1s infinite linear;
+}
+
+/* animation */
+@keyframes spin {
+  from { transform: scale(1) rotate(0deg); }
+  to { transform: scale(1) rotate(360deg); }
+}

@@ -4,15 +4,26 @@ require 'aspace_logger'
 class LocalContextsClient
 
   def initialize
-    @base_url = AppConfig[:local_context_base_url]
-    @api_version_path = AppConfig[:local_context_api_path]
+    @base_url = AppConfig[:local_contexts_base_url]
+    @api_version_path = AppConfig[:local_contexts_api_path]
     @query_data_type = '?format=json'
     @api_paths_map = {
       "project" => "projects",
       "user" => "users",
       "researcher" => "researchers",
-      "institution" => "institutions"
+      "institution" => "institutions",
+      "open_to_collaborate" => "notices/open_to_collaborate"
     }
+    @HTTP_ERRORS = [
+      EOFError,
+      Errno::ECONNRESET,
+      Errno::EINVAL,
+      Errno::ECONNREFUSED,
+      Net::HTTPBadResponse,
+      Net::HTTPHeaderSyntaxError,
+      Net::ProtocolError,
+      Timeout::Error
+    ]
   end
 
 
@@ -21,45 +32,77 @@ class LocalContextsClient
       ASUtils.json_parse(response.body)
     rescue JSON::ParserError
       Log.error("Couldn't parse response as JSON: #{response.inspect} -- #{response.body}")
-      raise ReferenceError.new("Unrecognized response from Local Conexts API")
+      raise ReferenceError.new("Unrecognized response from Local Contexts API")
     end
   end
 
+  def maybe_parse_cached_json(response)
+    begin
+      ASUtils.json_parse(response)
+    rescue JSON::ParserError
+      Log.error("Couldn't parse response as JSON: #{response}")
+      raise ReferenceError.new("Cached file data is not recognized")
+    end
+  end
 
-  def get(suffix, headers = {})
-    get_url = url(suffix)
-
+  def do_http_request(suffix, type, headers = {})
+    get_url = url(suffix, type)
     http_request(get_url) do |http|
       req = Net::HTTP::Get.new(get_url.request_uri)
 
       headers.each {|k,v| req[k] = v }
-
-      response = http.request(req)
-
-      if response.code != "200"
-        raise ConflictException.new("Failure in GET request from Local Contexts: #{response.body}")
+      begin
+        response = http.request(req)
+      rescue *HTTP_ERRORS => e
+        Log.error("Not a valid response from the Local Contexts API")
       end
 
       response
     end
   end
 
-
-  def get_json(suffix)
-    res = get(suffix)
-    maybe_parse_json(res)
+  def write_lcp_cache(cache_file, response)
+    if response.body
+      File.open(cache_file,"w"){ |f| f << response.body }
+    else
+      File.open(cache_file,"w"){ |f| f << '' }
+    end
   end
 
+  def get_json(suffix, type, id, use_cache)
+    cache_file = File.join(AppConfig[:data_directory], "local_contexts_cache", id + '.json')
 
-  def get_data_from_api(id, type)
-    lc_api_path_for_type = File.join(@api_paths_map[type], id)
-    get_json(lc_api_path_for_type)
+    if use_cache
+      if !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - 300))
+        res = do_http_request(suffix, type)
+        write_lcp_cache(cache_file, res)
+      end
+      maybe_parse_cached_json(File.open(cache_file).read)
+    else
+      response = do_http_request(suffix, type)
+      write_lcp_cache(cache_file, response)
+      maybe_parse_json(response)
+    end
+    
+  end
+
+  def get_data_from_local_contexts_api(id, type, use_cache = false)
+    if type == 'open_to_collaborate'
+      get_json(@api_paths_map[type], type, id, use_cache)
+    else
+      lc_api_path_for_type = File.join(@api_paths_map[type], id)
+      get_json(lc_api_path_for_type, type, id, use_cache)
+    end
   end
 
   private
 
-  def url(suffix, params = {})
-    URI(File.join(@base_url, @api_version_path, suffix, @query_data_type))
+  def url(suffix, type, params = {})
+    if type == "open_to_collaborate"
+      URI(File.join(@base_url, @api_version_path, suffix + @query_data_type))
+    else
+      URI(File.join(@base_url, @api_version_path, suffix, @query_data_type))
+    end
   end
 
   def http_request(url)

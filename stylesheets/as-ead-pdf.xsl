@@ -118,6 +118,12 @@
         <xsl:attribute name="border">.5pt solid #ccc</xsl:attribute>
         <xsl:attribute name="border-collapse">separate</xsl:attribute>
     </xsl:attribute-set>
+    <!-- Local Contexts start -->
+    <xsl:attribute-set name="inline-images">
+        <xsl:attribute name="height">1.00in</xsl:attribute>
+        <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
+    </xsl:attribute-set>
+    <!-- Local Contexts end -->
 
     <!--  Start main page design and layout -->
     <xsl:template match="/">
@@ -1133,27 +1139,27 @@
             </xsl:choose>
         </fo:basic-link>
     </xsl:template>
+    <!-- Local Contexts start -->
     <xsl:template match="ead:extref">
-      <xsl:choose>
-        <xsl:when test="starts-with(@id, 'institutionNotice')">
-          <fo:block>
-            <fo:external-graphic src="url('{@*:href}')" content-height="scale-to-fit" height="0.50in"  content-width="0.50in"/>
-          </fo:block>
-        </xsl:when>
-        <xsl:otherwise>
-          <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
-              <xsl:choose>
-                  <xsl:when test="text()">
-                      <xsl:value-of select="."/>
-                  </xsl:when>
-                  <xsl:otherwise>
-                      <xsl:value-of select="@*:href"/>
-                  </xsl:otherwise>
-              </xsl:choose>
-          </fo:basic-link>
-        </xsl:otherwise>
-      </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="@*:show = 'embed'">
+                <fo:external-graphic src="url({@*:href})" xsl:use-attribute-sets="inline-images"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
+                    <xsl:choose>
+                        <xsl:when test="text()">
+                            <xsl:value-of select="."/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="@*:href"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </fo:basic-link>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
+    <!-- Local Contexts end -->
     <xsl:template match="ead:extrefloc">
         <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
             <xsl:choose>

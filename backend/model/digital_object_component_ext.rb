@@ -1,0 +1,1 @@
+DigitalObjectComponent.include(LocalContextsProjects)

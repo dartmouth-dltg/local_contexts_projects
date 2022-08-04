@@ -1,3 +1,6 @@
 <!-- local_context/public/views/layout_head.html.erb -->
-<%= stylesheet_link_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_context.css" %>
-<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_context.js" %>
+<%= stylesheet_link_tag "#{AppConfig[:public_proxy_prefix]}assets/local_contexts_project.css" %>
+<script>
+  var LOCALCONTEXTS_PUBLIC_PREFIX = "<%= AppConfig[:public_proxy_prefix] %>";
+</script>
+<%= javascript_include_tag "#{AppConfig[:public_proxy_prefix]}assets/local_contexts_project.js" %>

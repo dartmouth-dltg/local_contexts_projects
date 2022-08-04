@@ -1,5 +1,5 @@
 class EADModel < ASpaceExport::ExportModel
-  def local_context
-    self.local_context
+  def local_contexts_project
+    self.local_contexts_project
   end
 end

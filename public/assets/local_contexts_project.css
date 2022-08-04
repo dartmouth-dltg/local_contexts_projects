@@ -1,0 +1,194 @@
+/* errors */
+.local-contexts-error-msg {
+  margin-left: 0.5em;
+  padding: 0.25em;
+}
+
+.local-contexts-error-msg:before {
+  margin-right: 0.25em;
+  content: "\f06a";
+  font-family: "FontAwesome";
+}
+
+/* data */
+.local-contexts-live-data {
+  margin: -10px 2em 2em 2em;
+}
+
+.local-contexts-live-data > div,
+#open-to-collaborate > div {
+  display: table;
+  clear: both;
+}
+
+.local-contexts-live-data p,
+#open-to-collaborate p {
+  display: table;
+}
+
+img.local-contexts-image {
+  display: table-cell;
+  max-width: 5em;
+  margin: 0 1em 1em 0;
+}
+
+span.local-contexts-audio {
+  display: block;
+}
+
+span.local-contexts-description {
+  display: table-cell;
+  max-width: 970px;
+  vertical-align: top;
+}
+span.local-contexts-placed-by {
+  display: block;
+}
+
+span.local-contexts-placed-by-label {
+  font-weight: bold;
+}
+span.local-contexts-inherited {
+  display: block;
+}
+
+#local-contexts-img-wrapper {
+  display: table;
+  clear: both;
+}
+
+#local-contexts-img-wrapper:hover {
+  cursor: pointer;
+}
+
+img.local-contexts-header-image {
+  float: left;
+  max-height: 2.25em;
+  margin-right: 0.25em;
+}
+
+/* translations */
+.local-contexts-translation-wrapper {
+  display: none;
+  margin-top: 0.5em;
+  margin-bottom: 1rem;
+}
+
+.local-contexts-translation-wrapper.shown {
+  display: block;
+}
+
+.local-contexts-translation-title {
+  font-weight: bold
+}
+
+.local-contexts-translation-translation {
+  display: block;
+  margin-bottom: 1em;
+}
+
+.local-contexts-translation-translation:last-of-type {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 767px) {
+  .local-contexts-live-data {
+    margin: 0;
+  }
+  .local-contexts-live-data > div, 
+  #open-to-collaborate > div,
+  .local-contexts-live-data p,
+  #open-to-collaborate p {
+    display: block;
+  }
+  span.local-contexts-audio audio {
+    max-width: 100%;
+  }
+}
+
+.lds-ellipsis {
+  position: relative;
+  width: 50px;
+  height: 15px;
+  margin-left: 0;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  -webkit-animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  border-radius: 50%;
+  background: #ccc;
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  -webkit-animation: lds-ellipsis1 0.6s infinite;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  -webkit-animation: lds-ellipsis2 0.6s infinite;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  -webkit-animation: lds-ellipsis2 0.6s infinite;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  -webkit-animation: lds-ellipsis3 0.6s infinite;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+
+@-webkit-keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@-webkit-keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@-webkit-keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}

@@ -1,0 +1,13 @@
+<% define_template "local_contexts_project" do |form, opts = {}|  %>
+  <div id="local-contexts-project-container" class="subrecord-form-container">
+    <div class="subrecord-form-fields">
+      <% if !opts[:readonly] %>
+        <%= render_aspace_partial :partial => "local_contexts_projects/linker",
+                   :locals => {
+                       :form => form
+                   }
+         %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

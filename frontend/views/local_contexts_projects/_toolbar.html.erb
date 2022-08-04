@@ -1,0 +1,27 @@
+<% if user_can?('manage_local_contexts_project_record') %>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="record-toolbar">
+        <% if ['edit', 'update', 'new', 'create'].include?(controller.action_name) %>
+          <div class="pull-left save-changes">
+            <button type="submit" class="btn btn-primary btn-sm"><%= I18n.t("actions.save_prefix") %></button>
+          </div>
+        <% else %>
+        <div class="btn-group pull-left">
+          <%= link_to I18n.t("actions.edit"), {:controller => :local_contexts_projects, :action => :edit, :id => @local_contexts_project.id}, :class => "btn btn-sm btn-primary" %>
+        </div>
+        <% end %>
+        <% if !['new', 'create'].include?(controller.action_name) %>
+        <div class="btn-toolbar pull-right">
+          <div class="btn-group">
+            <div class="btn btn-inline-form">
+              <%= button_delete_action url_for(:controller => :local_contexts_projects, :action => :delete, :id => @local_contexts_project.id), { :"data-title" => I18n.t("actions.delete_confirm_title", :title => @local_contexts_project.display_string) } unless @local_contexts_project.id.nil? %>
+            </div>
+          </div>
+        </div>
+        <% end %>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+<% end %>

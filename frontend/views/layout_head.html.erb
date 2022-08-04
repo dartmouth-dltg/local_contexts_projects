@@ -1,2 +1,5 @@
-<%= stylesheet_link_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_context.css" %>
-<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_context.js" %>
+<%= stylesheet_link_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_project.css" %>
+<script>
+  var LOCALCONTEXTS_FRONTEND_PREFIX = "<%= AppConfig[:frontend_proxy_prefix] %>";
+</script>
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_project.js" %>
