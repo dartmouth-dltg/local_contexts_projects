@@ -16,7 +16,14 @@
 
       <h2>
         <%= I18n.t("plugins.local_contexts_project._singular") %>
-        <button class="btn btn-sm pull-right"><a href="<%= "#{AppConfig[:frontend_proxy_prefix]}plugins/local_contexts_projects/new" %>"><%= I18n.t("local_contexts_project._frontend.action.create") %></a></button>
+        <% if user_can?('clear_localcontexts_projects_cache') %>
+          <div class="btn-group pull-right local-contexts-clear-cache-btn">
+            <%= link_to I18n.t("local_contexts_project._frontend.action.clear_cache"), {:controller => :local_contexts_projects, :action => :clear_cache}, data: { confirm: "Are you sure?" }, method: :post, :class => "btn btn-sm btn-warning" %>
+          </div>
+        <% end %>
+        <% if user_can?('update_localcontexts_project_record') %>
+          <div class="btn-group pull-right"><a class="btn btn-sm btn-primary" href="<%= "#{AppConfig[:frontend_proxy_prefix]}plugins/local_contexts_projects/new" %>"><%= I18n.t("local_contexts_project._frontend.action.create") %></a></button>
+        <% end %>
       </h2>
 
       <%= render_aspace_partial :partial => "shared/flash_messages" %>

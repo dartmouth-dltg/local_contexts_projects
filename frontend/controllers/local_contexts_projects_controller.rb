@@ -5,8 +5,7 @@ require 'aspace_logger'
 class LocalContextsProjectsController < ApplicationController
 
   set_access_control "view_repository" => [:fetch_lc_project_data, :index, :show, :typeahead],
-                      "update_local_contexts_project_record" => [:new, :edit, :create, :update, :delete]
-
+                      "update_localcontexts_project_record" => [:new, :edit, :create, :update, :delete, :clear_cache]
 
   SEARCH_FACETS = ["local_contexts_project_u_sstr"]
 
@@ -87,4 +86,13 @@ class LocalContextsProjectsController < ApplicationController
     render :json => Search.all(session[:repo_id], search_params)
   end
 
+  def clear_cache
+    res = JSONModel::HTTP::post_form("/local_contexts_projects/clear_cache")
+    begin ASUtils.json_parse(res.body)['success']
+      flash[:success] = I18n.t("local_contexts_project._frontend.messages.cache_clear_success")
+    rescue
+      flash[:error] = I18n.t("local_contexts_project._frontend.messages.cache_clear_error")
+    end
+    redirect_to(:controller => :local_contexts_projects, :action => :index)
+  end
 end

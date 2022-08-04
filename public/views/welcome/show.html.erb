@@ -28,7 +28,7 @@
 <% if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true %>
     <div class="row">
         <div class="col-sm-12">
-            <div id="open-to-collaborate"></div>
+            <div id="open-to-collaborate"><div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
             <script>new OpenToCollaborate('<%= raw(t('local_contexts_more_html')) %>')</script>
         </div>
     </div>

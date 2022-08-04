@@ -101,7 +101,7 @@ In the plugins menu, under the cog by the repo name, there is an additional entr
 `Local Contexts Projects`. Click this to view a list of the current projects, edit a project,
 or create a new project.
 
-Access to the this area is governed by a new permission defined in the plugin: `manage_local_contexts_project_record`
+Access to the this area is governed by a new permission defined in the plugin: `update_localcontexts_project_record`
 
 This new record contains three fields.
 ```

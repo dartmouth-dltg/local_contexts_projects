@@ -211,7 +211,8 @@ function OpenToCollaborate(about_lc_text) {
     url: this.publicPrefix + "local_contexts_projects/fetch/fetch_lc_project_data",
     data: {
       id: 'open_to_collaborate',
-      type: 'open_to_collaborate'
+      type: 'open_to_collaborate',
+      use_cache: true
     },
     dataType: 'json'
   })

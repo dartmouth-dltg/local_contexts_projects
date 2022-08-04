@@ -85,6 +85,11 @@ a.fetching::after {
   animation: spin 1s infinite linear;
 }
 
+/* clear cache button */
+.local-contexts-clear-cache-btn {
+  margin-left: 0.5rem;
+}
+
 /* animation */
 @keyframes spin {
   from { transform: scale(1) rotate(0deg); }

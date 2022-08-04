@@ -12,18 +12,24 @@ end
 
 AppConfig[:local_contexts_api_path] = "api/v1"
 
-Permission.define("manage_local_contexts_project_record",
+Permission.define("manage_localcontexts_records",
                   "The ability to create/update/delete Local Contexts Project records",
+                  :level => "repository")
+
+Permission.define("update_localcontexts_project_record",
+                  "The ability to create/update/delete Local Contexts Project records",
+                  :implied_by => 'manage_localcontexts_records',
                   :level => "global")
+
 
 # create the pui sitemaps directory if it does not already exist
 ArchivesSpaceService.loaded_hook do
 
   logger = Logger.new($stderr)
 
-  cache_dirname = File.join(AppConfig[:data_directory], "local_contexts_cache")
-  unless File.directory?(cache_dirname)
-    FileUtils.mkdir_p(cache_dirname)
+  AppConfig[:local_contexts_cache_dirname] = File.join(AppConfig[:data_directory], "local_contexts_cache")
+  unless File.directory?(AppConfig[:local_contexts_cache_dirname])
+    FileUtils.mkdir_p(AppConfig[:local_contexts_cache_dirname])
   end 
   
   unless AppConfig[:local_contexts_replace_xsl] == false
