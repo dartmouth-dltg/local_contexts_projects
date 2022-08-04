@@ -567,7 +567,7 @@ class LocalContextsEAD
   end
 
   def self.serialize_local_contexts_collaborate(data, xml, fragments, ead_serializer_class)
-    if AppConfig[:plugins].include?('local_contexts_project') && AppConfig[:local_contexts_project]['open_to_collaborate'] == true
+    if AppConfig[:plugins].include?('local_contexts_projects') && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
       otc = LocalContextsClient.new.get_data_from_local_contexts_api("open_to_collaborate", 'open_to_collaborate', true)
       ead_serializer_caller = ead_serializer_class.new
       if otc['name']
@@ -592,7 +592,7 @@ class LocalContextsEAD
 
   # custom method to include Local Contexts data
   def self.serialize_local_contexts_ead(data, xml, fragments, ead_serializer_class)
-    if AppConfig[:plugins].include?('local_contexts_project')
+    if AppConfig[:plugins].include?('local_contexts_projects')
       current_date = Time.now.strftime("%d/%m/%Y %H:%M")
       ead_serializer_caller = ead_serializer_class.new
       lcps = data.local_contexts_projects
@@ -614,7 +614,7 @@ class LocalContextsEAD
   end
 
   def self.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, ead_serializer_class)
-    if AppConfig[:plugins].include?('local_contexts_project')
+    if AppConfig[:plugins].include?('local_contexts_projects')
       ead_serializer_caller = ead_serializer_class.new
       lcps = digital_object['local_contexts_projects']
       include_lcps = include_lcps?(lcps)

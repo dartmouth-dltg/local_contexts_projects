@@ -21,7 +21,7 @@
     <p><%= record.finding_aid['edition_statement'] %></p>
 
     <!-- Local Contexts Begin -->
-    <% if AppConfig.has_key?(:local_contexts_project) && AppConfig[:local_contexts_project]['open_to_collaborate'] == true %>
+    <% if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true %>
         <% lcp = ArchivesSpaceClient.instance.get_data_from_local_contexts_api("open_to_collaborate", "open_to_collaborate", true) %>
         <% if lcp['name'] %>
             <h3><%= lcp['name'].html_safe %></h3>

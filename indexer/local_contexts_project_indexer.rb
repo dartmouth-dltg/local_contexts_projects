@@ -6,7 +6,7 @@ class IndexerCommon
   @@resolved_attributes << 'instances::digital_object::_resolved::local_contexts_projects'
 
   add_indexer_initialize_hook do |indexer|
-    if AppConfig[:plugins].include?('local_contexts_project')
+    if AppConfig[:plugins].include?('local_contexts_projects')
       indexer.add_document_prepare_hook {|doc, record|
         doc['local_contexts_project_uris_u_sstr'] = []
         if ['accession', 'resource', 'archival_object', 'digital_object', 'digital_object_component'].include?(doc['primary_type']) && record['record']['local_contexts_projects']

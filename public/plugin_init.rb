@@ -8,7 +8,7 @@ Rails.application.config.after_initialize do
   end
 
   # only add faceting if configured
-  if AppConfig.has_key?(:local_contexts_project) && AppConfig[:local_contexts_project]['public_faceting'] == true
+  if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['public_faceting'] == true
     Searchable.module_eval do
       alias_method :pre_local_contexts_project_set_up_advanced_search, :set_up_advanced_search
       def set_up_advanced_search(default_types = [],default_facets=[],default_search_opts={}, params={})

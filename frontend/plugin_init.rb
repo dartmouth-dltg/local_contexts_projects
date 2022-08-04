@@ -7,7 +7,7 @@ Rails.application.config.after_initialize do
   end
 
   # only add faceting if configured
-  if AppConfig.has_key?(:local_contexts_project) && AppConfig[:local_contexts_project]['staff_faceting'] == true
+  if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['staff_faceting'] == true
     SearchResultData.class_eval do
       self.singleton_class.send(:alias_method, :BASE_FACETS_pre_local_contexts_project, :BASE_FACETS)
       def self.BASE_FACETS
@@ -17,7 +17,7 @@ Rails.application.config.after_initialize do
   end
 
   # one can choose to remove the Local Contexxts Projects from the facets in search
-  if AppConfig.has_key?(:local_contexts_project) && AppConfig[:local_contexts_project]['local_contexts_project_faceting'] == false
+  if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['local_contexts_project_faceting'] == false
     class SearchResultData
       alias_method :facets_for_filter_pre_local_contexts_project, :facets_for_filter
       def facets_for_filter

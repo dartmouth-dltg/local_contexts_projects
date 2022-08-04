@@ -15,7 +15,7 @@
             <% end %>
         <% end %>
         <!-- Local Contexts Project Begin -->
-        <% if AppConfig[:plugins].include?('local_contexts_project') %>
+        <% if AppConfig[:plugins].include?('local_contexts_projects') %>
             <% unless lcps.blank? %>
                 <% project_ids = [] %>
                 <% lcps.each do |lcp| %>

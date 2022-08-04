@@ -35,12 +35,12 @@ Unzip the latest release of the plugin to your
 ArchivesSpace plugins directory:
 
      $ cd /path/to/archivesspace/plugins
-     $ unzip institution_notices.zip -d institution_notices
+     $ unzip institution_notices.zip -d local_contexts_projects
 
 Enable the plugin by editing your ArchivesSpace configuration file
 (`config/config.rb`):
 
-     AppConfig[:plugins] = ['other_plugin', 'local_context']
+     AppConfig[:plugins] = ['other_plugin', 'local_contexts_projects']
 
 (Make sure you uncomment this line (i.e., remove the leading '#' if present))
 
@@ -88,7 +88,7 @@ Default Values
 
     AppConfig[:local_contexts_replace_xsl] = true
 
-    AppConfig[:local_contexts_project] = {
+    AppConfig[:local_contexts_projects] = {
       'staff_faceting' => false,
       'public_faceting' => false,
       'open_to_collaborate' => false

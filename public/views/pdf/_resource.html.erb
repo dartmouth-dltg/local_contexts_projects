@@ -85,7 +85,7 @@
 </ul>
 
 <!-- Local Context Begin -->
-<% if AppConfig[:plugins].include?('local_contexts_project') %>
+<% if AppConfig[:plugins].include?('local_contexts_projects') %>
     <% unless record.json['local_contexts_projects'].blank? %>
       <% project_ids = [] %>
       <% record.json['local_contexts_projects'].each do |lcp| %>
