@@ -100,3 +100,11 @@ en:
       local_contexts_project_u_sbool:
         "true": "Yes"
         "false": "No"
+
+  local_contexts_projects_refresh_cache_job:
+    _singular: Local Contexts Projects Refresh Cache Job
+    _plural: Local Contexts Projects Refresh Cache Jobs
+
+  job:
+    types:
+      local_contexts_projects_refresh_cache_job: Local Contexts Projects Refresh Cache
