@@ -1,12 +1,15 @@
 en:
   plugins:
+    local_contexts_projects:
+      _plural: Local Contexts Projects
+      _singular: Local Contexts Project
+      label: Local Contexts Projects
     local_contexts_project:
-      _plural: Local Contexts Project
+      _plural: Local Contexts Projects
       _singular: Local Contexts Project
       _frontend:
         action:
           add: Add Local Contexts Project
-    local_contexts_projects:
       label: Local Contexts Projects
 
   local_contexts_project:
@@ -16,17 +19,27 @@ en:
       action:
         save: Save Local Contexts Project
         create: Create a new Project
-        clear_cache: Clear Local Contexts Projects Cache
+        reset_cache: Reset Local Contexts Projects Cache
       form_header: Local Contexts Project
       messages:
           cache_clear_error: No Local Contexts Cache directory found
           cache_clear_success: Cached Local Contexts API data cleared
+          cache_reset_error: Local Contexts Cache not reset
+          cache_reset_success: Cached Local Contexts API data updated
           created: Local Contexts Project Created
           deleted: Local Contexts Project Deleted
           delete_conflict: There was a problem deleting the Local Contexts Project
           updated: Local Contexts Project Updated
       section:
         search_embedded: Linked Records
+    _cache_reset:
+      error: Project not found or unable to be fetched
+      no_projects: No Cached Local Contexts Projects found
+      project_titles: Project ID & Title
+      reset_all: Reset Cache for all Local Contexts Projects
+      reset_one: Reset this project's cache
+      success: Cache reset for this project.
+      title: Reset Cache for one or more Local Contexts Projects
 
     digital_object_note: The following provides information about %{title} (related digital object)
     display_string: Display String

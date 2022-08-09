@@ -71,12 +71,12 @@ class LocalContextsClient
   end
 
   def get_json(suffix, type, id, use_cache)
-    cache_file = File.join(AppConfig[:data_directory], "local_contexts_cache", id + '.json')
-    cache_time = 300 # 5 minutes
+    cache_file = File.join(AppConfig[:local_contexts_cache_dirname], id + '.json')
+    cache_time = AppConfig[:local_contexts_cache_time]
 
     if use_cache
       if type == "open_to_collaborate"
-        cache_time = 604800 # 1 week
+        cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
       end
       if !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time))
         res = do_http_request(suffix, type)
@@ -91,13 +91,17 @@ class LocalContextsClient
     
   end
 
-  def get_data_from_local_contexts_api(id, type, use_cache = false)
+  def get_data_from_local_contexts_api(id, type, use_cache = true)
     if type == 'open_to_collaborate'
       get_json(@api_paths_map[type], type, id, use_cache)
     else
       lc_api_path_for_type = File.join(@api_paths_map[type], id)
       get_json(lc_api_path_for_type, type, id, use_cache)
     end
+  end
+
+  def reset_cache(project_id)
+    get_data_from_local_contexts_api(project_id, 'project', false)
   end
 
   def clear_cache

@@ -14,6 +14,17 @@ class ArchivesSpaceService < Sinatra::Base
     json_response(api_response)
   end
 
+  Endpoint.post('/local_contexts_projects/reset_cache')
+  .description("Clear Local Contexts Projects file cache")
+  .params(["project_id", String, "Project id"])
+  .permissions([:update_localcontexts_project_record])
+  .returns([200, :updated]) \
+  do
+    client = LocalContextsClient.new
+    response = client.reset_cache(params[:project_id])
+    json_response(response)
+  end
+
   Endpoint.post('/local_contexts_projects/clear_cache')
   .description("Clear Local Contexts Projects file cache")
   .params()
@@ -24,7 +35,6 @@ class ArchivesSpaceService < Sinatra::Base
     response = client.clear_cache
     json_response(response)
   end
-
 
   Endpoint.post('/local_contexts_projects/:id')
     .description("Update a Local Contexts Project")

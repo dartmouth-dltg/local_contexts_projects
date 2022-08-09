@@ -47,3 +47,42 @@
     </p>
   </div>
 --></div>
+
+<div id="template_local_context_reset_cache_title"><!--
+  <%= I18n.t("local_contexts_project._cache_reset.title") %>
+--></div>
+
+<div id="template_local_context_reset_cache_contents"><!--
+  {if ($.isEmptyObject(project_ids))}
+    <div class="alert alert-info"><%= I18n.t("local_contexts_project._cache_reset.no_projects") %></div>
+  {else}
+    <h4><%= I18n.t("local_contexts_project._cache_reset.project_titles") %></h4>
+    {for pid in project_ids}
+      <div class="reset-local-contexts-cache-list">
+        <div class="reset-local-contexts-cache-list-item">
+          <span class="local-contexts-pid">${pid.id} : ${pid.title}</span>
+          <button class="btn btn-sm btn-primary reset-local-contexts-cache-btn">
+            <a id="${pid.id}" href="<%= url_for :controller => :local_contexts_projects, :action => :reset_cache %>">
+              <%= I18n.t("local_contexts_project._cache_reset.reset_one") %>
+            </a>
+          </button>
+        </div>
+      </div>
+    {/for}
+  {/if}
+--></div>
+
+<div id="template_local_context_reset_cache_footer"><!--
+<div class="modal-footer">
+  <%= link_to I18n.t("local_contexts_project._cache_reset.reset_all"), {:controller => :local_contexts_projects, :action => :reset_all_cache}, {:class => "btn btn-primary pull-left"} %>
+  <button class="btn btn-warning pull-right" data-dismiss="modal"><%= I18n.t("actions.close") %></button>
+</div>
+--></div>
+
+<div id="template_local_context_reset_cache_success"><!--
+  <span class="local-contexts-reset-cache-success"><%= I18n.t("local_contexts_project._cache_reset.success") %></span>
+--></div>
+
+<div id="template_local_context_reset_cache_error"><!--
+  <span class="local-contexts-reset-cache-error"><%= I18n.t("local_contexts_project._cache_reset.error") %></span>
+--></div>

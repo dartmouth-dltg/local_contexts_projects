@@ -77,6 +77,7 @@ span.local-contexts-placed-by-label::after {
 }
 
 /* fetch button */
+button.fetching a::after,
 a.fetching::after {
   display: inline-block;
   content: "\e031";
@@ -85,9 +86,57 @@ a.fetching::after {
   animation: spin 1s infinite linear;
 }
 
-/* clear cache button */
-.local-contexts-clear-cache-btn {
+/* manage cache button */
+.local-contexts-manage-cache-btn {
   margin-left: 0.5rem;
+}
+
+.local-contexts-manage-cache-btn a {
+  color: #fff;
+}
+
+/* reset cache */
+
+.reset-local-contexts-cache-list-item {
+  display: table;
+  width: 100%;
+  padding: 1rem;
+  border-bottom: 1px solid #666;
+}
+
+.reset-local-contexts-cache-list-item > * {
+  display: table-cell;
+  min-width: 20rem;
+  margin: 1rem;
+}
+
+.local-contexts-pid {
+  width: 75%;
+}
+
+.reset-local-contexts-cache-list-item a {
+  color: #fff;
+}
+
+.local-contexts-reset-cache-success {
+  display: block;
+  color: #00693e;
+}
+
+.local-contexts-reset-cache-success::before {
+  margin-right: 0.5rem;
+  content: "\2713";
+}
+
+.local-contexts-reset-cache-error {
+  display: block;
+  color: red;
+}
+
+.local-contexts-reset-cache-error::before {
+  margin-right: 0.5rem;
+  content: "\274c";
+  color: red;
 }
 
 /* animation */

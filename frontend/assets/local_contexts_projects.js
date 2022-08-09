@@ -199,6 +199,75 @@ LocalContexts.prototype.renderLocalContextsError = function(id) {
   this.lc_data_el.append(error_msg);
 }
 
+function ResetLocalContextsCache() {
+  this.frontendPrefix = LOCALCONTEXTS_FRONTEND_PREFIX;
+  this.loadResetCacheModal();
+}
+
+ResetLocalContextsCache.prototype.loadResetCacheModal = function() {
+  var self = this;
+
+  var project_ids = [];
+  $('#tabledSearchResults td.sortable').each(function() {
+    p_id = $(this).text().split(":")[0].trim();
+    p_title = $(this).text().split(":")[1].trim()
+    project_ids.push({"id" : p_id, "title" : p_title});
+  });
+
+  var $modal = AS.openCustomModal("quickModal",
+    AS.renderTemplate("template_local_context_reset_cache_title"),
+    AS.renderTemplate("modal_quick_template", {
+      message: AS.renderTemplate("template_local_context_reset_cache_contents", {
+        project_ids: project_ids
+      })
+    }),
+    "full");
+
+  $modal.find(".modal-footer").replaceWith(AS.renderTemplate("template_local_context_reset_cache_footer"));
+
+  self.bindLocalContextsCacheResetEvents($modal);
+}
+
+ResetLocalContextsCache.prototype.bindLocalContextsCacheResetEvents = function($container) {
+  var self = this;
+
+  $container.
+    on("click", ".reset-local-contexts-cache-btn", function(event) {
+      event.preventDefault();
+      pid = $(this).children('a').attr('id');
+      self.resetCacheForProject(pid, $(this));
+    });
+}
+
+ResetLocalContextsCache.prototype.resetCacheForProject = function(pid, btn) {
+  var self = this;
+  btn.addClass('fetching');
+  msg = '';
+  var successMsg = AS.renderTemplate("template_local_context_reset_cache_success")
+  var errorMsg = AS.renderTemplate("template_local_context_reset_cache_error")
+  $.ajax({
+    url: self.frontendPrefix + "plugins/local_contexts_projects/reset_cache",
+    method: 'POST',
+    data: {
+      project_id: pid
+    },
+    dataType: 'json'
+  })
+  .done( function(data) {
+    if (!data.unique_id || data.unique_id != pid) {
+      msg = errorMsg
+    }
+    else {
+      msg = successMsg
+    }
+    $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
+    btn.removeClass('fetching');
+  })
+  .fail( function() {
+    btn.removeClass('fetching');
+  });
+}
+
 $().ready( function() {
   // toggle json
   $('body').on('click', '.show-lc-json', function() {
@@ -218,5 +287,11 @@ $().ready( function() {
     }
 
     else translation_container.addClass("shown");
+  });
+
+  // reset cache setup
+  $('body').on('click', '.local-contexts-manage-cache-btn', function(evt) {
+    evt.preventDefault();
+    new ResetLocalContextsCache();
   });
 });

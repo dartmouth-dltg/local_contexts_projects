@@ -10,7 +10,17 @@ unless AppConfig.has_key?(:local_contexts_replace_xsl)
   AppConfig[:local_contexts_replace_xsl] = true
 end
 
-AppConfig[:local_contexts_api_path] = "api/v1"
+unless AppConfig.has_key?(:local_contexts_open_to_collaborate_cache_time)
+  AppConfig[:local_contexts_open_to_collaborate_cache_time] = 2592000 # 30 days
+end
+
+unless AppConfig.has_key?(:local_contexts_cache_time)
+  AppConfig[:local_contexts_cache_time] = 604800 # 7 days
+end
+
+unless AppConfig.has_key?(:local_contexts_api_path)
+  AppConfig[:local_contexts_api_path] = "api/v1"
+end
 
 Permission.define("manage_localcontexts_records",
                   "The ability to create/update/delete Local Contexts Project records",
