@@ -36,7 +36,8 @@ LocalContexts.prototype.fetchLocalContextData = function(id, btn) {
   $.ajax({
     url: self.frontendPrefix + "plugins/local_contexts_projects/fetch_lc_project_data",
     data: {
-      project_id: id
+      project_id: id,
+      use_cache: true
     },
     dataType: 'json'
   })

@@ -54,7 +54,8 @@ LocalContexts.prototype.fetchLocalContextData = function(ids) {
       url: self.publicPrefix + "local_contexts_projects/fetch/fetch_lc_project_data",
       data: {
         id: current_id,
-        type: 'project'
+        type: 'project',
+        use_cache: true
       },
       dataType: 'json'
     })
