@@ -12,14 +12,14 @@ class LocalContextsProjectsRefreshCacheRunner < JobRunner
         begin
           msg = lcp_client.reset_cache(lcp[:project_id])
           if msg['unique_id'] == lcp[:project_id]
-            @job.write_output(" -> Success refreshing Local Contexts cache for project with id: #{lcp[:project_id]}")
+            @job.write_output(" -> Success refreshing Local Contexts cache for project #{msg['title']} with id: #{lcp[:project_id]}")
           else
             @job.write_output(" -> Error refreshing Local Contexts cache for project with id: #{lcp[:project_id]} => #{msg}")
           end
         rescue => e
           @job.write_output(" -> Error refreshing Local Contexts cache for project with id: #{lcp[:project_id]} => #{e.message}")
         end
-        @job.write_output("Waiting for #{AppConfig[:local_contexts_api_wait_time]} seconds till we refresh the next project's cache")
+        @job.write_output("Waiting for #{AppConfig[:local_contexts_api_wait_time]} seconds to refresh the next project's cache")
         sleep(AppConfig[:local_contexts_api_wait_time])
       end
       self.success!

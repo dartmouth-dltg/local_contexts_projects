@@ -74,8 +74,12 @@
 
 <div id="template_local_context_reset_cache_footer"><!--
 <div class="modal-footer">
-  <%= link_to I18n.t("local_contexts_project._cache_reset.reset_all"), {:controller => :local_contexts_projects, :action => :reset_all_cache}, {:class => "btn btn-primary pull-left"} %>
-  <button class="btn btn-warning pull-right" data-dismiss="modal"><%= I18n.t("actions.close") %></button>
+<%= form_for :job, :url => {:controller => :jobs, :action => :create} do |f| %>
+    <%= f.hidden_field :jsonmodel_type, :value => "local_contexts_projects_refresh_cache_job" %>
+    <%= f.hidden_field :job_type, :value => 'local_contexts_projects_refresh_cache_job' %>
+    <%= f.submit I18n.t("local_contexts_project._cache_reset.reset_all"), :class => "btn  btn-primary" %>
+<% end %>
+<button class="btn btn-default pull-right" data-dismiss="modal"><%= I18n.t("actions.close") %></button>
 </div>
 --></div>
 
