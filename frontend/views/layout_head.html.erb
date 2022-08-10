@@ -1,5 +1,9 @@
 <%= stylesheet_link_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects.css" %>
 <script>
   var LOCALCONTEXTS_FRONTEND_PREFIX = "<%= AppConfig[:frontend_proxy_prefix] %>";
+  var USE_OPEN_TO_COLLABORATE = false;
+  <% if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true %>
+    USE_OPEN_TO_COLLABORATE = true;
+  <% end %>
 </script>
 <%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects.js" %>

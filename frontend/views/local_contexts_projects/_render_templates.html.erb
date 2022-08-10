@@ -57,6 +57,18 @@
     <div class="alert alert-info"><%= I18n.t("local_contexts_project._cache_reset.no_projects") %></div>
   {else}
     <h4><%= I18n.t("local_contexts_project._cache_reset.project_titles") %></h4>
+    {if (open_to_collaborate)}
+      <div class="reset-local-contexts-cache-list">
+        <div class="reset-local-contexts-cache-list-item">
+          <span class="local-contexts-pid">Open To Collaborate Notice</span>
+          <button class="btn btn-sm btn-primary reset-local-contexts-cache-btn">
+            <a id="open_to_collaborate" href="<%= url_for :controller => :local_contexts_projects, :action => :reset_cache %>">
+              <%= I18n.t("local_contexts_project._cache_reset.reset_one") %>
+            </a>
+          </button>
+        </div>
+      </div>
+    {/if}
     {for pid in project_ids}
       <div class="reset-local-contexts-cache-list">
         <div class="reset-local-contexts-cache-list-item">

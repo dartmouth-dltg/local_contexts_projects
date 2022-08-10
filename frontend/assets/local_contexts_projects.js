@@ -201,6 +201,7 @@ LocalContexts.prototype.renderLocalContextsError = function(id) {
 
 function ResetLocalContextsCache() {
   this.frontendPrefix = LOCALCONTEXTS_FRONTEND_PREFIX;
+  this.use_otc = USE_OPEN_TO_COLLABORATE;
   this.loadResetCacheModal();
 }
 
@@ -218,7 +219,8 @@ ResetLocalContextsCache.prototype.loadResetCacheModal = function() {
     AS.renderTemplate("template_local_context_reset_cache_title"),
     AS.renderTemplate("modal_quick_template", {
       message: AS.renderTemplate("template_local_context_reset_cache_contents", {
-        project_ids: project_ids
+        project_ids: project_ids,
+        open_to_collaborate: self.use_otc
       })
     }),
     "full");
@@ -234,12 +236,13 @@ ResetLocalContextsCache.prototype.bindLocalContextsCacheResetEvents = function($
   $container.
     on("click", ".reset-local-contexts-cache-btn", function(event) {
       event.preventDefault();
-      pid = $(this).children('a').attr('id');
-      self.resetCacheForProject(pid, $(this));
+      var pid = $(this).children('a').attr('id');
+      var lc_type = pid == 'open_to_collaborate' ? pid : 'project';
+      self.resetCacheForProject(pid, lc_type, $(this));
     });
 }
 
-ResetLocalContextsCache.prototype.resetCacheForProject = function(pid, btn) {
+ResetLocalContextsCache.prototype.resetCacheForProject = function(pid, lc_type, btn) {
   var self = this;
   btn.addClass('fetching');
   msg = '';
@@ -249,16 +252,27 @@ ResetLocalContextsCache.prototype.resetCacheForProject = function(pid, btn) {
     url: self.frontendPrefix + "plugins/local_contexts_projects/reset_cache",
     method: 'POST',
     data: {
-      project_id: pid
+      project_id: pid,
+      type: lc_type
     },
     dataType: 'json'
   })
   .done( function(data) {
-    if (!data.unique_id || data.unique_id != pid) {
-      msg = errorMsg
+    if (pid == lc_type) {
+      if (!data.notice_type || data.notice_type != pid) {
+        msg = errorMsg
+      }
+      else {
+        msg = successMsg
+      }
     }
     else {
-      msg = successMsg
+      if (!data.unique_id || data.unique_id != pid) {
+        msg = errorMsg
+      }
+      else {
+        msg = successMsg
+      }
     }
     $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
     btn.removeClass('fetching');

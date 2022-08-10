@@ -100,8 +100,8 @@ class LocalContextsClient
     end
   end
 
-  def reset_cache(project_id)
-    get_data_from_local_contexts_api(project_id, 'project', false)
+  def reset_cache(project_id, type = "project")
+    get_data_from_local_contexts_api(project_id, type, false)
   end
 
   def clear_cache

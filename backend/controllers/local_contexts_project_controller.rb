@@ -16,12 +16,13 @@ class ArchivesSpaceService < Sinatra::Base
 
   Endpoint.post('/local_contexts_projects/reset_cache')
   .description("Clear Local Contexts Projects file cache")
-  .params(["project_id", String, "Project id"])
+  .params(["project_id", String, "Project id"],
+          ["type", String, "Type of LC data - Project or Open to Collaborate Notice"])
   .permissions([:update_localcontexts_project_record])
   .returns([200, :updated]) \
   do
     client = LocalContextsClient.new
-    response = client.reset_cache(params[:project_id])
+    response = client.reset_cache(params[:project_id], params[:type])
     json_response(response)
   end
 

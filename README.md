@@ -61,13 +61,16 @@ This will create the tables required by the plugin.
 
 ## Configuration
 
-This plugin accepts three configuration options. These options 
+This plugin accepts several optional configuration options. These options 
 
 - control the visibility of Local Contexts associated projects as facets in the staff application 
 - control the visibility of Local Contexts associated projects as facets in the PUI
 - control the visibility of the Open to Collaborate Notice on the home page
 - set the Local Contexts base URL
 - controls the automatic replacement of the `as-ead-pdf.xsl` stylsheet with the plugin version
+- sets the cache time for Open to Collaborate Notice
+- sets the cache time for project data
+- sets the default time between repeated API calls when refreshing cache for all projects
 
 If the base URL is not set in the config, the url is assumed to be `https://localcontextshub.org/`
 
@@ -93,6 +96,12 @@ Default Values
       'public_faceting' => false,
       'open_to_collaborate' => false
     }
+
+    AppConfig[:local_contexts_open_to_collaborate_cache_time] = 2592000
+
+    AppConfig[:local_contexts_cache_time] = 604800
+
+    AppConfig[:local_contexts_api_wait_time] = 15
 ```
 
 ## Using the Plugin
@@ -160,12 +169,21 @@ See the `samples` directory in the plugin for sample exports and screenshots.
 
 ### Caching
 
-The plugin implements a simple caching mechanism to prevent overloading the Local Contexts API. Caching
-is turned on for expoorts, but not for on-demand views in the staff UI or PUI. Requests for views in the staff UI
-or PUI will update the cache, though.
+The plugin implements a simple caching mechanism to descrease render times in the staff interface and PUI
+and prevent overloading the Local Contexts API. Cache invalidation is controlled
+by the time limits specified by `AppConfig[:local_contexts_cache_time]` and `AppConfig[:local_contexts_open_to_collaborate_cache_time]`
 
 Cache files are located in a new directory in the ArchivesSpace data directory named `local_contexts_cache`. This
 directory is created by the plugin during ArchivesSpace startup if it is not present.
+
+For users who can manage Local Contexts Projects, there is also an on-demand option to refresh cache data for individual projects 
+or for all projects. Cache refresh for all projects is controlled by a new background job.
+
+## Background Job
+
+The plugin adds a new background job `Local Contexts Projects Refresh Cache` which will refresh the cached data for all
+Local Contexts Projects. Cache refresh has a delay between API requests to prevent overloading the Local Contexts API. This 
+delay is set by `AppConfig[:local_contexts_api_wait_time]` and defaults to 10 seconds between requests.
 
 ## Notes
 
