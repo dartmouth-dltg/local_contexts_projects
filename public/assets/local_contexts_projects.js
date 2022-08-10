@@ -1,5 +1,5 @@
 /* local_context/public/assets/local_context.js */
-class LocalContexts{
+class LocalContexts {
   constructor(project_ids) {
     this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX;
     this.lc_data_el_prefix = "lc-project-live-data-";
@@ -206,36 +206,38 @@ class LocalContexts{
   }
 }
 
-function OpenToCollaborate(about_lc_text) {
-  var self = this
-  this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX
-  $.ajax({
-    url: this.publicPrefix + "local_contexts_projects/fetch/fetch_lc_project_data",
-    data: {
-      id: 'open_to_collaborate',
-      type: 'open_to_collaborate',
-      use_cache: true
-    },
-    dataType: 'json'
-  })
-  .done( function(data) {
-    var otc = self.parse_open_to_collaborate(data, about_lc_text)
-    $('#open-to-collaborate').html(otc);
-  })
-}
+class OpenToCollaborate {
+  constructor(about_lc_text) {
+    const self = this
+    this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX
+    $.ajax({
+      url: this.publicPrefix + "local_contexts_projects/fetch/fetch_lc_project_data",
+      data: {
+        id: 'open_to_collaborate',
+        type: 'open_to_collaborate',
+        use_cache: true
+      },
+      dataType: 'json'
+    })
+    .done( function(data) {
+      const otc = self.parse_open_to_collaborate(data, about_lc_text)
+      $('#open-to-collaborate').html(otc);
+    })
+  }
 
-OpenToCollaborate.prototype.parse_open_to_collaborate = function(json, about_lc_text) {
-  var otcHtml = '<h3>' + json.name + '</h3>' +
-                '<div><p>' +
-                '<img class="local-contexts-image" src="' + json.img_url + '" />' +
-                '<span class="local-contexts-description">' +
-                json.default_text + 
-                '<br /><br />' +
-                about_lc_text + 
-                '</span>' +
-                '</p></div>';
+  parse_open_to_collaborate(json, about_lc_text) {
+    const otcHtml = '<h3>' + json.name + '</h3>' +
+                  '<div><p>' +
+                  '<img class="local-contexts-image" src="' + json.img_url + '" />' +
+                  '<span class="local-contexts-description">' +
+                  json.default_text + 
+                  '<br /><br />' +
+                  about_lc_text + 
+                  '</span>' +
+                  '</p></div>';
 
-  return otcHtml;
+    return otcHtml;
+  }
 }
 
 
@@ -246,7 +248,7 @@ $().ready(function() {
   });
 
   $('body').on('click', '.local-contexts-translation-toggle', function() {
-    var translation_container = $(this).siblings('.local-contexts-translation-wrapper');
+    const translation_container = $(this).siblings('.local-contexts-translation-wrapper');
 
     if (translation_container.hasClass('shown')) {
       translation_container.removeClass('shown');

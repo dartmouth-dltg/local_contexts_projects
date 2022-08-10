@@ -219,7 +219,7 @@ class ResetLocalContextsCache {
       project_ids.push({"id" : p_id, "title" : p_title});
     });
 
-    var $modal = AS.openCustomModal("quickModal",
+    const $modal = AS.openCustomModal("quickModal",
       AS.renderTemplate("template_local_context_reset_cache_title"),
       AS.renderTemplate("modal_quick_template", {
         message: AS.renderTemplate("template_local_context_reset_cache_contents", {
@@ -291,7 +291,7 @@ class ResetLocalContextsCache {
 $().ready( function() {
   // toggle json
   $('body').on('click', '.show-lc-json', function() {
-    var json_container = $(this).parent('div').next('pre');
+    const json_container = $(this).parent('div').next('pre');
     if (json_container.hasClass('shown')) {
       json_container.removeClass('shown');
     }
@@ -300,7 +300,7 @@ $().ready( function() {
 
   // toggle translations
   $('body').on('click', '.local-contexts-translation-toggle', function() {
-    var translation_container = $(this).siblings('.local-contexts-translation-wrapper');
+    const translation_container = $(this).siblings('.local-contexts-translation-wrapper');
 
     if (translation_container.hasClass('shown')) {
       translation_container.removeClass('shown');
