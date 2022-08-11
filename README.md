@@ -225,9 +225,6 @@ This plugin also overrides the following views
     /public/views/welcome/show.html.erb
 ```
 
-If you are using other plugins which override the same files, you will need to reconcile
-them.
-
 ## Credits
 
 Plugin developed by Joshua Shaw [Joshua.D.Shaw@dartmouth.edu], Digital Library Technologies Group
