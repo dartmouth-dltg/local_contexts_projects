@@ -203,10 +203,12 @@ class LocalContexts {
 }
 
 class ResetLocalContextsCache {
-  constructor() {
+  constructor(interactive = true) {
     this.frontendPrefix = LOCALCONTEXTS_FRONTEND_PREFIX;
     this.use_otc = USE_OPEN_TO_COLLABORATE;
-    this.loadResetCacheModal();
+    if (interactive) {
+      this.loadResetCacheModal();
+    }
   }
 
   loadResetCacheModal() {
@@ -242,18 +244,46 @@ class ResetLocalContextsCache {
         event.preventDefault();
         const pid = $(this).children('a').attr('id');
         const lc_type = pid == 'open_to_collaborate' ? pid : 'project';
-        self.resetCacheForProject(pid, lc_type, $(this));
+        self.setupResetCacheForProject(pid, lc_type, $(this));
       });
   }
 
-  resetCacheForProject(pid, lc_type, btn) {
+  setupResetCacheForProject(pid, lc_type, btn) {
     const self = this;
 
     let msg = '';
     btn.addClass('fetching');
     const successMsg = AS.renderTemplate("template_local_context_reset_cache_success")
     const errorMsg = AS.renderTemplate("template_local_context_reset_cache_error")
-    $.ajax({
+    $.when(this.resetCacheForProject(pid, lc_type))
+      .done( function(data) {
+        if (pid == lc_type) {
+          if (!data.notice_type || data.notice_type != pid) {
+            msg = errorMsg
+          }
+          else {
+            msg = successMsg
+          }
+        }
+        else {
+          if (!data.unique_id || data.unique_id != pid) {
+            msg = errorMsg
+          }
+          else {
+            msg = successMsg
+          }
+        }
+        $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
+        btn.removeClass('fetching');
+      })
+      .fail( function() {
+        btn.removeClass('fetching');
+      });
+  }
+
+  resetCacheForProject(pid, lc_type) {
+    const self = this;
+    return $.ajax({
       url: self.frontendPrefix + "plugins/local_contexts_projects/reset_cache",
       method: 'POST',
       data: {
@@ -262,29 +292,6 @@ class ResetLocalContextsCache {
       },
       dataType: 'json'
     })
-    .done( function(data) {
-      if (pid == lc_type) {
-        if (!data.notice_type || data.notice_type != pid) {
-          msg = errorMsg
-        }
-        else {
-          msg = successMsg
-        }
-      }
-      else {
-        if (!data.unique_id || data.unique_id != pid) {
-          msg = errorMsg
-        }
-        else {
-          msg = successMsg
-        }
-      }
-      $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
-      btn.removeClass('fetching');
-    })
-    .fail( function() {
-      btn.removeClass('fetching');
-    });
   }
 }
 
@@ -312,6 +319,6 @@ $().ready( function() {
   // reset cache setup
   $('body').on('click', '.local-contexts-manage-cache-btn', function(evt) {
     evt.preventDefault();
-    new ResetLocalContextsCache();
+    new ResetLocalContextsCache(true);
   });
 });

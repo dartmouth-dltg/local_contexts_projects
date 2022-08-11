@@ -104,17 +104,19 @@ class LocalContextsClient
     get_data_from_local_contexts_api(project_id, type, false)
   end
 
-  def clear_cache
+  def clear_cache(project_id)
     # let's be very careful here
     dir_path = AppConfig[:local_contexts_cache_dirname]
     if dir_path.include?('local_contexts_cache')
-      Dir.foreach(dir_path) do |f|
-        fn = File.join(dir_path, f)
-        File.delete(fn) if f != '.' && f != '..'
+      filename = File.join(dir_path, project_id + '.json')
+      begin
+        File.delete(filename) 
+        {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_success')}
+      rescue
+        {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
       end
-      {"success" => I18n.t('local_contexts_project._frontend.messages.cache_clear_success')}
     else
-      {"error" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
+      {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
     end
   end
 

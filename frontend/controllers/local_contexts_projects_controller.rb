@@ -5,7 +5,7 @@ require 'aspace_logger'
 class LocalContextsProjectsController < ApplicationController
 
   set_access_control "view_repository" => [:fetch_lc_project_data, :index, :show, :typeahead],
-                      "update_localcontexts_project_record" => [:new, :edit, :create, :update, :delete, :clear_cache, :reset_cache, :reset_all_cache]
+                      "update_localcontexts_project_record" => [:new, :edit, :create, :update, :delete, :clear_cache, :reset_cache]
 
   SEARCH_FACETS = ["local_contexts_project_u_sstr"]
 
@@ -38,6 +38,7 @@ class LocalContextsProjectsController < ApplicationController
   end
 
   def edit
+    @update_cache = params[:update_cache].nil? ? false: params[:update_cache]
     @local_contexts_project = JSONModel(:local_contexts_project).find(params[:id])
   end
 
@@ -49,7 +50,8 @@ class LocalContextsProjectsController < ApplicationController
                     flash[:success] = I18n.t("local_contexts_project._frontend.messages.created")
                     redirect_to(:controller => :local_contexts_projects,
                                 :action => :edit,
-                                :id => id) })
+                                :id => id,
+                                :update_cache => true) })
   end
 
   def update
@@ -67,6 +69,7 @@ class LocalContextsProjectsController < ApplicationController
 
   def delete
     local_contexts_project = JSONModel(:local_contexts_project).find(params[:id])
+    project_id = local_contexts_project['project_id']
     begin
       local_contexts_project.delete
     rescue ConflictException => e
@@ -74,6 +77,7 @@ class LocalContextsProjectsController < ApplicationController
       return redirect_to(:controller => :local_contexts_projects, :action => :show, :id => params[:id])
     end
 
+    JSONModel::HTTP::post_form("/local_contexts_projects/clear_cache", {:project_id => project_id})
     flash[:success] = I18n.t("local_contexts_project._frontend.messages.deleted")
     redirect_to(:controller => :local_contexts_projects, :action => :index, :deleted_uri => local_contexts_project.uri)
   end
@@ -87,11 +91,13 @@ class LocalContextsProjectsController < ApplicationController
   end
 
   def clear_cache
-    res = JSONModel::HTTP::post_form("/local_contexts_projects/clear_cache")
-    begin ASUtils.json_parse(res.body)['success']
-      flash[:success] = I18n.t("local_contexts_project._frontend.messages.cache_clear_success")
-    rescue
-      flash[:error] = I18n.t("local_contexts_project._frontend.messages.cache_clear_error")
+    if params[:project_id]
+      res = JSONModel::HTTP::post_form("/local_contexts_projects/clear_cache", {:project_id => params[:project_id]})
+      begin ASUtils.json_parse(res.body)['success']
+        flash[:success] = I18n.t("local_contexts_project._frontend.messages.cache_clear_success")
+      rescue
+        flash[:error] = I18n.t("local_contexts_project._frontend.messages.cache_clear_error")
+      end
     end
     redirect_to(:controller => :local_contexts_projects, :action => :index)
   end
@@ -100,7 +106,7 @@ class LocalContextsProjectsController < ApplicationController
     project_id = params[:project_id].nil? ? '' : params[:project_id]
     project_type = params[:type].nil? ? 'project' : params[:type]
     unless project_id.empty?
-      res = JSONModel::HTTP::post_form("/local_contexts_projects/reset_cache", {"project_id" => project_id, "type" => project_type})
+      res = JSONModel::HTTP::post_form("/local_contexts_projects/reset_cache", {:project_id => project_id, :type => project_type})
       if response.code != '200'
         render :json => I18n.t("local_contexts_project._frontend.messages.cache_reset_error").to_json
       else
@@ -109,6 +115,4 @@ class LocalContextsProjectsController < ApplicationController
     end
   end
 
-  def reset_all_cache
-  end
 end
