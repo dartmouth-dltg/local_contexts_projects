@@ -14,12 +14,34 @@ class ArchivesSpaceService < Sinatra::Base
     json_response(api_response)
   end
 
+  Endpoint.post('/local_contexts_projects/reset_cache')
+  .description("Clear Local Contexts Projects file cache")
+  .params(["project_id", String, "Project id"],
+          ["type", String, "Type of LC data - Project or Open to Collaborate Notice"])
+  .permissions([:update_localcontexts_project_record])
+  .returns([200, :updated]) \
+  do
+    client = LocalContextsClient.new
+    response = client.reset_cache(params[:project_id], params[:type])
+    json_response(response)
+  end
+
+  Endpoint.post('/local_contexts_projects/clear_cache')
+  .description("Clear Local Contexts Projects file cache")
+  .params(["project_id", String, "Project id"])
+  .permissions([:update_localcontexts_project_record])
+  .returns([200, :updated]) \
+  do
+    client = LocalContextsClient.new
+    response = client.clear_cache(params[:project_id])
+    json_response(response)
+  end
 
   Endpoint.post('/local_contexts_projects/:id')
     .description("Update a Local Contexts Project")
     .params(["id", :id],
             ["local_contexts_project", JSONModel(:local_contexts_project), "The updated record", :body => true])
-    .permissions([:update_local_contexts_project_record])
+    .permissions([:update_localcontexts_project_record])
     .returns([200, :updated]) \
   do
     handle_update(LocalContextsProject, params[:id], params[:local_contexts_project])
@@ -29,7 +51,7 @@ class ArchivesSpaceService < Sinatra::Base
   Endpoint.post('/local_contexts_projects')
     .description("Create an Local Contexts Project")
     .params(["local_contexts_project", JSONModel(:local_contexts_project), "The record to create", :body => true])
-    .permissions([:update_local_contexts_project_record])
+    .permissions([:update_localcontexts_project_record])
     .returns([200, :created]) \
   do
     handle_create(LocalContextsProject, params[:local_contexts_project])
@@ -62,7 +84,7 @@ class ArchivesSpaceService < Sinatra::Base
   Endpoint.delete('/local_contexts_projects/:id')
     .description("Delete a Local Contexts Project")
     .params(["id", :id])
-    .permissions([:update_local_contexts_project_record])
+    .permissions([:update_localcontexts_project_record])
     .returns([200, :deleted]) \
   do
     handle_delete(LocalContextsProject, params[:id])

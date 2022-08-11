@@ -1,12 +1,15 @@
 en:
   plugins:
+    local_contexts_projects:
+      _plural: Local Contexts Projects
+      _singular: Local Contexts Project
+      label: Local Contexts Projects
     local_contexts_project:
-      _plural: Local Contexts Project
+      _plural: Local Contexts Projects
       _singular: Local Contexts Project
       _frontend:
         action:
           add: Add Local Contexts Project
-    local_contexts_projects:
       label: Local Contexts Projects
 
   local_contexts_project:
@@ -16,18 +19,33 @@ en:
       action:
         save: Save Local Contexts Project
         create: Create a new Project
+        reset_cache: Reset Local Contexts Projects Cache
       form_header: Local Contexts Project
       messages:
+          cache_clear_error: 'Cache not cleared for project: '
+          cache_clear_success: 'Cached Local Contexts API data removed for deleted project: '
+          cache_reset_error: Local Contexts cache not reset
+          cache_reset_success: Cached Local Contexts API data updated
           created: Local Contexts Project Created
           deleted: Local Contexts Project Deleted
           delete_conflict: There was a problem deleting the Local Contexts Project
           updated: Local Contexts Project Updated
       section:
         search_embedded: Linked Records
+    _cache_reset:
+      error: Not found or unable to be fetched
+      no_projects: No cached Local Contexts Projects found
+      project_titles: Project ID & Title
+      reset_all: Refresh cache for all Local Contexts data
+      reset_one: Refresh cache
+      success: Cache refreshed
+      title: Refresh Cache for Local Contexts Data
 
     digital_object_note: The following provides information about %{title} (related digital object)
     display_string: Display String
     fetch_btn: See Local Contexts Data
+    messages:
+
     placed_by_txt: Placed By
     project_date_information: 'Local Contexts Labels and Notices for this material as of: '
     project_date_see_current: Please check the project in the Local Contexts Hub for current information.
@@ -52,8 +70,10 @@ en:
       message: An error occurred while fetching the data from the Local Contexts Hub for project id
       message_append: Try again or consult the logs.
 
-  permission_types:
-    manage_local_contexts_project_record: create/modify/delete local contexts records
+  group:
+    permission_types:
+      manage_localcontexts_records: create/modify/delete/clear cache for local contexts records
+      update_localcontexts_project_record: create/modify/delete/clear cache for local contexts records
 
   advanced_search:
     text:
@@ -80,3 +100,11 @@ en:
       local_contexts_project_u_sbool:
         "true": "Yes"
         "false": "No"
+
+  local_contexts_projects_refresh_cache_job:
+    _singular: Local Contexts Projects Refresh Cache Job
+    _plural: Local Contexts Projects Refresh Cache Jobs
+
+  job:
+    types:
+      local_contexts_projects_refresh_cache_job: Local Contexts Projects Refresh Cache

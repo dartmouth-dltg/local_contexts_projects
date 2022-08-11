@@ -1,4 +1,5 @@
 require 'net/http'
+require 'fileutils'
 require 'aspace_logger'
 
 class LocalContextsClient
@@ -70,10 +71,14 @@ class LocalContextsClient
   end
 
   def get_json(suffix, type, id, use_cache)
-    cache_file = File.join(AppConfig[:data_directory], "local_contexts_cache", id + '.json')
+    cache_file = File.join(AppConfig[:local_contexts_cache_dirname], id + '.json')
+    cache_time = AppConfig[:local_contexts_cache_time]
 
     if use_cache
-      if !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - 300))
+      if type == "open_to_collaborate"
+        cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
+      end
+      if !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time))
         res = do_http_request(suffix, type)
         write_lcp_cache(cache_file, res)
       end
@@ -86,12 +91,32 @@ class LocalContextsClient
     
   end
 
-  def get_data_from_local_contexts_api(id, type, use_cache = false)
+  def get_data_from_local_contexts_api(id, type, use_cache = true)
     if type == 'open_to_collaborate'
       get_json(@api_paths_map[type], type, id, use_cache)
     else
       lc_api_path_for_type = File.join(@api_paths_map[type], id)
       get_json(lc_api_path_for_type, type, id, use_cache)
+    end
+  end
+
+  def reset_cache(project_id, type = "project")
+    get_data_from_local_contexts_api(project_id, type, false)
+  end
+
+  def clear_cache(project_id)
+    # let's be very careful here
+    dir_path = AppConfig[:local_contexts_cache_dirname]
+    if dir_path.include?('local_contexts_cache')
+      filename = File.join(dir_path, project_id + '.json')
+      begin
+        File.delete(filename) 
+        {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_success')}
+      rescue
+        {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
+      end
+    else
+      {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
     end
   end
 

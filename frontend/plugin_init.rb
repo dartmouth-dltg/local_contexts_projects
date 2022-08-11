@@ -77,7 +77,7 @@ Rails.application.config.after_initialize do
     alias_method :column_opts_pre_local_contexts_project, :column_opts
 
     def can_edit_search_result?(record)
-      return user_can?('update_local_contexts_project_record', record['id']) if record['primary_type'] === "local_contexts_project"
+      return user_can?('update_localcontexts_project_record', record['id']) if record['primary_type'] === "local_contexts_project"
       can_edit_search_result_pre_local_contexts_project?(record)
     end
 

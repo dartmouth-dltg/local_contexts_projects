@@ -10,20 +10,41 @@ unless AppConfig.has_key?(:local_contexts_replace_xsl)
   AppConfig[:local_contexts_replace_xsl] = true
 end
 
-AppConfig[:local_contexts_api_path] = "api/v1"
+unless AppConfig.has_key?(:local_contexts_open_to_collaborate_cache_time)
+  AppConfig[:local_contexts_open_to_collaborate_cache_time] = 2592000 # 30 days
+end
 
-Permission.define("manage_local_contexts_project_record",
+unless AppConfig.has_key?(:local_contexts_cache_time)
+  AppConfig[:local_contexts_cache_time] = 604800 # 7 days
+end
+
+unless AppConfig.has_key?(:local_contexts_api_path)
+  AppConfig[:local_contexts_api_path] = "api/v1"
+end
+
+# define the wait till we hit the api again for full (all projects) cache reset
+unless AppConfig.has_key?(:local_contexts_api_wait_time)
+  AppConfig[:local_contexts_api_wait_time] = 10
+end
+
+Permission.define("manage_localcontexts_records",
                   "The ability to create/update/delete Local Contexts Project records",
+                  :level => "repository")
+
+Permission.define("update_localcontexts_project_record",
+                  "The ability to create/update/delete Local Contexts Project records",
+                  :implied_by => 'manage_localcontexts_records',
                   :level => "global")
+
 
 # create the pui sitemaps directory if it does not already exist
 ArchivesSpaceService.loaded_hook do
 
   logger = Logger.new($stderr)
 
-  cache_dirname = File.join(AppConfig[:data_directory], "local_contexts_cache")
-  unless File.directory?(cache_dirname)
-    FileUtils.mkdir_p(cache_dirname)
+  AppConfig[:local_contexts_cache_dirname] = File.join(AppConfig[:data_directory], "local_contexts_cache")
+  unless File.directory?(AppConfig[:local_contexts_cache_dirname])
+    FileUtils.mkdir_p(AppConfig[:local_contexts_cache_dirname])
   end 
   
   unless AppConfig[:local_contexts_replace_xsl] == false

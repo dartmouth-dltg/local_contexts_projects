@@ -26,5 +26,11 @@
         </div>
       </div>
     </div>
+    <% if @update_cache %>
+      <script>
+        const lc_cache = new ResetLocalContextsCache(false);
+        lc_cache.resetCacheForProject("<%= raw @local_contexts_project['project_id'] %>", 'project', false);
+      </script>
+    <% end %>
   <% end %>
 <% end %>

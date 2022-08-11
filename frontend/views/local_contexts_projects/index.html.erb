@@ -1,4 +1,4 @@
-<%= setup_context(:title => I18n.t("plugins.local_contexts_project._singular")) %>
+<%= setup_context(:title => I18n.t("plugins.local_contexts_projects._plural")) %>
 
 <%
    @show_multiselect_column = false
@@ -15,8 +15,13 @@
       <%= link_to_help :topic => "search" %>
 
       <h2>
-        <%= I18n.t("plugins.local_contexts_project._singular") %>
-        <button class="btn btn-sm pull-right"><a href="<%= "#{AppConfig[:frontend_proxy_prefix]}plugins/local_contexts_projects/new" %>"><%= I18n.t("local_contexts_project._frontend.action.create") %></a></button>
+        <%= I18n.t("local_contexts_project._plural") %>
+        <% if user_can?('update_localcontexts_project_record') %>
+          <div class="btn-group pull-right local-contexts-manage-cache-btn">
+            <button class="btn btn-sm btn-warning"><a href="#"><%= I18n.t("local_contexts_project._frontend.action.reset_cache") %></a></button>
+          </div>
+          <div class="btn-group pull-right"><a class="btn btn-sm btn-primary" href="<%= "#{AppConfig[:frontend_proxy_prefix]}plugins/local_contexts_projects/new" %>"><%= I18n.t("local_contexts_project._frontend.action.create") %></a></button>
+        <% end %>
       </h2>
 
       <%= render_aspace_partial :partial => "shared/flash_messages" %>
