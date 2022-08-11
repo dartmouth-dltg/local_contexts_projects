@@ -14,6 +14,11 @@ class LocalContextsProject < Sequel::Model(:local_contexts_project)
                         Accession, ArchivalObject, Resource, DigitalObject, DigitalObjectComponent
                       ]})
 
+  def validate
+    super
+    validates_unique(:project_id, :message => "local contexts project id not unique")
+  end
+
   def display_string
     "#{project_id} : #{project_name}"
   end

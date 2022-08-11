@@ -113,11 +113,11 @@ or create a new project.
 Access to the this area is governed by a new permission defined in the plugin: `update_localcontexts_project_record`
 
 This new record contains three fields.
-```
-  Project ID - the id of the project from the Local Contexts Hub (required)
-  Project Name - a user supplied name for easy linking (required)
-  Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
-```
+
+- Project ID - the id of the project from the Local Contexts Hub (required)
+- Project Name - a user supplied name for easy linking (required)
+- Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
+
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 
 To link a project to an object, this plugin adds a new subrecord to resources, accessions, archival objects,
