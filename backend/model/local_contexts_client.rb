@@ -104,6 +104,21 @@ class LocalContextsClient
     get_data_from_local_contexts_api(project_id, type, false)
   end
 
+  def check_cache
+    logger = Logger.new($stderr)
+    if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
+      logger.info('Checking cache for Open to Collaborate Notice')
+      get_data_from_local_contexts_api('open_to_collaborate', 'open_to_collaborate')
+    end
+    LocalContextsProject.each_with_index do |lcp, idx|
+      if (AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true) || idx != 0
+        sleep(AppConfig[:local_contexts_api_wait_time])
+      end
+      logger.info("Checking cache for Local Contexts Project Id: #{lcp[:project_id]}")
+      get_data_from_local_contexts_api(lcp[:project_id], 'project')
+    end
+  end
+
   def clear_cache(project_id)
     # let's be very careful here
     dir_path = AppConfig[:local_contexts_cache_dirname]
