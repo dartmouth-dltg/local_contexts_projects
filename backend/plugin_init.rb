@@ -1,6 +1,8 @@
 require 'fileutils'
 require 'aspace_logger'
 require_relative 'lib/local_contexts_ead'
+require_relative 'lib/ead_exporter_overrides'
+require_relative 'lib/ead3_exporter_overrides'
 
 unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
