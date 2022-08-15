@@ -186,7 +186,7 @@ or for all projects. Cache refresh for all projects is controlled by a new backg
 
 The plugin adds a new background job `Local Contexts Projects Refresh Cache` which will refresh the cached data for all
 Local Contexts Projects. Cache refresh has a delay between API requests to prevent overloading the Local Contexts API. This 
-delay is set by `AppConfig[:local_contexts_api_wait_time]` and defaults to 10 seconds between requests.
+delay is set by `AppConfig[:local_contexts_api_wait_time]` and defaults to 30 seconds between requests.
 
 ## Notes
 
