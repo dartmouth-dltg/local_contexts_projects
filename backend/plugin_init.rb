@@ -20,13 +20,17 @@ unless AppConfig.has_key?(:local_contexts_cache_time)
   AppConfig[:local_contexts_cache_time] = 604800 # 7 days
 end
 
-unless AppConfig.has_key?(:local_contexts_api_path)
+unless AppConfig.has_key?(:local_contexts_api_path) 
   AppConfig[:local_contexts_api_path] = "api/v1"
+end
+
+unless AppConfig.has_key?(:local_contexts_refresh_cache_period)
+  AppConfig[:local_contexts_refresh_cache_period] = 86400 # one day
 end
 
 # define the wait till we hit the api again for full (all projects) cache reset
 unless AppConfig.has_key?(:local_contexts_api_wait_time)
-  AppConfig[:local_contexts_api_wait_time] = 30
+  AppConfig[:local_contexts_api_wait_time] = 30 # 30 seconds recommended by Local Contexts
 end
 
 Permission.define("manage_localcontexts_records",
@@ -65,6 +69,10 @@ ArchivesSpaceService.loaded_hook do
     end
   end
   
+end
+
+ArchivesSpaceService.settings.scheduler.every(AppConfig[:local_contexts_refresh_cache_period], :allow_overlapping => false) do
+  LocalContextsClient.new.check_cache
 end
 
 Solr.add_search_hook do |query|
