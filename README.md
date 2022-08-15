@@ -182,8 +182,7 @@ Cache files are created at the time of creation of a new Local Contexts Project 
 For users who can manage Local Contexts Projects, there is an on-demand option to refresh cache data for individual projects 
 or for all projects. Cache refresh for all projects is controlled by a new background job. 
 
-A cache check also runs every 24 hours and will refresh any cache that is older than the cache times specified. In practice, this means that 
-the use of the on-demand cache refresh will only be necessary for cases where you know that a project has been updated and you 
+A cache check also runs every week (Sunday, 1am) and will refresh any cache that is older than the cache times specified. In practice, this means that the use of the on-demand cache refresh will only be necessary for cases where you know that a project has been updated and you 
 need to ensure that the data displayed in ArchivesSpace is up to date.
 
 ## Background Job

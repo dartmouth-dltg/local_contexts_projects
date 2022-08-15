@@ -24,8 +24,8 @@ unless AppConfig.has_key?(:local_contexts_api_path)
   AppConfig[:local_contexts_api_path] = "api/v1"
 end
 
-unless AppConfig.has_key?(:local_contexts_refresh_cache_period)
-  AppConfig[:local_contexts_refresh_cache_period] = 86400 # one day
+unless AppConfig.has_key?(:local_contexts_refresh_cache_cron)
+  AppConfig[:local_contexts_refresh_cache_period] = "0 1 * * 0" # every sunday at 1 am
 end
 
 # define the wait till we hit the api again for full (all projects) cache reset
@@ -71,7 +71,7 @@ ArchivesSpaceService.loaded_hook do
   
 end
 
-ArchivesSpaceService.settings.scheduler.every(AppConfig[:local_contexts_refresh_cache_period], :allow_overlapping => false) do
+ArchivesSpaceService.settings.scheduler.cron(AppConfig[:local_contexts_refresh_cache_cron], :allow_overlapping => false) do
   LocalContextsClient.new.check_cache
 end
 
