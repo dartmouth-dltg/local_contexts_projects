@@ -56,6 +56,8 @@ class EADSerializer < ASpaceExport::Serializer
               end
             end
 
+            handle_arks(data, xml)
+
             serialize_extents(data, xml, @fragments)
 
             serialize_dates(data, xml, @fragments)
@@ -136,22 +138,11 @@ class EADSerializer < ASpaceExport::Serializer
           xml.unittitle { sanitize_mixed_content( val, xml, fragments) }
         end
 
-        if AppConfig[:arks_enabled]
-          ark_url = ArkName::get_ark_url(data.id, :archival_object)
-          if ark_url
-            xml.unitid {
-              xml.extref ({"xlink:href" => ark_url,
-                           "xlink:actuate" => "onload",
-                           "xlink:show" => "new",
-                           "xlink:type" => "simple"
-                          }) { xml.text 'Archival Resource Key' }
-            }
-          end
-        end
-
         if !data.component_id.nil? && !data.component_id.empty?
           xml.unitid data.component_id
         end
+
+        handle_arks(data, xml)
 
         if @include_unpublished
           data.external_ids.each do |exid|
@@ -229,7 +220,6 @@ class EADSerializer < ASpaceExport::Serializer
         content << "-#{date['end']}"
       end
     end
-
     atts['xlink:title'] = digital_object['title'] if digital_object['title']
 
 
@@ -274,7 +264,7 @@ class EADSerializer < ASpaceExport::Serializer
     if digital_object['local_contexts_projects'] && digital_object['local_contexts_projects'].length > 0
       LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EADSerializer)
     end
-    # Local Contexts end}
+    # Local Contexts end
   end
 
 end
