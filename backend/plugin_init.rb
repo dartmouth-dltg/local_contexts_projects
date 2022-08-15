@@ -26,7 +26,7 @@ end
 
 # define the wait till we hit the api again for full (all projects) cache reset
 unless AppConfig.has_key?(:local_contexts_api_wait_time)
-  AppConfig[:local_contexts_api_wait_time] = 10
+  AppConfig[:local_contexts_api_wait_time] = 30
 end
 
 Permission.define("manage_localcontexts_records",
