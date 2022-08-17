@@ -31,7 +31,7 @@ additional guidance on best practices.
 
 This plugin has been tested with ArchivesSpace versions 3.1.0+.
 
-Unzip the latest release of the plugin to your
+Unzip the latest relevant release (check for specific releases for specific versions of ArchivesSpace) of the plugin to your
 ArchivesSpace plugins directory:
 
      $ cd /path/to/archivesspace/plugins
@@ -97,11 +97,11 @@ Default Values
       'open_to_collaborate' => false
     }
 
-    AppConfig[:local_contexts_open_to_collaborate_cache_time] = 2592000
+    AppConfig[:local_contexts_open_to_collaborate_cache_time] = 2592000 # 30 days
 
-    AppConfig[:local_contexts_cache_time] = 604800
+    AppConfig[:local_contexts_cache_time] = 604800 # 7 days
 
-    AppConfig[:local_contexts_api_wait_time] = 15
+    AppConfig[:local_contexts_api_wait_time] = 30
 ```
 
 ## Using the Plugin
@@ -135,10 +135,61 @@ If an archival object or digital object component has not been directly associat
 has been, the Local Contexts data will also be added to the display with an additional note
 indicating where the inheritance comes from.
 
+## Exports
 EAD, EAD3, & PDF exports for the staff & PUI have also been customized. These add a section
 which includes a link to the public facing description of the project if the
 `Hub Project is Public` field is checked for that project as well as the Local Contexts data for the project
 at the time of export.
+
+### Staff EAD/EAD3 Note
+The plugin attempts to match Local Contexts Labels and Notices to the most applicable EAD/EAD3 tag. The default
+mapping is given below. Note that due to the nature of digital objects data contained in EAD/EAD3 using the `<dao>`
+tag, Local Contexts information for linked digital objects is contained within a `<note>` tag instead of using the mapping.
+
+Local Contexts Labels & Notices to EAD/EAD3 Tag Map
+```
+AppConfig[:local_contexts_label_ead_tag_map] = {
+  # Notices
+  'traditional_knowledge' => 'userestrict',
+  'biocultural' => 'userestrict',
+  'attribution_incomplete' => 'custodhist',
+  'open_to_collaborate' => 'odd',
+
+  # TK Labels
+  'attribution' => 'custodhist',
+  'clan' => 'custodhist',
+  'family' => 'custodhist',
+  'outreach' => 'userestrict',
+  'tk_multiple_community' => 'custodhist',
+  'non_verified' => 'accessrestrict',
+  'verified' => 'accessrestrict',
+  'non_commercial' => 'userestrict',
+  'commercial' => 'userestrict',
+  'culturally_sensitive' => 'accessrestrict',
+  'community_voice' => 'custodhist',
+  'community_use_only' => 'userestrict',
+  'seasonal' => 'accessrestrict',
+  'women_general' => 'accessrestrict',
+  'men_general' => 'accessrestrict',
+  'men_restricted' => 'accessrestrict',
+  'women_restricted' => 'accessrestrict',
+  'secret_sacred' => 'accessrestrict',
+  'open_to_collaboration' => 'userestrict',
+  'creative' => 'custodhist',
+
+  # BC Labels
+  'provenance' => 'custodhist',
+  'commercialization' => 'userestrict',
+  'non_commercial' => 'userestrict',
+  'collaboration' => 'userestrict',
+  'consent_verified' => 'accessrestrict',
+  'consent_non_verified' => 'accessrestrict',
+  'multiple_community' => 'custodhist',
+  'research' => 'userestrict',
+  'clan' => 'custodhist',
+  'outreach' => 'userestrict'
+}
+```
 
 ### <a name="staff-pdf-exports-note"></a>Staff PDF Exports Note
 
@@ -169,7 +220,7 @@ See the `samples` directory in the plugin for sample exports and screenshots.
 
 ### Caching
 
-The plugin implements a simple caching mechanism to descrease render times in the staff interface and PUI
+The plugin implements a simple caching mechanism to decrease render times in the staff interface and PUI
 and prevent overloading the Local Contexts API. Cache invalidation is controlled
 by the time limits specified by `AppConfig[:local_contexts_cache_time]` and `AppConfig[:local_contexts_open_to_collaborate_cache_time]`
 If a request is made to view an object linked to a Local Contexts Project whose cache is out of date, the Local Contexts API is called and the cache for that project is refreshed. Otherwise the cached version of the project data is used for display.
