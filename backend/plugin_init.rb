@@ -38,6 +38,7 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
   'traditional_knowledge' => 'userestrict',
   'biocultural' => 'userestrict',
   'attribution_incomplete' => 'custodhist',
+  'open_to_collaborate' => 'odd',
 
   # TK Labels
   'attribution' => 'custodhist',
