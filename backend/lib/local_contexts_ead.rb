@@ -55,12 +55,11 @@ class LocalContextsEAD
             ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") , xml, fragments)
           }
           construct_lc_intro(lcps, xml, fragments, ead_serializer_caller)
-
-          # loop through each attached id
-          data.local_contexts_projects.each do |lcp|
-            construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
-          end
-          }
+        }
+        # loop through each attached id
+        data.local_contexts_projects.each do |lcp|
+          construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
+        end
       end
     end
   end
@@ -75,12 +74,11 @@ class LocalContextsEAD
           xml.p {
             ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.section_title") + '. ' + I18n.t("local_contexts_project.digital_object_note", :title => digital_object['title']) , xml, fragments)
           }
-
           construct_lc_intro(lcps, xml, fragments, ead_serializer_caller)
 
           # loop through each attached id
           lcps.each do |lcp|
-            construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
+            construct_project_ead(lcp, xml, fragments, ead_serializer_caller, true)
           end
         }
       end
@@ -104,8 +102,15 @@ class LocalContextsEAD
     }
   end
 
-  def self.construct_project_ead(lcp, xml, fragments, ead_serializer_caller)
+  def self.construct_project_ead(lcp, xml, fragments, ead_serializer_caller, digital_object = false)
+    logger = Logger.new($stderr)
     lc_labels = ['bc_labels', 'tk_labels']
+    tag_name = 'odd'
+    tag_head = 'head'
+    if digital_object
+      tag_name = 'p'
+      tag_head = 'p'
+    end
     unless lcp['_resolved']
       id = JSONModel.parse_reference(lcp['ref'])[:id]
       lc_obj = LocalContextsProject.get_or_die(id)
@@ -119,91 +124,114 @@ class LocalContextsEAD
 
       # for each fetched project, render the data
       if project_json['title'] && project_json['title'].length > 0
-        xml.p {
-          ead_serializer_caller.sanitize_mixed_content(project_json['title'], xml, fragments)
+        xml.send(tag_name) {
+          xml.send(tag_head) {
+            ead_serializer_caller.sanitize_mixed_content(project_json['title'], xml, fragments)
+          }
+          xml.p {
+            xml.extref ({"xlink:href" => project_url,
+                        "xlink:actuate" => "onLoad",
+                        "xlink:show" => "new",
+                        "xlink:type" => "simple"
+                        }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
+          }
         }
-        xml.p {
-          xml.extref ({"xlink:href" => project_url,
-                      "xlink:actuate" => "onLoad",
-                      "xlink:show" => "new",
-                      "xlink:type" => "simple"
-                      }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
-        }
-
         # render labels and notices slightly differently
         project_json.each do |k,v|
-
           # labels
           if lc_labels.include?(k)
             v.each do |label|
-              xml.p {
-                ead_serializer_caller.sanitize_mixed_content(label['name'] + " (" + label['language'] + ")", xml, fragments)
-              }
-              xml.p {
-                xml.extref ({"xlink:href" => label['img_url'],
-                            "xlink:actuate" => "onLoad",
-                            "xlink:show" => "embed",
-                            "xlink:type" => "simple"
-                })
-              }
-              xml.p {
-                ead_serializer_caller.sanitize_mixed_content(label['label_text'], xml, fragments)
-              }
-              if label['community']
-                xml.p {
-                  ead_serializer_caller.sanitize_mixed_content("Placed By: " + label['community'], xml, fragments)
-                }
-              end
-              if label['translations'].length > 0
-                label['translations'].each do |translation|
-                  xml.p {
-                    ead_serializer_caller.sanitize_mixed_content(translation['translated_name']  + " (" + translation['language'] + ")", xml, fragments)
-                  }
-                  xml.p {
-                    ead_serializer_caller.sanitize_mixed_content(translation['translated_text'], xml, fragments)
-                  }
+              unless digital_object
+                begin
+                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][label['label_type']]
+                rescue
+                  logger.info("Label Type: #{label['label_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
                 end
               end
+              xml.send(tag_name) {
+                xml.send(tag_head) {
+                  ead_serializer_caller.sanitize_mixed_content(label['name'] + " (" + label['language'] + ")", xml, fragments)
+                }
+                xml.p {
+                  xml.extref ({"xlink:href" => label['img_url'],
+                              "xlink:actuate" => "onLoad",
+                              "xlink:show" => "embed",
+                              "xlink:type" => "simple"
+                  })
+                }
+                xml.p {
+                  ead_serializer_caller.sanitize_mixed_content(label['label_text'], xml, fragments)
+                }
+                if label['community']
+                  xml.p {
+                    ead_serializer_caller.sanitize_mixed_content("Placed By: " + label['community'], xml, fragments)
+                  }
+                end
+                if label['translations'].length > 0
+                  label['translations'].each do |translation|
+                    xml.p {
+                      ead_serializer_caller.sanitize_mixed_content(translation['translated_name']  + " (" + translation['language'] + ")", xml, fragments)
+                    }
+                    xml.p {
+                      ead_serializer_caller.sanitize_mixed_content(translation['translated_text'], xml, fragments)
+                    }
+                  end
+                end
+              }
             end
           # notices
           elsif k == 'notice'
             v.each do |notice|
-              xml.p {
-                ead_serializer_caller.sanitize_mixed_content(notice['name'], xml, fragments)
-              }
-              xml.p {
-                xml.extref ({"xlink:href" => notice['img_url'],
-                            "xlink:actuate" => "onLoad",
-                            "xlink:show" => "embed",
-                            "xlink:type" => "simple"
-                })
-              }
-              xml.p {
-                ead_serializer_caller.sanitize_mixed_content(notice['default_text'], xml, fragments)
+              unless digital_object
+                begin
+                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][notice['notice_type']]
+                rescue
+                  logger.info("Label Type: #{notice['notice_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
+                end
+              end
+              xml.send(tag_name) {
+
+                xml.send(tag_head) {
+                  ead_serializer_caller.sanitize_mixed_content(notice['name'], xml, fragments)
+                }
+                xml.p {
+                  xml.extref ({"xlink:href" => notice['img_url'],
+                              "xlink:actuate" => "onLoad",
+                              "xlink:show" => "embed",
+                              "xlink:type" => "simple"
+                  })
+                }
+                xml.p {
+                  ead_serializer_caller.sanitize_mixed_content(notice['default_text'], xml, fragments)
+                }
               }
             end
           end
         end
-      
+
       # render error message if the project could not be fetched
       else
         constructed_project_url = AppConfig[:local_contexts_base_url] + "projects/project/" + project_id
-
-        xml.p {
-          ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.fetch_error.ead_message"), xml, fragments)
-        }
-        xml.p {
-          xml.extref ({"xlink:href" => constructed_project_url,
-                      "xlink:actuate" => "onLoad",
-                      "xlink:show" => "new",
-                      "xlink:type" => "simple"
-                      }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
+        xml.send(tag_name) {
+          xml.p {
+            ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.fetch_error.ead_message"), xml, fragments)
+          }
+          xml.p {
+            xml.extref ({"xlink:href" => constructed_project_url,
+                        "xlink:actuate" => "onLoad",
+                        "xlink:show" => "new",
+                        "xlink:type" => "simple"
+                        }) { xml.text I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"}
+          }
         }
       end
+
     # the project is not public
     else
-      xml.p {
-        ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_not_public_message"), xml, fragments)
+      xml.send(tag_nam) {
+        xml.p {
+          ead_serializer_caller.sanitize_mixed_content(I18n.t("local_contexts_project.project_not_public_message"), xml, fragments)
+        }
       }
     end
   end

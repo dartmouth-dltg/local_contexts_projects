@@ -25,13 +25,55 @@ unless AppConfig.has_key?(:local_contexts_api_path)
 end
 
 unless AppConfig.has_key?(:local_contexts_refresh_cache_cron)
-  AppConfig[:local_contexts_refresh_cache_period] = "0 1 * * 0" # every sunday at 1 am
+  AppConfig[:local_contexts_refresh_cache_cron] = "0 1 * * 0" # every sunday at 1 am
 end
 
 # define the wait till we hit the api again for full (all projects) cache reset
 unless AppConfig.has_key?(:local_contexts_api_wait_time)
   AppConfig[:local_contexts_api_wait_time] = 30 # 30 seconds recommended by Local Contexts
 end
+
+AppConfig[:local_contexts_label_ead_tag_map] = {
+  # Notices
+  'traditional_knowledge' => 'userestrict',
+  'biocultural' => 'userestrict',
+  'attribution_incomplete' => 'custodhist',
+  'open_to_collaborate' => 'odd',
+
+  # TK Labels
+  'attribution' => 'custodhist',
+  'clan' => 'custodhist',
+  'family' => 'custodhist',
+  'outreach' => 'userestrict',
+  'tk_multiple_community' => 'custodhist',
+  'non_verified' => 'accessrestrict',
+  'verified' => 'accessrestrict',
+  'non_commercial' => 'userestrict',
+  'commercial' => 'userestrict',
+  'culturally_sensitive' => 'accessrestrict',
+  'community_voice' => 'custodhist',
+  'community_use_only' => 'userestrict',
+  'seasonal' => 'accessrestrict',
+  'women_general' => 'accessrestrict',
+  'men_general' => 'accessrestrict',
+  'men_restricted' => 'accessrestrict',
+  'women_restricted' => 'accessrestrict',
+  'secret_sacred' => 'accessrestrict',
+  'open_to_collaboration' => 'userestrict',
+  'creative' => 'custodhist',
+
+  # BC Labels
+  'provenance' => 'custodhist',
+  'commercialization' => 'userestrict',
+  'non_commercial' => 'userestrict',
+  'collaboration' => 'userestrict',
+  'consent_verified' => 'accessrestrict',
+  'consent_non_verified' => 'accessrestrict',
+  'multiple_community' => 'custodhist',
+  'research' => 'userestrict',
+  'clan' => 'custodhist',
+  'outreach' => 'userestrict'
+}
 
 Permission.define("manage_localcontexts_records",
                   "The ability to create/update/delete Local Contexts Project records",
