@@ -7,110 +7,127 @@ class EAD3Serializer < EADSerializer
     @use_numbered_c_tags = data.use_numbered_c_tags?
     @id_prefix = I18n.t('archival_object.ref_id_export_prefix', :default => 'aspace_')
 
-    doc = Nokogiri::XML::Builder.new(:encoding => "UTF-8") do |xml|
-      ead_attributes = {
-        'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-        'xsi:schemaLocation' => 'urn:isbn:1-931666-22-9 http://www.loc.gov/ead/ead.xsd',
-        'xmlns:xlink' => 'http://www.w3.org/1999/xlink'
-      }
+    builder = Nokogiri::XML::Builder.new(:encoding => "UTF-8") do |xml|
+      begin
+        ead_attributes = {}
 
-      if data.publish === false
-        ead_attributes['audience'] = 'internal'
-      end
+        if data.publish === false
+          ead_attributes['audience'] = 'internal'
+        end
 
-      xml.ead( ead_attributes ) {
+        xml.ead( ead_attributes ) {
 
-        xml.text (
-          @stream_handler.buffer { |xml, new_fragments|
-            serialize_eadheader(data, xml, new_fragments)
-          })
+          xml.text (
+            @stream_handler.buffer { |xml, new_fragments|
+              serialize_control(data, xml, new_fragments)
+            }
+          )
 
-        atts = {:level => data.level, :otherlevel => data.other_level}
-        atts.reject! {|k, v| v.nil?}
+          atts = {:level => data.level, :otherlevel => data.other_level}
+          atts.reject! {|k, v| v.nil?}
 
-        xml.archdesc(atts) {
+          xml.archdesc(atts) {
 
-          xml.did {
+            xml.did {
 
-            if (val = data.repo.name)
-              xml.repository {
-                xml.corpname { sanitize_mixed_content(val, xml, @fragments) }
-              }
-            end
-
-            if (val = data.title)
-              xml.unittitle { sanitize_mixed_content(val, xml, @fragments) }
-            end
-
-            serialize_origination(data, xml, @fragments)
-
-            xml.unitid (0..3).map {|i| data.send("id_#{i}")}.compact.join('.')
-
-            if @include_unpublished
-              data.external_ids.each do |exid|
-                xml.unitid ({ "audience" => "internal", "type" => exid['source'], "identifier" => exid['external_id']}) { xml.text exid['external_id']}
+              unless data.title.nil?
+                xml.unittitle { sanitize_mixed_content(data.title, xml, @fragments) }
               end
-            end
 
-            serialize_extents(data, xml, @fragments)
+              xml.unitid (0..3).map { |i| data.send("id_#{i}") }.compact.join('.')
 
-            serialize_dates(data, xml, @fragments)
-
-            serialize_did_notes(data, xml, @fragments)
-
-            if (languages = data.lang_materials)
-              serialize_languages(languages, xml, @fragments)
-            end
-
-            data.instances_with_sub_containers.each do |instance|
-              serialize_container(instance, xml, @fragments)
-            end
-
-            # Patch for Open to Collaborate Notice
-            LocalContextsEAD.serialize_local_contexts_collaborate(data, xml, @fragments, EAD3Serializer)
-            # end
-
-            EADSerializer.run_serialize_step(data, xml, @fragments, :did)
-
-          }# </did>
-
-          # This is it. The patch. All one line of it
-          LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer)
-          # end the patch
-
-          data.digital_objects.each do |dob|
-            serialize_digital_object(dob, xml, @fragments)
-          end
-
-          serialize_nondid_notes(data, xml, @fragments)
-
-          serialize_bibliographies(data, xml, @fragments)
-
-          serialize_indexes(data, xml, @fragments)
-
-          serialize_controlaccess(data, xml, @fragments)
-
-          EADSerializer.run_serialize_step(data, xml, @fragments, :archdesc)
-
-          xml.dsc {
-
-            data.children_indexes.each do |i|
-              xml.text(
-                @stream_handler.buffer {|xml, new_fragments|
-                  serialize_child(data.get_child(i), xml, new_fragments)
+              unless data.repo.nil? || data.repo.name.nil?
+                xml.repository {
+                  xml.corpname {
+                    xml.part {
+                      sanitize_mixed_content(data.repo.name, xml, @fragments)
+                    }
+                  }
                 }
-              )
-            end
+              end
+
+              unless (languages = data.lang_materials).empty?
+                serialize_languages(languages, xml, @fragments)
+              end
+
+              data.instances_with_sub_containers.each do |instance|
+                serialize_container(instance, xml, @fragments)
+              end
+
+              serialize_extents(data, xml, @fragments)
+
+              serialize_dates(data, xml, @fragments)
+
+              serialize_did_notes(data, xml, @fragments)
+
+              serialize_origination(data, xml, @fragments)
+
+              if @include_unpublished
+                data.external_ids.each do |exid|
+                  xml.unitid ({ "audience" => "internal", "type" => exid['source'], "identifier" => exid['external_id']}) { xml.text exid['external_id']}
+                end
+              end
+
+              # Patch for Open to Collaborate Notice
+              LocalContextsEAD.serialize_local_contexts_collaborate(data, xml, @fragments, EAD3Serializer, 'ead3')
+              # end
+
+              EADSerializer.run_serialize_step(data, xml, @fragments, :did)
+
+              # Change from EAD 2002: dao must be children of did in EAD3, not archdesc
+              data.digital_objects.each do |dob|
+                serialize_digital_object(dob, xml, @fragments)
+              end
+
+            }# </did>
+
+
+              # This is it. The patch. All one line of it
+              LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer, 'ead3')
+              # end the patch
+
+              serialize_nondid_notes(data, xml, @fragments)
+
+            serialize_bibliographies(data, xml, @fragments)
+
+            serialize_indexes(data, xml, @fragments)
+
+            serialize_controlaccess(data, xml, @fragments)
+
+            EADSerializer.run_serialize_step(data, xml, @fragments, :archdesc)
+
+            xml.dsc {
+
+              data.children_indexes.each do |i|
+                xml.text( @stream_handler.buffer {
+                  |xml, new_fragments| serialize_child(data.get_child(i), xml, new_fragments)
+                  }
+                )
+              end
+            }
           }
         }
-      }
+
+      rescue => e
+        xml.text "ASPACE EXPORT ERROR : YOU HAVE A PROBLEM WITH YOUR EXPORT OF YOUR RESOURCE. THE FOLLOWING INFORMATION MAY HELP:\n
+                  MESSAGE: #{e.message.inspect}  \n
+                  TRACE: #{e.backtrace.inspect} \n "
+      end
     end
-    doc.doc.root.add_namespace nil, 'urn:isbn:1-931666-22-9'
+
+    # Add xml-model for rng
+    # Make this conditional if XSD or DTD are requested
+    xmlmodel_content = 'href="https://raw.githubusercontent.com/SAA-SDT/EAD3/master/ead3.rng"
+      type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"'
+
+    xmlmodel = Nokogiri::XML::ProcessingInstruction.new(builder.doc, "xml-model", xmlmodel_content)
+    builder.doc.root.add_previous_sibling(xmlmodel)
+    builder.doc.root.add_namespace nil, 'http://ead3.archivists.org/schema/'
 
     Enumerator.new do |y|
-      @stream_handler.stream_out(doc, @fragments, y)
+      @stream_handler.stream_out(builder, @fragments, y)
     end
-  end
+  end # END stream
 
   def serialize_child(data, xml, fragments, c_depth = 1)
     begin
@@ -177,9 +194,8 @@ class EAD3Serializer < EADSerializer
             end
           end
         }
-
         # This is it. The patch. All one line of it for AOs
-        LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer)
+        LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer, 'ead3')
         # end the patch
 
         serialize_nondid_notes(data, xml, fragments)
@@ -203,7 +219,6 @@ class EAD3Serializer < EADSerializer
     end
   end
 
-  # Override this method to include Local Contexts data
   def serialize_digital_object(digital_object, xml, fragments)
     return if digital_object["publish"] === false && !@include_unpublished
     return if digital_object["suppressed"] === true
@@ -257,9 +272,9 @@ class EAD3Serializer < EADSerializer
     end
     # Local Contexts start
     if digital_object['local_contexts_projects'] && digital_object['local_contexts_projects'].length > 0
-      LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EAD3Serializer)
+      LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EAD3Serializer, 'ead3')
     end
-    # Local Contexts end}
+    # Local Contexts end
   end
 
 end

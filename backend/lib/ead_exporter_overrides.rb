@@ -71,7 +71,7 @@ class EADSerializer < ASpaceExport::Serializer
             end
 
             # Patch for Open to Collaborate Notice
-            LocalContextsEAD.serialize_local_contexts_collaborate(data, xml, @fragments, EADSerializer)
+            LocalContextsEAD.serialize_local_contexts_collaborate(data, xml, @fragments, EADSerializer, 'ead')
             # end
 
             EADSerializer.run_serialize_step(data, xml, @fragments, :did)
@@ -79,7 +79,7 @@ class EADSerializer < ASpaceExport::Serializer
           }# </did>
 
           # This is it. The patch. All one line of it
-          LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EADSerializer)
+          LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EADSerializer, 'ead')
           # end the patch
 
           data.digital_objects.each do |dob|
@@ -182,7 +182,7 @@ class EADSerializer < ASpaceExport::Serializer
       }
 
       # This is it. The patch. All one line of it for AOs
-      LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EADSerializer)
+      LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EADSerializer, 'ead')
       # end the patch
 
       serialize_nondid_notes(data, xml, fragments)
@@ -272,7 +272,7 @@ class EADSerializer < ASpaceExport::Serializer
     end
     # Local Contexts start
     if digital_object['local_contexts_projects'] && digital_object['local_contexts_projects'].length > 0
-      LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EADSerializer)
+      LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EADSerializer, 'ead')
     end
     # Local Contexts end}
   end
