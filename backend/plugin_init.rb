@@ -1,6 +1,9 @@
 require 'fileutils'
 require 'aspace_logger'
+require_relative 'lib/local_contexts_ead_helper'
 require_relative 'lib/local_contexts_ead'
+require_relative 'lib/local_contexts_ead3'
+require_relative 'lib/local_contexts_serializer'
 require_relative 'lib/ead_exporter_overrides'
 require_relative 'lib/ead3_exporter_overrides'
 
@@ -84,8 +87,12 @@ Permission.define("update_localcontexts_project_record",
                   :implied_by => 'manage_localcontexts_records',
                   :level => "global")
 
+# Register our custom serialize steps.
+EADSerializer.add_serialize_step(EADLocalContextsSerialize)
+EAD3Serializer.add_serialize_step(EAD3LocalContextsSerialize)
 
-# create the pui sitemaps directory if it does not already exist
+
+# create the local contexts data directory if it does not already exist
 ArchivesSpaceService.loaded_hook do
 
   logger = Logger.new($stderr)
