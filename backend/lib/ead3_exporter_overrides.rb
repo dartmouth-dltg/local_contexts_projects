@@ -70,11 +70,7 @@ class EAD3Serializer < EADSerializer
                 end
               end
 
-              # Patch for Open to Collaborate Notice
-              LocalContextsEAD.serialize_local_contexts_collaborate(data, xml, @fragments, EAD3Serializer)
-              # end
-
-              EADSerializer.run_serialize_step(data, xml, @fragments, :did)
+              EAD3Serializer.run_serialize_step(data, xml, @fragments, :did)
 
               # Change from EAD 2002: dao must be children of did in EAD3, not archdesc
               data.digital_objects.each do |dob|
@@ -82,10 +78,6 @@ class EAD3Serializer < EADSerializer
               end
 
             }# </did>
-
-            # This is it. The patch. All one line of it
-            LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer)
-            # end the patch
 
             serialize_nondid_notes(data, xml, @fragments)
 
@@ -95,7 +87,7 @@ class EAD3Serializer < EADSerializer
 
             serialize_controlaccess(data, xml, @fragments)
 
-            EADSerializer.run_serialize_step(data, xml, @fragments, :archdesc)
+            EAD3Serializer.run_serialize_step(data, xml, @fragments, :archdesc)
 
             xml.dsc {
 
@@ -172,7 +164,7 @@ class EAD3Serializer < EADSerializer
             serialize_languages(languages, xml, fragments)
           end
 
-          EADSerializer.run_serialize_step(data, xml, fragments, :did)
+          EAD3Serializer.run_serialize_step(data, xml, fragments, :did)
 
           data.instances_with_sub_containers.each do |instance|
             serialize_container(instance, xml, @fragments)
@@ -185,15 +177,11 @@ class EAD3Serializer < EADSerializer
           end
         }
 
-        # This is it. The patch. All one line of it for AOs
-        LocalContextsEAD.serialize_local_contexts_ead(data, xml, @fragments, EAD3Serializer)
-        # end the patch
-
         serialize_nondid_notes(data, xml, fragments)
         serialize_bibliographies(data, xml, fragments)
         serialize_indexes(data, xml, fragments)
         serialize_controlaccess(data, xml, fragments)
-        EADSerializer.run_serialize_step(data, xml, fragments, :archdesc)
+        EADS3erializer.run_serialize_step(data, xml, fragments, :archdesc)
 
         data.children_indexes.each do |i|
           xml.text(
@@ -261,11 +249,8 @@ class EAD3Serializer < EADSerializer
         }
       end
     end
-    # Local Contexts start
-    if digital_object['local_contexts_projects'] && digital_object['local_contexts_projects'].length > 0
-      LocalContextsEAD.serialize_local_contexts_ead_for_digital_objects(digital_object, xml, fragments, EAD3Serializer)
-    end
-    # Local Contexts end
+    # add run serializer step
+    EAD3Serializer.run_serialize_step(digital_object, xml, fragments, :dao)
   end
 
 end
