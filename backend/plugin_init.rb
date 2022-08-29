@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'thread'
 require 'aspace_logger'
 require_relative 'lib/local_contexts_ead_helper'
 require_relative 'lib/local_contexts_ead'
@@ -118,6 +119,11 @@ ArchivesSpaceService.loaded_hook do
     end
   end
   
+end
+
+# check the cache on startup
+Thread.new do
+  LocalContextsClient.new.check_cache
 end
 
 ArchivesSpaceService.settings.scheduler.cron(AppConfig[:local_contexts_refresh_cache_cron], :allow_overlapping => false) do
