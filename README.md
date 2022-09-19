@@ -3,8 +3,8 @@
 ## About
 
 An ArchivesSpace plugin that allows staff users to add & display Local Contexts
-Labels (Traditional Knowledge (TK) & Biocultural (BC)), Notices (TK & BC), & Local Contexts Institution
-Notices (Attribution Incomplete) on resources, accessions, archival objects,
+Labels (Traditional Knowledge (TK) & Biocultural (BC)), Notices (TK, BC, & Attribution Incomplete) 
+on resources, accessions, archival objects,
 digital objects, and digital object components by linking a Local Contexts Hub
 Project to an object via the project id. The plugin also supports displaying the Open to Collaborate Notice on
 the ArchivesSpace PUI homepage.
@@ -15,11 +15,6 @@ additional guidance on best practices.
 - <a href="https://localcontexts.org/labels/biocultural-labels/">Local Contexts Biocultural Labels</a>
 - <a href="https://localcontexts.org/notices/aboutnotices/">Local Contexts Notices</a>
 - Contact: <a href="mailto:support@localcontexts.org">support@localcontexts.org</a>
-
-Please read the Local Contexts guidelines for using Institution Notices and contact them for
-additional guidance on best practices.
-- <a href="https://localcontexts.org/notices/cultural-institution-notices/">Local Contexts</a>
-- Contact: <a href="mailto:support@localcontexts.org">support@localcontexts.org</a>.
 
 ## API Links
 
@@ -35,7 +30,7 @@ Unzip the latest relevant release (check for specific releases for specific vers
 ArchivesSpace plugins directory:
 
      $ cd /path/to/archivesspace/plugins
-     $ unzip institution_notices.zip -d local_contexts_projects
+     $ unzip local_contexts_projects.zip -d local_contexts_projects
 
 Enable the plugin by editing your ArchivesSpace configuration file
 (`config/config.rb`):
@@ -83,7 +78,8 @@ enable Local Contexts associated projects facets in that area.
 
 Set `open_to_collaborate` to `true` to display an Open to Collaborate Notice on the homepage.
 Please <a href="https://localcontexts.org/notices/cultural-institution-notices/">read more about using the 
-Open to Collaborate Notice</a> at Local Contexts: 
+Open to Collaborate Notice</a> at Local Contexts. If you choose to display an Open to Collaborate Notice, 
+the Notice should also be added to your account in the Local Contexts Hub. 
 
 Default Values
 ```
@@ -125,10 +121,10 @@ digital objects, and digital object components. The new subrecord is labeled 'Lo
 
 The subrecord contains one field - a link to a Local Contexts Project as defined above. In view mode,
 there is a button which fetches the data associated with the project id(s) and displays all
-BC Labels, TK Labels, Notices, & Institution Notices associated with the project(s).
+BC Labels, TK Labels, & Notices associated with the project(s).
 
-On the PUI side, the icons for the labels & notices will be appended to the title of the
-object. Fuller descriptions of the labels (including translations) will be added to the object
+On the PUI side, the icons for the Labels & Notices will be appended to the title of the
+object. Fuller descriptions of the Labels (including translations) will be added to the object
 description area.
 
 If an archival object or digital object component has not been directly associated with a project, but has an ancestor that
@@ -283,4 +279,4 @@ Plugin developed by Joshua Shaw [Joshua.D.Shaw@dartmouth.edu], Digital Library T
 Dartmouth Library, Dartmouth College
 
 Please visit <a href="https://localcontexts.org/">Local Contexts</a> for more information about
-Local Contexts Labels, Notices, & Institution Notices.
+Local Contexts Labels, & Notices.
