@@ -1,5 +1,8 @@
 # Local Contexts Plugin
 
+## Note: Beta Status
+We're awaiting additional community feedback before creating an official release.
+
 ## About
 
 An ArchivesSpace plugin that allows staff users to add & display Local Contexts
