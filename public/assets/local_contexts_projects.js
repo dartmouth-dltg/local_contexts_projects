@@ -107,7 +107,7 @@ class LocalContexts {
       $.each(v, function(idx, label) {
         const labelLanguage = label.language_tag;
         let translations = '';
-        
+
         if (typeof(label.default_text) !== 'undefined' && k == 'notice') {
           label['label_text'] = label.default_text;
         }
@@ -117,7 +117,6 @@ class LocalContexts {
         }
 
         lc_data_html += self.renderFullDataTemplate(label, labelLanguage, translations);
-
 
         if (!self.img_urls.includes(label.img_url)) {
           self.img_urls.push(label.img_url);
