@@ -105,7 +105,9 @@ class LocalContexts {
 
     $.each(new_json, function(k,v) {
       $.each(v, function(idx, label) {
+        const labelLanguage = label.language_tag;
         let translations = '';
+        
         if (typeof(label.default_text) !== 'undefined' && k == 'notice') {
           label['label_text'] = label.default_text;
         }
@@ -113,8 +115,6 @@ class LocalContexts {
         if (label.translations && label.translations.length > 0) {
           translations = self.renderTranslations(label, labelLanguage);
         }
-
-        const labelLanguage = label.language_tag;
 
         lc_data_html += self.renderFullDataTemplate(label, labelLanguage, translations);
 
