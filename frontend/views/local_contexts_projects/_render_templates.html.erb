@@ -10,8 +10,9 @@
       <span class="local-contexts-description">
         {if label.audiofile && label.audiofile.length > 0}
           <span class="local-contexts-audio">
-            <audio controls><source src="${label.audiofile}" />
-              'Your browser does not support HTML5 audio. Here is a <a href="${label.audiofile}">link to the audio</a> instead.' +
+            <audio controls>
+              <source src="${label.audiofile}" />
+              Your browser does not support HTML5 audio. Here is a <a href="${label.audiofile}">link to the audio</a> instead.
             </audio>
           </span>
         {/if}
