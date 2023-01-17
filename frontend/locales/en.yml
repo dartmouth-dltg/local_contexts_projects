@@ -72,8 +72,8 @@ en:
 
   group:
     permission_types:
-      manage_localcontexts_records: create/modify/delete/clear cache for local contexts records
-      update_localcontexts_project_record: create/modify/delete/clear cache for local contexts records
+      manage_localcontexts_records: create/modify/delete/clear cache for Local Contexts records
+      update_localcontexts_project_record: create/modify/delete/clear cache for Local Contexts records
 
   advanced_search:
     text:
