@@ -35,7 +35,7 @@ class LocalContexts {
                             '</span>';
 
     this.audioTemplate = '<span class="local-contexts-audio">' +
-                          '<audio controls><src="${audioSrc}" />' +
+                          '<audio controls><source src="${audioSrc}" />' +
                           'Your browser does not support HTML5 audio. Here is a <a href="${audioSrc}">link to the audio</a> instead.' +
                           '</audio></span>';
 
