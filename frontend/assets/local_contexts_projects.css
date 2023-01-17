@@ -22,6 +22,10 @@ img.local-contexts-image {
   margin: 0 1em 1em 0;
 }
 
+span.local-contexts-audio {
+  display: block;
+}
+
 span.local-contexts-description {
   display: table-cell;
   vertical-align: top;

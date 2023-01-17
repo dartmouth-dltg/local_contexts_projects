@@ -35,7 +35,7 @@ class LocalContexts {
                             '</span>';
 
     this.audioTemplate = '<span class="local-contexts-audio">' +
-                          '<audio controls><src="${audioSrc}" />' +
+                          '<audio controls><source src="${audioSrc}" />' +
                           'Your browser does not support HTML5 audio. Here is a <a href="${audioSrc}">link to the audio</a> instead.' +
                           '</audio></span>';
 
@@ -105,7 +105,9 @@ class LocalContexts {
 
     $.each(new_json, function(k,v) {
       $.each(v, function(idx, label) {
+        const labelLanguage = label.language_tag;
         let translations = '';
+        
         if (typeof(label.default_text) !== 'undefined' && k == 'notice') {
           label['label_text'] = label.default_text;
         }
@@ -114,10 +116,7 @@ class LocalContexts {
           translations = self.renderTranslations(label, labelLanguage);
         }
 
-        const labelLanguage = label.language_tag;
-
         lc_data_html += self.renderFullDataTemplate(label, labelLanguage, translations);
-
 
         if (!self.img_urls.includes(label.img_url)) {
           self.img_urls.push(label.img_url);
