@@ -156,17 +156,17 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
 
   # TK Labels
   'attribution' => 'custodhist',
-  'clan' => 'custodhist',
-  'family' => 'custodhist',
+  'clan' => 'accessrestrict',
+  'family' => 'accessrestrict',
   'outreach' => 'userestrict',
   'tk_multiple_community' => 'custodhist',
-  'non_verified' => 'accessrestrict',
-  'verified' => 'accessrestrict',
+  'non_verified' => 'userestrict',
+  'verified' => 'userestrict',
   'non_commercial' => 'userestrict',
   'commercial' => 'userestrict',
   'culturally_sensitive' => 'accessrestrict',
   'community_voice' => 'custodhist',
-  'community_use_only' => 'userestrict',
+  'community_use_only' => 'accessrestrict',
   'seasonal' => 'accessrestrict',
   'women_general' => 'accessrestrict',
   'men_general' => 'accessrestrict',
@@ -174,18 +174,18 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
   'women_restricted' => 'accessrestrict',
   'secret_sacred' => 'accessrestrict',
   'open_to_collaboration' => 'userestrict',
-  'creative' => 'custodhist',
+  'creative' => 'userestrict',
 
   # BC Labels
-  'provenance' => 'custodhist',
+  'provenance' => 'userestrict',
   'commercialization' => 'userestrict',
   'non_commercial' => 'userestrict',
   'collaboration' => 'userestrict',
-  'consent_verified' => 'accessrestrict',
-  'consent_non_verified' => 'accessrestrict',
-  'multiple_community' => 'custodhist',
+  'consent_verified' => 'userestrict',
+  'consent_non_verified' => 'userestrict',
+  'multiple_community' => 'userestrict',
   'research' => 'userestrict',
-  'clan' => 'custodhist',
+  'clan' => 'accessrestrict',
   'outreach' => 'userestrict'
 }
 ```
