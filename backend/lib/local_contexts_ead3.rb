@@ -108,10 +108,10 @@ class LocalContextsEAD3 < EAD3Serializer
   def project_contents(label_or_notice, xml, fragments, digital_object)
     if digital_object
       xml.lb {}
-      image_ref(label_or_notice, xml, fragments, ead_type)
+      image_ref(label_or_notice, xml, fragments)
     else
       xml.p {
-        image_ref(label_or_notice, xml, fragments, ead_type)
+        image_ref(label_or_notice, xml, fragments)
       }
     end
     if label_or_notice['label_text']
