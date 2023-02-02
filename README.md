@@ -272,7 +272,6 @@ This plugin also overrides the following views
     /public/views/pdf/_archival_object.html.erb
     /public/views/pdf/_digital_object_links.html.erb
     /public/views/pdf/_titlepage.html.erb
-    /public/views/shared/_record_innards.html.erb
     /public/views/welcome/show.html.erb
 ```
 
