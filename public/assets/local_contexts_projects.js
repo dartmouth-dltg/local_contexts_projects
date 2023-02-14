@@ -1,43 +1,104 @@
 /* local_context/public/assets/local_context.js */
+
 class LocalContexts {
   constructor(project_ids) {
+    this.localCfgDefaults = this.checkLocalConfigDefaults()
+    this.localTemplates = this.checkLocalTemplates()
+    this.defaults = {
+      cfg: this.localCfgDefaults ||= new LocalContextsCfgDefaults(),
+      templates: this.localTemplates ||= new LocalContextsDefaultTemplates()
+    }
+    new LocalContextsInit(project_ids, this.defaults)
+  }
+
+  checkLocalConfigDefaults() {
+    if (typeof LocalContextsLocalCfgDefaults === 'function') {
+      return new LocalContextsLocalCfgDefaults()
+    }
+    else return false
+  }
+
+  checkLocalTemplates() {
+    if (typeof LocalContextsLocalTemplates === 'function') {
+      return new LocalContextsLocalTemplates()
+    }
+    else return false
+  }
+}
+
+class LocalContextsCfgDefaults {
+  constructor() {
+    this.defaultCfg = this.defaultCfg()
+  }
+
+  defaultCfg() {
+    return {
+      headerSelector : $('#main-content h1')
+    }
+  }
+}
+
+class LocalContextsDefaultTemplates {
+  constructor() {
+    this.defaultDataTemplate = this.defaultDataTemplate()
+    this.defaultAudioTemplate = this.defaultAudioTemplate()
+    this.defaultPlacedByTemplate = this.defaultPlacedByTemplate()
+    this.defaultTranslationsTemplate = this.defaultTranslationsTemplate()
+  }
+
+  defaultDataTemplate() {
+    return  '<div ${label_language_tag}>' +
+            '<h4>${label_name}</h4>' +
+            '<p>' +
+            '<img class="local-contexts-image" src="${label_img_url}" alt="${label_img_alt}" />' +
+            '<span class="local-contexts-description">' +
+            '${label_audio}' +
+            '${label_default_text}' +
+            '${label_placed_by}' +
+            '${label_translations}' +
+            '</span>' +
+            '</p>' +
+            '</div>';
+  }
+
+  defaultTranslationsTemplate() {
+    return  '<span class="local-contexts-translation-wrapper well" ${translation_language_tag}>' +
+            '<span class="local-contexts-translation-title">${translation_title}</span>' +
+            '${translation_language}' +
+            '<span class="local-contexts-translation-translation">${translation_translation}</span>'  +
+            '</span>';
+  }
+
+  defaultPlacedByTemplate() {
+    return  '<span class="local-contexts-placed-by">' +
+            '<span class="local-contexts-placed-by-label">Placed by:</span> ${label_community}' +
+            '</span>';
+  }
+
+  defaultAudioTemplate() {
+    return  '<span class="local-contexts-audio">' +
+            '<audio controls><source src="${audioSrc}" />' +
+            'Your browser does not support HTML5 audio. Here is a <a href="${audioSrc}">link to the audio</a> instead.' +
+            '</audio></span>';
+  }
+}
+
+class LocalContextsInit {
+  constructor(project_ids, defaults) {
     this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX;
     this.lc_data_el_prefix = "lc-project-live-data-";
     this.spinner = '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>';
-    this.lc_img_el = $('#main-content h1');
+    this.lc_img_el = $('#notes_row .badge-and-identifier') //defaults.cfg.defaultCfg.headerSelector
     this.lc_img_el.after(this.spinner)
     this.img_urls = Array();
     this.img_html = "";
     this.mainLanguage = typeof($('html').attr('lang')) !== 'undefined' ? $('html').attr('lang') : '';
     $('[id^=' + this.lc_data_el_prefix + ']').html('');
 
-    this.fullDataTemplate = '<div ${label_language_tag}>' +
-                            '<h4>${label_name}</h4>' +
-                            '<p>' +
-                            '<img class="local-contexts-image" src="${label_img_url}" alt="${label_img_alt}" />' +
-                            '<span class="local-contexts-description">' +
-                            '${label_audio}' +
-                            '${label_default_text}' +
-                            '${label_placed_by}' +
-                            '${label_translations}' +
-                            '</span>' +
-                            '</p>' +
-                            '</div>';
-
-    this.translationsTemplate = '<span class="local-contexts-translation-wrapper well" ${translation_language_tag}>' +
-                                '<span class="local-contexts-translation-title">${translation_title}</span>' +
-                                '${translation_language}' +
-                                '<span class="local-contexts-translation-translation">${translation_translation}</span>'  +
-                                '</span>';
-
-    this.placedByTemplate = '<span class="local-contexts-placed-by">' +
-                            '<span class="local-contexts-placed-by-label">Placed by:</span> ${label_community}' +
-                            '</span>';
-
-    this.audioTemplate = '<span class="local-contexts-audio">' +
-                          '<audio controls><source src="${audioSrc}" />' +
-                          'Your browser does not support HTML5 audio. Here is a <a href="${audioSrc}">link to the audio</a> instead.' +
-                          '</audio></span>';
+    this.fullDataTemplate = defaults.templates.defaultDataTemplate
+    this.translationsTemplate = defaults.templates.defaultTranslationsTemplate
+    this.placedByTemplate = defaults.templates.defaultPlacedByTemplate
+    this.audioTemplate = defaults.templates.defaultAudioTemplate
 
     const ids = JSON.parse(project_ids);
     if (ids.length > 0) {
@@ -92,7 +153,7 @@ class LocalContexts {
   renderLocalContextsData(new_json, id, project_title) {
     const self = this;
 
-    $('a#lc-project-id-' + id).before('<h4 class="lc-project-title">Project Title: ' + project_title + '</h4>');
+    $('a#lc-project-id-' + id).parent('p').before('<h3 class="lc-project-title">Project Title: ' + project_title + '</h3>');
 
     let lc_data_html = "";
     let lc_img_html = "";
@@ -107,7 +168,7 @@ class LocalContexts {
       $.each(v, function(idx, label) {
         const labelLanguage = label.language_tag;
         let translations = '';
-
+        
         if (typeof(label.default_text) !== 'undefined' && k == 'notice') {
           label['label_text'] = label.default_text;
         }
