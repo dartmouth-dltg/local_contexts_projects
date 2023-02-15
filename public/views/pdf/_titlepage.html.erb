@@ -27,7 +27,7 @@
             <h3><%= lcp['name'].html_safe %></h3>
             <p><img style="height: 3em" src="<%= lcp['img_url'] %>" /></p>
             <p><%= lcp['default_text'] %></p>
-            <p><%= I18n.t('local_contexts_more_html') %></p>
+            <p><%= I18n.t('local_contexts_more_html').html_safe %></p>
         <% end %>
     <% end %>
     <!-- Local Contexts end -->
