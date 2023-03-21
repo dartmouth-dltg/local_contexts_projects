@@ -7,6 +7,8 @@ require_relative 'lib/local_contexts_ead3'
 require_relative 'lib/local_contexts_serializer'
 require_relative 'lib/ead_exporter_overrides'
 require_relative 'lib/ead3_exporter_overrides'
+require_relative 'lib/aspace_patches'
+require_relative 'lib/local_contexts_marc_serialize'
 
 unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
@@ -69,14 +71,60 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
   # BC Labels
   'provenance' => 'custodhist',
   'commercialization' => 'userestrict',
-  'non_commercial' => 'userestrict',
+  #'non_commercial' => 'userestrict',
   'collaboration' => 'userestrict',
   'consent_verified' => 'accessrestrict',
   'consent_non_verified' => 'accessrestrict',
   'multiple_community' => 'custodhist',
   'research' => 'userestrict',
-  'clan' => 'custodhist',
-  'outreach' => 'userestrict'
+  #'clan' => 'custodhist',
+  #'outreach' => 'userestrict'
+}
+
+# FIXME: Incomplete & needs further review
+# May also require additional logic in MARC serializer if contents 
+# need to be split across multiple subfields
+# or if multiple indicators are necessary
+AppConfig[:local_contexts_label_marc_tag_map] = {
+   # Notices
+   'traditional_knowledge' => {'tag_number' => '540', "indicator" => '', 'subfield' => 'a'},
+   'biocultural' => {'tag_number' => '540', 'subfield' => 'a'},
+   'attribution_incomplete' => {'tag_number' => '561', 'subfield' => ''},
+   'open_to_collaborate' => {'tag_number' => '500', 'subfield' => ''},
+ 
+   # TK Labels
+   'attribution' => {'tag_number' => '561', 'subfield' => ''},
+   'clan' => {'tag_number' => '561', 'subfield' => ''},
+   'family' => {'tag_number' => '561', 'subfield' => ''},
+   'outreach' => {'tag_number' => '540', 'subfield' => 'a'},
+   'tk_multiple_community' => {'tag_number' => '561', 'subfield' => ''},
+   'non_verified' => {'tag_number' => '506',  "indicator" => '1', 'subfield' => ''},
+   'verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
+   'commercial' => {'tag_number' => '540', 'subfield' => 'a'},
+   'culturally_sensitive' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'community_voice' => {'tag_number' => '561', 'subfield' => ''},
+   'community_use_only' => {'tag_number' => '540', 'subfield' => 'a'},
+   'seasonal' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'women_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'men_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'men_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'women_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'secret_sacred' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'open_to_collaboration' => {'tag_number' => '540', 'subfield' => ''},
+   'creative' => {'tag_number' => '561', 'subfield' => ''},
+ 
+   # BC Labels
+   'provenance' => {'tag_number' => '561', 'subfield' => ''},
+   'commercialization' => {'tag_number' => '540', 'subfield' => ''},
+   #'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
+   'collaboration' => {'tag_number' => '540', 'subfield' => ''},
+   'consent_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'consent_non_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+   'multiple_community' => {'tag_number' => '561', 'subfield' => ''},
+   'research' => {'tag_number' => '540', 'subfield' => ''},
+   #'clan' => {'tag_number' => '561', 'subfield' => ''},
+   #'outreach' => {'tag_number' => '540', 'subfield' => ''}
 }
 
 Permission.define("manage_localcontexts_records",
@@ -91,6 +139,9 @@ Permission.define("update_localcontexts_project_record",
 # Register our custom serialize steps.
 EADSerializer.add_serialize_step(EADLocalContextsSerialize)
 EAD3Serializer.add_serialize_step(EAD3LocalContextsSerialize)
+
+# Uncomment when MARC mappings are finalized
+# MARCSerializer.add_decorator(LocalContextsMARCSerialize)
 
 
 # create the local contexts data directory if it does not already exist
