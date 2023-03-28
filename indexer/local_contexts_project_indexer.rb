@@ -9,14 +9,13 @@ class IndexerCommon
     if AppConfig[:plugins].include?('local_contexts_projects')
       indexer.add_document_prepare_hook {|doc, record|
         doc['local_contexts_project_uris_u_sstr'] = []
+        doc['local_contexts_project_u_sbool'] = nil
         if ['accession', 'resource', 'archival_object', 'digital_object', 'digital_object_component'].include?(doc['primary_type']) && record['record']['local_contexts_projects']
-          if record['record']['local_contexts_projects'].length > 0
+          unless record['record']['local_contexts_projects'].empty?
             doc['local_contexts_project_u_sbool'] = true
-          else
-            doc['local_contexts_project_u_sbool'] = false
-          end
-          record['record']['local_contexts_projects'].each do |lcp|
-            doc['local_contexts_project_uris_u_sstr'] << lcp['ref']
+            record['record']['local_contexts_projects'].each do |lcp|
+              doc['local_contexts_project_uris_u_sstr'] << lcp['ref']
+            end
           end
         end
 
