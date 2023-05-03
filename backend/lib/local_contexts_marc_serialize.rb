@@ -42,18 +42,19 @@ class LocalContextsMARCSerialize
 
   def construct_project_text(project_json, lcp_preamble)
     project_marc = []
+    lc_labels = ['bc_labels', 'tk_labels']
     project_json.each do |k,v|
       # labels
       if lc_labels.include?(k)
         v.each do |label|
-          tag_number, indicator, subfield = marc_map[label_or_notice['label_type']]
+          tag_number, indicator, subfield = marc_map(k, label['label_type'])
           project_text << lcp_preamble + label['name'] + " (" + label['language'] + ")."
           project_text << DataField.new("#{tag_number}", "#{indicator}", ' ', [SubField.new("#{subfield}", project_contents(label))])
         end
       # notices
       elsif k == 'notice'
         v.each do |notice|
-          tag_number, indicator, subfield = marc_map[label_or_notice['notice_type']]
+          tag_number, indicator, subfield = marc_map('notices', notice['notice_type'])
           project_text << lcp_preamble + notice['name'] + "."
           project_text << DataField.new("#{tag_number}", "#{indicator}", ' ', [SubField.new("#{subfield}", project_contents(notice))])
         end
@@ -63,8 +64,8 @@ class LocalContextsMARCSerialize
     project_marc
   end
 
-  def marc_map(type)
-    marc_map = AppConfig[:local_contexts_label_marc_tag_map][type]
+  def marc_map(label_or_notice, type)
+    marc_map = AppConfig[:local_contexts_label_marc_tag_map][label_or_notice][type]
     tag_number = marc_map['tag_number']
     indicator = marc_map['indicator']
     subfield = marc_map['subfield']
