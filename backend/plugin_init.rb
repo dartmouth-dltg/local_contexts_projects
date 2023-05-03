@@ -153,7 +153,7 @@ EADSerializer.add_serialize_step(EADLocalContextsSerialize)
 EAD3Serializer.add_serialize_step(EAD3LocalContextsSerialize)
 
 # Uncomment when MARC mappings are finalized
-# MARCSerializer.add_decorator(LocalContextsMARCSerialize)
+MARCSerializer.add_decorator(LocalContextsMARCSerialize)
 
 
 # create the local contexts data directory if it does not already exist
