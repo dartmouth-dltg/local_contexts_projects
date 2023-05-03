@@ -18,14 +18,14 @@ class LocalContextsMARCSerialize
     extra_fields = []
     
     if @record.aspace_record['local_contexts_projects']
-      @record.aspace_record['local_contexts_projects'].each do |lcp|
+      include_lcps = LocalContextsEADHelper.include_lcps?(@record.aspace_record['local_contexts_projects'])
+      include_lcps.each do |lcp|        
         if lcp['_resolved'] && lcp['_resolved']['project_id'] && lcp['_resolved']['project_is_public'] === true
           project_id = lcp['_resolved']['project_id']
           project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
-          project_ref = I18n.t("local_contexts_project.project_link_text") + " (Project ID: " + project_id + ")"
-          project_link = "<a href='#{project_url}'>#{project_ref}</a>".html_safe
+          project_ref = I18n.t("local_contexts_project.project_link_text") + " - Project ID and URL: " + project_id + ", " + project_url
           project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project', true)
-          lcp_preamble = project_json['title'] + "(" + project_link + "). "
+          lcp_preamble = project_json['title'] + " (" + project_ref + "). "
           construct_project_text(project_json, lcp_preamble).each do |marc_field|
             extra_fields << marc_field
           end
@@ -48,15 +48,15 @@ class LocalContextsMARCSerialize
       if lc_labels.include?(k)
         v.each do |label|
           tag_number, indicator, subfield = marc_map(k, label['label_type'])
-          project_text << lcp_preamble + label['name'] + " (" + label['language'] + ")."
-          project_text << DataField.new("#{tag_number}", "#{indicator}", ' ', [SubField.new("#{subfield}", project_contents(label))])
+          project_preamble = lcp_preamble + label['name'] + " (" + label['language'] + "). "
+          project_marc << DataField.new(tag_number, indicator, ' ', [SubField.new(subfield, project_preamble + project_contents(label))])
         end
       # notices
       elsif k == 'notice'
         v.each do |notice|
           tag_number, indicator, subfield = marc_map('notices', notice['notice_type'])
-          project_text << lcp_preamble + notice['name'] + "."
-          project_text << DataField.new("#{tag_number}", "#{indicator}", ' ', [SubField.new("#{subfield}", project_contents(notice))])
+          project_preamble = lcp_preamble + notice['name'] + ". "
+          project_marc << DataField.new(tag_number, indicator, ' ', [SubField.new(subfield, project_preamble + project_contents(notice))])
         end
       end
     end
@@ -67,7 +67,7 @@ class LocalContextsMARCSerialize
   def marc_map(label_or_notice, type)
     marc_map = AppConfig[:local_contexts_label_marc_tag_map][label_or_notice][type]
     tag_number = marc_map['tag_number']
-    indicator = marc_map['indicator']
+    indicator = marc_map['indicator'].nil? ? ' ' : marc_map['indicator']
     subfield = marc_map['subfield']
 
     return tag_number, indicator, subfield

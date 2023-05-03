@@ -188,7 +188,7 @@ class LocalContextsEAD < EADSerializer
             v.each do |notice|
               unless digital_object
                 begin
-                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][notice['notice_type']]
+                  tag_name = AppConfig[:local_contexts_label_ead_tag_map]['notices'][notice['notice_type']]
                 rescue
                   logger.info("Label Type: #{notice['notice_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
                 end
