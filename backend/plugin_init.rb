@@ -41,44 +41,50 @@ end
 
 AppConfig[:local_contexts_label_ead_tag_map] = {
   # Notices
-  'traditional_knowledge' => 'userestrict',
-  'biocultural' => 'userestrict',
-  'attribution_incomplete' => 'custodhist',
-  'open_to_collaborate' => 'odd',
+  'notices' => {
+    'traditional_knowledge' => 'userestrict',
+    'biocultural' => 'userestrict',
+    'attribution_incomplete' => 'custodhist',
+    'open_to_collaborate' => 'odd',
+  },
 
   # TK Labels
-  'attribution' => 'custodhist',
-  'clan' => 'custodhist',
-  'family' => 'custodhist',
-  'outreach' => 'userestrict',
-  'tk_multiple_community' => 'custodhist',
-  'non_verified' => 'accessrestrict',
-  'verified' => 'accessrestrict',
-  'non_commercial' => 'userestrict',
-  'commercial' => 'userestrict',
-  'culturally_sensitive' => 'accessrestrict',
-  'community_voice' => 'custodhist',
-  'community_use_only' => 'userestrict',
-  'seasonal' => 'accessrestrict',
-  'women_general' => 'accessrestrict',
-  'men_general' => 'accessrestrict',
-  'men_restricted' => 'accessrestrict',
-  'women_restricted' => 'accessrestrict',
-  'secret_sacred' => 'accessrestrict',
-  'open_to_collaboration' => 'userestrict',
-  'creative' => 'custodhist',
+  'tk_labels' => {
+    'attribution' => 'custodhist',
+    'clan' => 'custodhist',
+    'family' => 'custodhist',
+    'outreach' => 'userestrict',
+    'tk_multiple_community' => 'custodhist',
+    'non_verified' => 'accessrestrict',
+    'verified' => 'accessrestrict',
+    'non_commercial' => 'userestrict',
+    'commercial' => 'userestrict',
+    'culturally_sensitive' => 'accessrestrict',
+    'community_voice' => 'custodhist',
+    'community_use_only' => 'userestrict',
+    'seasonal' => 'accessrestrict',
+    'women_general' => 'accessrestrict',
+    'men_general' => 'accessrestrict',
+    'men_restricted' => 'accessrestrict',
+    'women_restricted' => 'accessrestrict',
+    'secret_sacred' => 'accessrestrict',
+    'open_to_collaboration' => 'userestrict',
+    'creative' => 'custodhist',
+  },
 
   # BC Labels
-  'provenance' => 'custodhist',
-  'commercialization' => 'userestrict',
-  #'non_commercial' => 'userestrict',
-  'collaboration' => 'userestrict',
-  'consent_verified' => 'accessrestrict',
-  'consent_non_verified' => 'accessrestrict',
-  'multiple_community' => 'custodhist',
-  'research' => 'userestrict',
-  #'clan' => 'custodhist',
-  #'outreach' => 'userestrict'
+  'bc_labels' => {
+    'provenance' => 'custodhist',
+    'commercialization' => 'userestrict',
+    'non_commercial' => 'userestrict',
+    'collaboration' => 'userestrict',
+    'consent_verified' => 'accessrestrict',
+    'consent_non_verified' => 'accessrestrict',
+    'multiple_community' => 'custodhist',
+    'research' => 'userestrict',
+    'clan' => 'custodhist',
+    'outreach' => 'userestrict'
+  }
 }
 
 # FIXME: Incomplete & needs further review
@@ -86,45 +92,51 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
 # need to be split across multiple subfields
 # or if multiple indicators are necessary
 AppConfig[:local_contexts_label_marc_tag_map] = {
-   # Notices
-   'traditional_knowledge' => {'tag_number' => '540', "indicator" => '', 'subfield' => 'a'},
-   'biocultural' => {'tag_number' => '540', 'subfield' => 'a'},
-   'attribution_incomplete' => {'tag_number' => '561', 'subfield' => ''},
-   'open_to_collaborate' => {'tag_number' => '500', 'subfield' => ''},
- 
-   # TK Labels
-   'attribution' => {'tag_number' => '561', 'subfield' => ''},
-   'clan' => {'tag_number' => '561', 'subfield' => ''},
-   'family' => {'tag_number' => '561', 'subfield' => ''},
-   'outreach' => {'tag_number' => '540', 'subfield' => 'a'},
-   'tk_multiple_community' => {'tag_number' => '561', 'subfield' => ''},
-   'non_verified' => {'tag_number' => '506',  "indicator" => '1', 'subfield' => ''},
-   'verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
-   'commercial' => {'tag_number' => '540', 'subfield' => 'a'},
-   'culturally_sensitive' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'community_voice' => {'tag_number' => '561', 'subfield' => ''},
-   'community_use_only' => {'tag_number' => '540', 'subfield' => 'a'},
-   'seasonal' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'women_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'men_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'men_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'women_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'secret_sacred' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'open_to_collaboration' => {'tag_number' => '540', 'subfield' => ''},
-   'creative' => {'tag_number' => '561', 'subfield' => ''},
- 
-   # BC Labels
-   'provenance' => {'tag_number' => '561', 'subfield' => ''},
-   'commercialization' => {'tag_number' => '540', 'subfield' => ''},
-   #'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
-   'collaboration' => {'tag_number' => '540', 'subfield' => ''},
-   'consent_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'consent_non_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-   'multiple_community' => {'tag_number' => '561', 'subfield' => ''},
-   'research' => {'tag_number' => '540', 'subfield' => ''},
-   #'clan' => {'tag_number' => '561', 'subfield' => ''},
-   #'outreach' => {'tag_number' => '540', 'subfield' => ''}
+  # Notices
+  'notices' => {
+    'traditional_knowledge' => {'tag_number' => '540', "indicator" => '', 'subfield' => 'a'},
+    'biocultural' => {'tag_number' => '540', 'subfield' => 'a'},
+    'attribution_incomplete' => {'tag_number' => '561', 'subfield' => ''},
+    'open_to_collaborate' => {'tag_number' => '500', 'subfield' => ''},
+  },
+  
+  # TK Labels
+  'tk_labels' => {
+    'attribution' => {'tag_number' => '561', 'subfield' => ''},
+    'clan' => {'tag_number' => '561', 'subfield' => ''},
+    'family' => {'tag_number' => '561', 'subfield' => ''},
+    'outreach' => {'tag_number' => '540', 'subfield' => 'a'},
+    'tk_multiple_community' => {'tag_number' => '561', 'subfield' => ''},
+    'non_verified' => {'tag_number' => '506',  "indicator" => '1', 'subfield' => ''},
+    'verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
+    'commercial' => {'tag_number' => '540', 'subfield' => 'a'},
+    'culturally_sensitive' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'community_voice' => {'tag_number' => '561', 'subfield' => ''},
+    'community_use_only' => {'tag_number' => '540', 'subfield' => 'a'},
+    'seasonal' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'women_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'men_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'men_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'women_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'secret_sacred' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'open_to_collaboration' => {'tag_number' => '540', 'subfield' => ''},
+    'creative' => {'tag_number' => '561', 'subfield' => ''},
+  },
+
+  # BC Labels
+  'bc_labels' => {
+    'provenance' => {'tag_number' => '561', 'subfield' => ''},
+    'commercialization' => {'tag_number' => '540', 'subfield' => ''},
+    'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
+    'collaboration' => {'tag_number' => '540', 'subfield' => ''},
+    'consent_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'consent_non_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
+    'multiple_community' => {'tag_number' => '561', 'subfield' => ''},
+    'research' => {'tag_number' => '540', 'subfield' => ''},
+    'clan' => {'tag_number' => '561', 'subfield' => ''},
+    'outreach' => {'tag_number' => '540', 'subfield' => ''}
+  }
 }
 
 Permission.define("manage_localcontexts_records",
