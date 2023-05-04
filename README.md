@@ -1,12 +1,5 @@
 # Local Contexts Plugin
 
-## Note: Beta Status
-We're awaiting additional community feedback before creating an official release. Please
-use the branch specific to your version of ArchivesSpace
-- main => ASpace v3.1.0 & v3.1.1
-- as320 => Aspace v3.2.0
-- as330 => Aspace v3.3.0 & v3.3.1
-
 ## About
 
 An ArchivesSpace plugin that allows staff users to add & display Local Contexts
@@ -32,6 +25,10 @@ additional guidance on best practices.
 ## Getting started
 
 This plugin has been tested with ArchivesSpace versions 3.1.0+.
+
+Releases are broken into two compatability categories - prior to 3.4.0 and after 3.4.0.
+They are labeled as vX.x.331 or vx.x Use the vX.x..330 for ArchivesSpace versions
+3.1.0 to 3.3.1. Use vX.x for ArchivesSpace releases 3.4.0 and greater.
 
 Unzip the latest relevant release (check for specific releases for specific versions of ArchivesSpace) of the plugin to your
 ArchivesSpace plugins directory:

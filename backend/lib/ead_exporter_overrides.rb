@@ -1,7 +1,15 @@
 class EADSerializer < ASpaceExport::Serializer
 
+  @as_version = AppConfig[:lcp_as_version]
+
+  old_serialize_digital_object = instance_method(:serialize_digital_object)
+
+  define_method(:serialize_digital_object) do
+    lcp_serialize_digital_object(digital_object, xml, fragments)
+  end
+
   # Override this method to include Local Contexts data
-  def serialize_digital_object(digital_object, xml, fragments)
+  def lcp_serialize_digital_object(digital_object, xml, fragments)
     return if digital_object["publish"] === false && !@include_unpublished
     return if digital_object["suppressed"] === true
 

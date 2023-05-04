@@ -1,6 +1,11 @@
 require 'fileutils'
 require 'thread'
 require 'aspace_logger'
+require_relative 'lib/local_contexts_helpers'
+
+# set this early so that the ead serializers can use it
+AppConfig[:lcp_as_version] = LcpHelpers.new.find_as_version
+
 require_relative 'lib/local_contexts_ead_helper'
 require_relative 'lib/local_contexts_ead'
 require_relative 'lib/local_contexts_ead3'
@@ -151,15 +156,14 @@ Permission.define("update_localcontexts_project_record",
 # Register our custom serialize steps.
 EADSerializer.add_serialize_step(EADLocalContextsSerialize)
 EAD3Serializer.add_serialize_step(EAD3LocalContextsSerialize)
-
-# Uncomment when MARC mappings are finalized
 MARCSerializer.add_decorator(LocalContextsMARCSerialize)
-
 
 # create the local contexts data directory if it does not already exist
 ArchivesSpaceService.loaded_hook do
 
   logger = Logger.new($stderr)
+
+  logger.info("Local Contexts configured for ArchivesSpace version range: #{AppConfig[:lcp_as_version]}")
 
   AppConfig[:local_contexts_cache_dirname] = File.join(AppConfig[:data_directory], "local_contexts_cache")
   unless File.directory?(AppConfig[:local_contexts_cache_dirname])
