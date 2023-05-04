@@ -26,8 +26,8 @@ additional guidance on best practices.
 
 This plugin has been tested with ArchivesSpace versions 3.1.0+.
 
-Releases are broken into two compatability categories - prior to 3.4.0 and after 3.4.0.
-They are labeled as vX.x.331 or vx.x Use the vX.x..330 for ArchivesSpace versions
+Releases are broken into two compatability categories - prior to 3.4.0 and 3.4.0 and future releases.
+They are labeled as vX.x.331 or vx.x Use the vX.x..331 for ArchivesSpace versions
 3.1.0 to 3.3.1. Use vX.x for ArchivesSpace releases 3.4.0 and greater.
 
 Unzip the latest relevant release (check for specific releases for specific versions of ArchivesSpace) of the plugin to your
