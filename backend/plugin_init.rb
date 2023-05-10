@@ -99,48 +99,48 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
 AppConfig[:local_contexts_label_marc_tag_map] = {
   # Notices
   'notices' => {
-    'traditional_knowledge' => {'tag_number' => '540', "indicator" => '', 'subfield' => 'a'},
+    'traditional_knowledge' => {'tag_number' => '540', 'subfield' => 'a'},
     'biocultural' => {'tag_number' => '540', 'subfield' => 'a'},
-    'attribution_incomplete' => {'tag_number' => '561', 'subfield' => ''},
+    'attribution_incomplete' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
     'open_to_collaborate' => {'tag_number' => '500', 'subfield' => ''},
   },
   
   # TK Labels
   'tk_labels' => {
-    'attribution' => {'tag_number' => '561', 'subfield' => ''},
-    'clan' => {'tag_number' => '561', 'subfield' => ''},
-    'family' => {'tag_number' => '561', 'subfield' => ''},
+    'attribution' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'clan' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'family' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
     'outreach' => {'tag_number' => '540', 'subfield' => 'a'},
-    'tk_multiple_community' => {'tag_number' => '561', 'subfield' => ''},
-    'non_verified' => {'tag_number' => '506',  "indicator" => '1', 'subfield' => ''},
-    'verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
+    'tk_multiple_community' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'non_verified' => {'tag_number' => '506',  'indicator' => '1', 'subfield' => 'a'},
+    'verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'non_commercial' => {'tag_number' => '540', 'subfield' => 'a'},
     'commercial' => {'tag_number' => '540', 'subfield' => 'a'},
-    'culturally_sensitive' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'community_voice' => {'tag_number' => '561', 'subfield' => ''},
+    'culturally_sensitive' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'community_voice' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
     'community_use_only' => {'tag_number' => '540', 'subfield' => 'a'},
-    'seasonal' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'women_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'men_general' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'men_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'women_restricted' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'secret_sacred' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'open_to_collaboration' => {'tag_number' => '540', 'subfield' => ''},
-    'creative' => {'tag_number' => '561', 'subfield' => ''},
+    'seasonal' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'women_general' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'men_general' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'men_restricted' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'women_restricted' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'secret_sacred' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'open_to_collaboration' => {'tag_number' => '540', 'subfield' => 'a'},
+    'creative' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
   },
 
   # BC Labels
   'bc_labels' => {
-    'provenance' => {'tag_number' => '561', 'subfield' => ''},
-    'commercialization' => {'tag_number' => '540', 'subfield' => ''},
-    'non_commercial' => {'tag_number' => '540', 'subfield' => ''},
-    'collaboration' => {'tag_number' => '540', 'subfield' => ''},
-    'consent_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'consent_non_verified' => {'tag_number' => '506', "indicator" => '1', 'subfield' => ''},
-    'multiple_community' => {'tag_number' => '561', 'subfield' => ''},
-    'research' => {'tag_number' => '540', 'subfield' => ''},
-    'clan' => {'tag_number' => '561', 'subfield' => ''},
-    'outreach' => {'tag_number' => '540', 'subfield' => ''}
+    'provenance' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'commercialization' => {'tag_number' => '540', 'subfield' => 'a'},
+    'non_commercial' => {'tag_number' => '540', 'subfield' => 'a'},
+    'collaboration' => {'tag_number' => '540', 'subfield' => 'a'},
+    'consent_verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'consent_non_verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'multiple_community' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'research' => {'tag_number' => '540', 'subfield' => 'a'},
+    'clan' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'outreach' => {'tag_number' => '540', 'subfield' => 'a'}
   }
 }
 
