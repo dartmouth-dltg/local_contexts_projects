@@ -88,7 +88,7 @@ class LocalContextsInit {
     this.publicPrefix = LOCALCONTEXTS_PUBLIC_PREFIX;
     this.lc_data_el_prefix = "lc-project-live-data-";
     this.spinner = '<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>';
-    this.lc_img_el = $('#notes_row .badge-and-identifier') //defaults.cfg.defaultCfg.headerSelector
+    this.lc_img_el = defaults.cfg.defaultCfg.headerSelector
     this.lc_img_el.after(this.spinner)
     this.img_urls = Array();
     this.img_html = "";
