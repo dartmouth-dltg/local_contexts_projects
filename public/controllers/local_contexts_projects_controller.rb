@@ -1,3 +1,4 @@
+require 'aspace_logger'
 class LocalContextsProjectsController < ApplicationController
 
   skip_before_action  :verify_authenticity_token
@@ -10,5 +11,5 @@ class LocalContextsProjectsController < ApplicationController
       render :json => res
     end
   end
-
+  
 end

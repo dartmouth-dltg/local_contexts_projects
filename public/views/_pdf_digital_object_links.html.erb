@@ -1,0 +1,34 @@
+<!-- Local Contexts Project Begin -->
+<% lcps = instance['digital_object']['_resolved']['local_contexts_projects'] %>
+<% if AppConfig[:plugins].include?('local_contexts_projects') %>
+    <% unless lcps.blank? %>
+        <% project_ids = [] %>
+        <% lcps.each do |lcp| %>
+            <% if lcp['_resolved'] && lcp['_resolved']['project_is_public'] %>
+                <% project_ids  << lcp['_resolved']['project_id'] %>
+            <% end %>
+        <% end %>
+        <% if project_ids.length > 0 %>
+            <dt><%= I18n.t('local_contexts_section_title') %></dt>
+            <dd>
+                <ul style="list-style: none;">
+                <li>
+                    <p style="font-size: 0.8em; margin-top: 0.5em">
+                    <% if project_ids.length > 1 %>
+                        <%= I18n.t("local_contexts_project_information._dig_obj_plural") %>
+                    <% else %>
+                        <%= I18n.t("local_contexts_project_information._dig_obj_singular") %>
+                    <% end %>
+                    </p>
+                </li>
+                </ul>
+            </dd>
+            <% project_ids.each do |pid| %>
+                <dd>
+                <%= render(:partial => 'local_contexts_project', :locals => {:project_id => pid}) %>
+                </dd>
+            <% end %>
+        <% end %>
+    <% end %>
+<% end %>
+<!-- Local Context Project End -->

@@ -1,17 +1,11 @@
 require 'fileutils'
 require 'thread'
 require 'aspace_logger'
-require_relative 'lib/local_contexts_helpers'
-
-# set this early so that the ead serializers can use it
-AppConfig[:lcp_as_version] = LcpHelpers.new.find_as_version
 
 require_relative 'lib/local_contexts_ead_helper'
 require_relative 'lib/local_contexts_ead'
 require_relative 'lib/local_contexts_ead3'
 require_relative 'lib/local_contexts_serializer'
-require_relative 'lib/ead_exporter_overrides'
-require_relative 'lib/ead3_exporter_overrides'
 require_relative 'lib/aspace_patches'
 require_relative 'lib/local_contexts_marc_serialize'
 
