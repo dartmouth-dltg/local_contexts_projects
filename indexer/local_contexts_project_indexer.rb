@@ -50,9 +50,9 @@ class IndexerCommon
 
   def self.get_parent_local_context_uris(uri, doc)
     inherited_lcps = []
-    parent = JSONModel::HTTP.get_json(uri)
+    parent = JSONModel::HTTP.get_json(uri, "resolve[]" => "local_contexts_projects")
     parent['local_contexts_projects'].each do |lcp|
-      inherited_lcps << JSONModel::HTTP.get_json(lcp['ref'])
+      inherited_lcps << lcp['_resolved']
     end
     if inherited_lcps.length > 0
       if parent['jsonmodel_type'] == 'digital_object'
