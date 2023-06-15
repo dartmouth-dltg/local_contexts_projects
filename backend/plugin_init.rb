@@ -157,8 +157,6 @@ ArchivesSpaceService.loaded_hook do
 
   logger = Logger.new($stderr)
 
-  logger.info("Local Contexts configured for ArchivesSpace version range: #{AppConfig[:lcp_as_version]}")
-
   AppConfig[:local_contexts_cache_dirname] = File.join(AppConfig[:data_directory], "local_contexts_cache")
   unless File.directory?(AppConfig[:local_contexts_cache_dirname])
     FileUtils.mkdir_p(AppConfig[:local_contexts_cache_dirname])
