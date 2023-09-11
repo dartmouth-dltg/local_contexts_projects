@@ -86,11 +86,15 @@ class LocalContextsClient
             res = do_http_request(suffix, type)
             write_lcp_cache(cache_file, res)
           rescue => e
-            logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now.")
+            logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now for project: #{id}")
             get_json(suffix, type, id, use_cache, true, attempts)
           end
         end
-        maybe_parse_cached_json(File.open(cache_file).read)
+        if File.exist?(cache_file)
+          maybe_parse_cached_json(File.open(cache_file).read)
+        else
+          logger.debug("Failed to fetch Local Contexts data for project: #{id}")
+        end
       else
         response = do_http_request(suffix, type)
         if response.respond_to?(:body)      
@@ -98,7 +102,7 @@ class LocalContextsClient
           write_lcp_cache(cache_file, response)
           maybe_parse_json(response)
         else
-          logger ("Failed to get new Local Contexts data; trying cached version. Attempt: #{attempts}")
+          logger.debug("Failed to get new Local Contexts data; trying cached version for project: #{id}. Attempt: #{attempts}")
           get_json(suffix, type, id, use_cache, true, attempts)
         end
       end
@@ -106,7 +110,7 @@ class LocalContextsClient
       if File.exist?(cache_file)
         maybe_parse_cached_json(File.open(cache_file).read)
       else
-        logger.debug("Failed to fetch Local Contexts data for new project")
+        logger.debug("Failed to fetch Local Contexts data for project: #{id}")
       end
     end
   end

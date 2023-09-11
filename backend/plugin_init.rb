@@ -182,12 +182,7 @@ end
 
 # check the cache on startup
 Thread.new do
-  logger = Logger.new($stderr)
-  begin
-    LocalContextsClient.new.check_cache
-  rescue
-    logger.info("Could not check Local Contexts cache on startup")
-  end
+  LocalContextsClient.new.check_cache
 end
 
 ArchivesSpaceService.settings.scheduler.cron(AppConfig[:local_contexts_refresh_cache_cron], :allow_overlapping => false) do
