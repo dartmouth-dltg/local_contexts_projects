@@ -130,6 +130,11 @@ class LocalContextsInit {
       })
       .fail( function() {
         self.renderLocalContextsError(current_id);
+      })
+      .always(() => {
+        if ($('.lds-ellipsis').length > 0) {
+          $('.lds-ellipsis').remove()
+        }
       });
     });
   }
