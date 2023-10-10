@@ -68,7 +68,7 @@ class IndexerCommon
       elsif parent['resource']
         get_parent_local_context_uris(parent['resource']['ref'], doc)
       elsif parent['digital_object']
-        get_parent_local_context_uris(parent['record']['digital_object']['ref'], doc)
+        get_parent_local_context_uris(parent['digital_object']['ref'], doc)
       end
     end
   end
