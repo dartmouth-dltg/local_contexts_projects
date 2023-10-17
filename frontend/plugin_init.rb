@@ -71,6 +71,16 @@ Rails.application.config.after_initialize do
 
   end
 
+  PreferencesController.class_eval do
+
+    alias_method :edit_pre_local_contexts, :edit
+
+    def edit
+      SearchAndBrowseColumnConfig.columns.delete('local_contexts_project')
+      edit_pre_local_contexts
+    end
+  end
+
   SearchHelper.class_eval do
 
     alias_method :can_edit_search_result_pre_local_contexts_project?, :can_edit_search_result?
