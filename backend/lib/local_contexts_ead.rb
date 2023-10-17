@@ -29,7 +29,6 @@ class LocalContextsEAD < EADSerializer
   # custom method to include Local Contexts data
   def serialize_local_contexts_ead(data, xml, fragments)
     if AppConfig[:plugins].include?('local_contexts_projects')
-      current_date = Time.now.strftime("%d/%m/%Y %H:%M")
       lcps = data.local_contexts_projects
       include_lcps = LocalContextsEADHelper.include_lcps?(lcps)
       if include_lcps.length > 0
@@ -165,7 +164,7 @@ class LocalContextsEAD < EADSerializer
             v.each do |label|
               unless digital_object
                 begin
-                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][label['label_type']]
+                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][k][label['label_type']]
                 rescue
                   logger.info("Label Type: #{label['label_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
                 end
@@ -189,7 +188,7 @@ class LocalContextsEAD < EADSerializer
             v.each do |notice|
               unless digital_object
                 begin
-                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][notice['notice_type']]
+                  tag_name = AppConfig[:local_contexts_label_ead_tag_map]['notices'][notice['notice_type']]
                 rescue
                   logger.info("Label Type: #{notice['notice_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
                 end

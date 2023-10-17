@@ -1,12 +1,19 @@
 require 'fileutils'
 require 'thread'
 require 'aspace_logger'
+require_relative 'lib/local_contexts_helpers'
+
+# set this early so that the ead serializers can use it
+AppConfig[:lcp_as_version] = LcpHelpers.new.find_as_version
+
 require_relative 'lib/local_contexts_ead_helper'
 require_relative 'lib/local_contexts_ead'
 require_relative 'lib/local_contexts_ead3'
 require_relative 'lib/local_contexts_serializer'
 require_relative 'lib/ead_exporter_overrides'
 require_relative 'lib/ead3_exporter_overrides'
+require_relative 'lib/aspace_patches'
+require_relative 'lib/local_contexts_marc_serialize'
 
 unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
@@ -39,44 +46,102 @@ end
 
 AppConfig[:local_contexts_label_ead_tag_map] = {
   # Notices
-  'traditional_knowledge' => 'userestrict',
-  'biocultural' => 'userestrict',
-  'attribution_incomplete' => 'custodhist',
-  'open_to_collaborate' => 'odd',
+  'notices' => {
+    'traditional_knowledge' => 'userestrict',
+    'biocultural' => 'userestrict',
+    'attribution_incomplete' => 'custodhist',
+    'open_to_collaborate' => 'odd',
+  },
 
   # TK Labels
-  'attribution' => 'custodhist',
-  'clan' => 'custodhist',
-  'family' => 'custodhist',
-  'outreach' => 'userestrict',
-  'tk_multiple_community' => 'custodhist',
-  'non_verified' => 'accessrestrict',
-  'verified' => 'accessrestrict',
-  'non_commercial' => 'userestrict',
-  'commercial' => 'userestrict',
-  'culturally_sensitive' => 'accessrestrict',
-  'community_voice' => 'custodhist',
-  'community_use_only' => 'userestrict',
-  'seasonal' => 'accessrestrict',
-  'women_general' => 'accessrestrict',
-  'men_general' => 'accessrestrict',
-  'men_restricted' => 'accessrestrict',
-  'women_restricted' => 'accessrestrict',
-  'secret_sacred' => 'accessrestrict',
-  'open_to_collaboration' => 'userestrict',
-  'creative' => 'custodhist',
+  'tk_labels' => {
+    'attribution' => 'custodhist',
+    'clan' => 'custodhist',
+    'family' => 'custodhist',
+    'outreach' => 'userestrict',
+    'tk_multiple_community' => 'custodhist',
+    'non_verified' => 'accessrestrict',
+    'verified' => 'accessrestrict',
+    'non_commercial' => 'userestrict',
+    'commercial' => 'userestrict',
+    'culturally_sensitive' => 'accessrestrict',
+    'community_voice' => 'custodhist',
+    'community_use_only' => 'userestrict',
+    'seasonal' => 'accessrestrict',
+    'women_general' => 'accessrestrict',
+    'men_general' => 'accessrestrict',
+    'men_restricted' => 'accessrestrict',
+    'women_restricted' => 'accessrestrict',
+    'secret_sacred' => 'accessrestrict',
+    'open_to_collaboration' => 'userestrict',
+    'creative' => 'custodhist',
+  },
 
   # BC Labels
-  'provenance' => 'custodhist',
-  'commercialization' => 'userestrict',
-  'non_commercial' => 'userestrict',
-  'collaboration' => 'userestrict',
-  'consent_verified' => 'accessrestrict',
-  'consent_non_verified' => 'accessrestrict',
-  'multiple_community' => 'custodhist',
-  'research' => 'userestrict',
-  'clan' => 'custodhist',
-  'outreach' => 'userestrict'
+  'bc_labels' => {
+    'provenance' => 'custodhist',
+    'commercialization' => 'userestrict',
+    'non_commercial' => 'userestrict',
+    'collaboration' => 'userestrict',
+    'consent_verified' => 'accessrestrict',
+    'consent_non_verified' => 'accessrestrict',
+    'multiple_community' => 'custodhist',
+    'research' => 'userestrict',
+    'clan' => 'custodhist',
+    'outreach' => 'userestrict'
+  }
+}
+
+# FIXME: Incomplete & needs further review
+# May also require additional logic in MARC serializer if contents 
+# need to be split across multiple subfields
+# or if multiple indicators are necessary
+AppConfig[:local_contexts_label_marc_tag_map] = {
+  # Notices
+  'notices' => {
+    'traditional_knowledge' => {'tag_number' => '540', 'subfield' => 'a'},
+    'biocultural' => {'tag_number' => '540', 'subfield' => 'a'},
+    'attribution_incomplete' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'open_to_collaborate' => {'tag_number' => '500', 'subfield' => ''},
+  },
+  
+  # TK Labels
+  'tk_labels' => {
+    'attribution' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'clan' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'family' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'outreach' => {'tag_number' => '540', 'subfield' => 'a'},
+    'tk_multiple_community' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'non_verified' => {'tag_number' => '506',  'indicator' => '1', 'subfield' => 'a'},
+    'verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'non_commercial' => {'tag_number' => '540', 'subfield' => 'a'},
+    'commercial' => {'tag_number' => '540', 'subfield' => 'a'},
+    'culturally_sensitive' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'community_voice' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'community_use_only' => {'tag_number' => '540', 'subfield' => 'a'},
+    'seasonal' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'women_general' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'men_general' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'men_restricted' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'women_restricted' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'secret_sacred' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'open_to_collaboration' => {'tag_number' => '540', 'subfield' => 'a'},
+    'creative' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+  },
+
+  # BC Labels
+  'bc_labels' => {
+    'provenance' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'commercialization' => {'tag_number' => '540', 'subfield' => 'a'},
+    'non_commercial' => {'tag_number' => '540', 'subfield' => 'a'},
+    'collaboration' => {'tag_number' => '540', 'subfield' => 'a'},
+    'consent_verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'consent_non_verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'},
+    'multiple_community' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'research' => {'tag_number' => '540', 'subfield' => 'a'},
+    'clan' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
+    'outreach' => {'tag_number' => '540', 'subfield' => 'a'}
+  }
 }
 
 Permission.define("manage_localcontexts_records",
@@ -91,12 +156,14 @@ Permission.define("update_localcontexts_project_record",
 # Register our custom serialize steps.
 EADSerializer.add_serialize_step(EADLocalContextsSerialize)
 EAD3Serializer.add_serialize_step(EAD3LocalContextsSerialize)
-
+MARCSerializer.add_decorator(LocalContextsMARCSerialize)
 
 # create the local contexts data directory if it does not already exist
 ArchivesSpaceService.loaded_hook do
 
   logger = Logger.new($stderr)
+
+  logger.info("Local Contexts configured for ArchivesSpace version range: #{AppConfig[:lcp_as_version]}")
 
   AppConfig[:local_contexts_cache_dirname] = File.join(AppConfig[:data_directory], "local_contexts_cache")
   unless File.directory?(AppConfig[:local_contexts_cache_dirname])

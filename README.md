@@ -1,12 +1,5 @@
 # Local Contexts Plugin
 
-## Note: Beta Status
-We're awaiting additional community feedback before creating an official release. Please
-use the branch specific to your version of ArchivesSpace
-- main => ASpace v3.1.0 & v3.1.1
-- as320 => Aspace v3.2.0
-- as330 => Aspace v3.3.0 & v3.3.1
-
 ## About
 
 An ArchivesSpace plugin that allows staff users to add & display Local Contexts
@@ -33,8 +26,11 @@ additional guidance on best practices.
 
 This plugin has been tested with ArchivesSpace versions 3.1.0+.
 
-Unzip the latest relevant release (check for specific releases for specific versions of ArchivesSpace) of the plugin to your
-ArchivesSpace plugins directory:
+Releases will note which versions of ArchivesSpace they are compatible with. 
+Please choose the release that is compatible with your version of ArchivesSpace.
+
+Unzip the latest relevant release (check for specific releases for specific versions 
+of ArchivesSpace) of the plugin to your ArchivesSpace plugins directory:
 
      $ cd /path/to/archivesspace/plugins
      $ unzip local_contexts_projects.zip -d local_contexts_projects

@@ -65,10 +65,19 @@ Rails.application.config.after_initialize do
        browse_columns["local_contexts_project_browse_column_1"] = "title"
        browse_columns["local_contexts_project_sort_column"] = "title"
        browse_columns["local_contexts_project_sort_direction"] = "asc"
-
        @browse_columns = browse_columns
      end
 
+  end
+
+  PreferencesController.class_eval do
+
+    alias_method :edit_pre_local_contexts, :edit
+
+    def edit
+      SearchAndBrowseColumnConfig.columns.delete('local_contexts_project')
+      edit_pre_local_contexts
+    end
   end
 
   SearchHelper.class_eval do

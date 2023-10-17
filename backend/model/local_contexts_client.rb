@@ -54,8 +54,8 @@ class LocalContextsClient
       headers.each {|k,v| req[k] = v }
       begin
         response = http.request(req)
-      rescue *HTTP_ERRORS => e
-        Log.error("Not a valid response from the Local Contexts API")
+      rescue => e
+        Log.error("Not a valid response from the Local Contexts API: #{e}")
       end
 
       response
@@ -70,25 +70,49 @@ class LocalContextsClient
     end
   end
 
-  def get_json(suffix, type, id, use_cache)
+  def get_json(suffix, type, id, use_cache, ignore_cache_time = false, attempts = 0)
+    attempts += 1
+    logger = Logger.new($stderr)
     cache_file = File.join(AppConfig[:local_contexts_cache_dirname], id + '.json')
     cache_time = AppConfig[:local_contexts_cache_time]
 
-    if use_cache
-      if type == "open_to_collaborate"
-        cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
+    if attempts < 3
+      if use_cache
+        if type == "open_to_collaborate"
+          cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
+        end
+        if !ignore_cache_time && (!File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time)))
+          begin
+            res = do_http_request(suffix, type)
+            write_lcp_cache(cache_file, res)
+          rescue => e
+            logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now for project: #{id}")
+            get_json(suffix, type, id, use_cache, true, attempts)
+          end
+        end
+        if File.exist?(cache_file)
+          maybe_parse_cached_json(File.open(cache_file).read)
+        else
+          logger.debug("Failed to fetch Local Contexts data for project: #{id}")
+        end
+      else
+        response = do_http_request(suffix, type)
+        if response.respond_to?(:body)      
+          logger.debug("getting response: #{response}")
+          write_lcp_cache(cache_file, response)
+          maybe_parse_json(response)
+        else
+          logger.debug("Failed to get new Local Contexts data; trying cached version for project: #{id}. Attempt: #{attempts}")
+          get_json(suffix, type, id, use_cache, true, attempts)
+        end
       end
-      if !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time))
-        res = do_http_request(suffix, type)
-        write_lcp_cache(cache_file, res)
-      end
-      maybe_parse_cached_json(File.open(cache_file).read)
     else
-      response = do_http_request(suffix, type)
-      write_lcp_cache(cache_file, response)
-      maybe_parse_json(response)
+      if File.exist?(cache_file)
+        maybe_parse_cached_json(File.open(cache_file).read)
+      else
+        logger.debug("Failed to fetch Local Contexts data for project: #{id}")
+      end
     end
-    
   end
 
   def get_data_from_local_contexts_api(id, type, use_cache = true)
@@ -146,12 +170,16 @@ class LocalContextsClient
   end
 
   def http_request(url)
-    Net::HTTP.start(url.host, url.port,
-                    :use_ssl => url.scheme == 'https',
-                    :read_timeout => 60,
-                    :open_timeout => 60,
-                    :ssl_timeout => 60) do |http|
-      yield(http)
+    begin
+      Net::HTTP.start(url.host, url.port,
+                      :use_ssl => url.scheme == 'https',
+                      :read_timeout => 60,
+                      :open_timeout => 60,
+                      :ssl_timeout => 60) do |http|
+        yield(http)
+      end
+    rescue => e
+      Log.error("Could not connect to the Local Contexts API: #{e}")
     end
   end
 
