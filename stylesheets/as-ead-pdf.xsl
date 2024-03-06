@@ -36,7 +36,7 @@
         <xsl:attribute name="margin-bottom">8pt</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="h2">
-        <xsl:attribute name="font-size">16pt</xsl:attribute>
+        <xsl:attribute name="font-size">14pt</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
         <xsl:attribute name="border-top">4pt solid #333</xsl:attribute>
         <xsl:attribute name="border-bottom">1pt dotted #333</xsl:attribute>
@@ -47,14 +47,14 @@
         <xsl:attribute name="keep-with-next.within-page">always</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="h3">
-        <xsl:attribute name="font-size">14pt</xsl:attribute>
+        <xsl:attribute name="font-size">12pt</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
         <xsl:attribute name="margin-bottom">4pt</xsl:attribute>
         <xsl:attribute name="padding-bottom">0</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-page">always</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="h4">
-        <xsl:attribute name="font-size">12pt</xsl:attribute>
+        <xsl:attribute name="font-size">10pt</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
         <xsl:attribute name="margin-bottom">4pt</xsl:attribute>
         <xsl:attribute name="padding-bottom">0</xsl:attribute>
@@ -173,7 +173,7 @@
                 </fo:static-content>
                 <!-- Page footer-->
                 <fo:static-content flow-name="xsl-region-after">
-                    <fo:block text-align="center" color="dimgray">
+                    <fo:block text-align="center" color="dimgray" font-size="10pt">
                         <xsl:text>- Page </xsl:text>
                         <fo:page-number/>
                         <xsl:text> -</xsl:text>
@@ -190,11 +190,12 @@
                 <fo:static-content flow-name="xsl-region-before" margin-top=".15in">
                     <fo:block color="dimgray" font-size="10pt" text-align="center">
                         <xsl:apply-templates select="ead:ead/ead:eadheader/ead:filedesc/ead:titlestmt" mode="pageHeader"/>
+                        <xsl:apply-templates select="ead:ead/ead:did/ead:unitid" mode="pageHeader"/>
                     </fo:block>
                 </fo:static-content>
                 <!-- Page footer-->
                 <fo:static-content flow-name="xsl-region-after">
-                    <fo:block text-align="center">
+                    <fo:block text-align="center" font-size="10pt" color="dimgray">
                         <xsl:text>- Page </xsl:text>
                         <fo:page-number/>
                         <xsl:text>- </xsl:text>
@@ -849,16 +850,18 @@
     <xsl:template match="ead:tgroup">
         <fo:table xsl:use-attribute-sets="tableBorder">
             <xsl:apply-templates/>
-            <fo:table-body>
+    <!--        <fo:table-body>
                 <xsl:apply-templates select="*[not(ead:colspec)]"/>
-            </fo:table-body>
+            </fo:table-body> -->
         </fo:table>
     </xsl:template>
     <xsl:template match="ead:colspec">
         <fo:table-column column-width="{@colwidth}"/>
     </xsl:template>
     <xsl:template match="ead:thead">
-        <xsl:apply-templates mode="thead"/>
+        <fo:table-header>
+            <xsl:apply-templates mode="thead"/>
+        </fo:table-header>
     </xsl:template>
     <xsl:template match="ead:tbody">
         <fo:table-body>
@@ -1499,7 +1502,7 @@
 
     <!-- Series titles -->
     <xsl:template match="ead:did" mode="dscSeriesTitle">
-        <fo:block font-weight="bold" font-size="14" margin-bottom="0" margin-top="4" id="{local:buildID(parent::*)}">
+        <fo:block font-weight="bold" font-size="12" margin-bottom="0" margin-top="4" id="{local:buildID(parent::*)}">
             <!-- Uncomment the following to add 'Series' to series titles  -->
             <!--
             <xsl:if test="ead:unitid">
@@ -1615,8 +1618,7 @@
         </xsl:if>
     </xsl:template>
     <xsl:template match="ead:relatedmaterial | ead:separatedmaterial | ead:accessrestrict | ead:userestrict |
-        ead:custodhist | ead:accruals | ead:altformavail | ead:acqinfo |
-        ead:processinfo | ead:appraisal | ead:originalsloc" mode="dsc">
+        ead:custodhist | ead:accruals | ead:altformavail | ead:processinfo | ead:appraisal | ead:originalsloc" mode="dsc">
         <xsl:if test="child::*">
             <fo:block xsl:use-attribute-sets="smpDsc">
                 <fo:inline text-decoration="underline"><xsl:value-of select="local:tagName(.)"/>:</fo:inline>
