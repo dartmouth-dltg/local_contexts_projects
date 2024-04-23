@@ -4,7 +4,7 @@ class EADSerializer < ASpaceExport::Serializer
 
   old_serialize_digital_object = instance_method(:serialize_digital_object)
 
-  define_method(:serialize_digital_object) do
+  define_method(:serialize_digital_object) do |digital_object, xml, fragments|
     lcp_serialize_digital_object(digital_object, xml, fragments)
   end
 
