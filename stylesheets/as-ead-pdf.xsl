@@ -1146,7 +1146,16 @@
     <xsl:template match="ead:extref">
         <xsl:choose>
             <xsl:when test="@*:show = 'embed'">
-                <fo:external-graphic src="url({@*:href})" xsl:use-attribute-sets="inline-images"/>
+                <fo:external-graphic src="url({@*:href})" xsl:use-attribute-sets="inline-images">
+                    <xsl:choose>
+                        <xsl:when test="text()">
+                            <xsl:value-of select="."/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="@*:href"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </fo:external-graphic>
             </xsl:when>
             <xsl:otherwise>
                 <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
