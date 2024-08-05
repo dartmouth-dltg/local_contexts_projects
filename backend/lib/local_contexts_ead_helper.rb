@@ -2,6 +2,9 @@ class LocalContextsEADHelper
 
   def self.include_lcps?(lcps)
     lcps_to_use = []
+
+    return lcps_to_use if lcps.nil?
+    
     lcps.each do |lcp|
       unless lcp['_resolved']
         id = JSONModel.parse_reference(lcp['ref'])[:id]
