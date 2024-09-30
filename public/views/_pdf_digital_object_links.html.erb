@@ -1,5 +1,5 @@
 <!-- Local Contexts Project Begin -->
-<% lcps = instance['digital_object']['_resolved']['local_contexts_projects'] %>
+<% lcps = instance.dig('digital_object', '_resolved', 'local_contexts_projects') %>
 <% if AppConfig[:plugins].include?('local_contexts_projects') %>
     <% unless lcps.blank? %>
         <% project_ids = [] %>
