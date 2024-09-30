@@ -1,11 +1,15 @@
 <!-- Local Contexts Project Begin -->
-<% lcps = instance['digital_object']['_resolved']['local_contexts_projects'] %>
+<% 
+    unless instance.dig('digital_object', '_resolved', 'local_contexts_projects').nil? 
+        lcps = instance['digital_object']['_resolved']['local_contexts_projects']
+    end
+%>
 <% if AppConfig[:plugins].include?('local_contexts_projects') %>
     <% unless lcps.blank? %>
         <% project_ids = [] %>
         <% lcps.each do |lcp| %>
             <% if lcp['_resolved'] && lcp['_resolved']['project_is_public'] %>
-                <% project_ids  << lcp['_resolved']['project_id'] %>
+                <% project_ids << lcp['_resolved']['project_id'] %>
             <% end %>
         <% end %>
         <% if project_ids.length > 0 %>

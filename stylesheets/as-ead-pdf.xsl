@@ -198,7 +198,7 @@
                     <fo:block text-align="center" font-size="10pt" color="dimgray">
                         <xsl:text>- Page </xsl:text>
                         <fo:page-number/>
-                        <xsl:text>- </xsl:text>
+                        <xsl:text> -</xsl:text>
                     </fo:block>
                 </fo:static-content>
                 <!-- Content of page -->
@@ -284,7 +284,7 @@
       <fo:block-container max-width="6.5in" max-height="4in">
         <fo:block text-align="left">
             <fo:external-graphic content-width="scale-down-to-fit"
-              content-height="scale-down-to-fit" width="100%" height="100%"
+              content-height="scale-down-to-fit" width="200px"
               scaling="uniform">
               <xsl:attribute name="src"><xsl:value-of select="$pdf_image"/></xsl:attribute>
             </fo:external-graphic>
@@ -663,10 +663,10 @@
                         <xsl:apply-templates select="ead:unitdate" mode="overview"/>
                         <xsl:apply-templates select="ead:physdesc" mode="overview"/>
                         <xsl:apply-templates select="ead:physloc" mode="overview"/>
-                        <xsl:apply-templates select="ead:dao" mode="overview"/>
-                        <xsl:apply-templates select="ead:daogrp" mode="overview"/>
                         <xsl:apply-templates select="ead:langmaterial" mode="overview"/>
                         <xsl:apply-templates select="ead:materialspec" mode="overview"/>
+                        <xsl:apply-templates select="../ead:dao" mode="overview"/>
+                        <xsl:apply-templates select="../ead:daogrp" mode="overview"/>
                         <xsl:apply-templates select="ead:container" mode="overview"/>
                         <xsl:apply-templates select="ead:abstract" mode="overview"/>
                         <xsl:apply-templates select="ead:note" mode="overview"/>
@@ -691,7 +691,7 @@
 
     <!-- Formats children of arcdesc/did -->
     <xsl:template match="ead:repository | ead:origination | ead:unittitle | ead:unitdate | ead:unitid
-        | ead:physdesc | ead:physloc | ead:dao | ead:daogrp | ead:langmaterial | ead:materialspec | ead:container
+        | ead:physdesc | ead:physloc | ead:langmaterial | ead:materialspec | ead:dao | ead:daogrp | ead:container
         | ead:abstract | ead:note" mode="overview">
         <fo:table-row>
             <fo:table-cell padding-bottom="8pt" padding-right="16pt" text-align="right" font-weight="bold">
@@ -704,10 +704,10 @@
                         <xsl:if test="self::ead:origination">
                             <xsl:choose>
                                 <xsl:when test="ead:persname[@role != ''] and contains(ead:persname/@role,' (')">
-                                    - <xsl:value-of select="substring-before(ead:persname/@role,' (')"/>
+                                    - <xsl:value-of select="substring-before(ead:persname/@role_translation,' (')"/>
                                 </xsl:when>
                                 <xsl:when test="ead:persname[@role != '']">
-                                    - <xsl:value-of select="ead:persname/@role"/>
+                                    - <xsl:value-of select="ead:persname/@role_translation"/>
                                 </xsl:when>
                                 <xsl:otherwise/>
                             </xsl:choose>
@@ -1200,7 +1200,37 @@
             </xsl:choose>
         </fo:basic-link>
     </xsl:template>
-    <xsl:template match="ead:dao">
+
+    <xsl:template match="ead:langmaterial" mode="overview">
+        <fo:table-row>
+            <fo:table-cell padding-bottom="8pt" padding-right="16pt" text-align="right" font-weight="bold">
+                <fo:block>
+                    <xsl:value-of select="local:tagName(.)"/>:
+                </fo:block>
+            </fo:table-cell>
+            <fo:table-cell>
+                <fo:block>
+                    <xsl:choose>
+                        <!-- When the langmaterial does not have any notes -->
+                        <xsl:when test="child::*">
+                            <xsl:for-each select="child::*">
+                              <xsl:apply-templates select="."/>
+                              <xsl:if test="position()!=last()">
+                                    <xsl:text>, </xsl:text>
+                              </xsl:if>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <!-- When the langmaterial has notes -->
+                        <xsl:otherwise>
+                            <xsl:apply-templates />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </fo:block>
+            </fo:table-cell>
+        </fo:table-row>
+    </xsl:template>
+
+    <xsl:template match="ead:dao" mode="overview">
         <xsl:variable name="linkTitle">
             <xsl:choose>
                 <xsl:when test="child::*">
@@ -1214,16 +1244,27 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
-            <xsl:value-of select="$linkTitle"/>
-        </fo:basic-link>
+        <fo:table-row>
+            <fo:table-cell padding-bottom="8pt" padding-right="16pt" text-align="right" font-weight="bold">
+                <fo:block>
+                    <xsl:value-of select="local:tagName(.)"/>:
+                </fo:block>
+            </fo:table-cell>
+            <fo:table-cell>
+                <fo:block>
+                    <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
+                        <xsl:value-of select="$linkTitle"/>
+                    </fo:basic-link>
+                </fo:block>
+            </fo:table-cell>
+        </fo:table-row>
     </xsl:template>
-    <xsl:template match="ead:daogrp">
+    <xsl:template match="ead:daogrp" mode="overview">
         <fo:block>
             <xsl:apply-templates/>
         </fo:block>
     </xsl:template>
-    <xsl:template match="ead:daoloc">
+    <xsl:template match="ead:daoloc" mode="overview">
         <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
             <xsl:choose>
                 <xsl:when test="text()">
@@ -1314,22 +1355,22 @@
     <!-- Collection Inventory (dsc) templates -->
     <xsl:template match="ead:archdesc/ead:dsc">
         <xsl:if test="count(child::*) >= 1">
-		<fo:block xsl:use-attribute-sets="section">
-		    <fo:block xsl:use-attribute-sets="h2ID"><xsl:value-of select="local:tagName(.)"/></fo:block>
-		    <fo:table table-layout="fixed" space-after="12pt" width="100%" font-size="10pt">
-			<fo:table-column column-number="1" column-width="4in"/>
-			<fo:table-column column-number="2" column-width="1in"/>
-			<fo:table-column column-number="3" column-width="1in"/>
-			<fo:table-column column-number="4" column-width="1in"/>
-			<fo:table-body>
-			    <xsl:if test="child::*[@level][1][@level='item' or @level='file' or @level='otherlevel']">
-				<xsl:call-template name="tableHeaders"/>
-			    </xsl:if>
-			    <xsl:apply-templates select="*[not(self::ead:head)]"/>
-			</fo:table-body>
-		    </fo:table>
-		</fo:block>
-	</xsl:if>
+    <fo:block xsl:use-attribute-sets="section">
+        <fo:block xsl:use-attribute-sets="h2ID"><xsl:value-of select="local:tagName(.)"/></fo:block>
+        <fo:table table-layout="fixed" space-after="12pt" width="100%" font-size="10pt">
+      <fo:table-column column-number="1" column-width="4in"/>
+      <fo:table-column column-number="2" column-width="1in"/>
+      <fo:table-column column-number="3" column-width="1in"/>
+      <fo:table-column column-number="4" column-width="1in"/>
+      <fo:table-body>
+          <xsl:if test="child::*[@level][1][@level='item' or @level='file' or @level='otherlevel']">
+        <xsl:call-template name="tableHeaders"/>
+          </xsl:if>
+          <xsl:apply-templates select="*[not(self::ead:head)]"/>
+      </fo:table-body>
+        </fo:table>
+    </fo:block>
+  </xsl:if>
     </xsl:template>
 
     <!--
@@ -1534,7 +1575,7 @@
             <xsl:for-each select="ead:unitdate">
               <xsl:apply-templates select="." mode="did"/>
               <xsl:if test="position()!=last()">
-				            <xsl:text>, </xsl:text>
+                    <xsl:text>, </xsl:text>
               </xsl:if>
             </xsl:for-each>
         </fo:block>
@@ -1545,6 +1586,7 @@
         <fo:block margin-bottom="4pt" margin-top="0">
             <xsl:apply-templates select="ead:repository" mode="dsc"/>
             <xsl:apply-templates select="ead:origination" mode="dsc"/>
+            <xsl:apply-templates select="ead:unitid" mode="dsc"/>
             <xsl:apply-templates select="ead:unitdate" mode="dsc"/>
             <xsl:apply-templates select="ead:physdesc" mode="dsc"/>
             <xsl:apply-templates select="ead:physloc" mode="dsc"/>
@@ -1565,13 +1607,14 @@
             <xsl:for-each select="ead:unitdate">
               <xsl:apply-templates select="." mode="did"/>
               <xsl:if test="position()!=last()">
-				            <xsl:text>, </xsl:text>
+                    <xsl:text>, </xsl:text>
               </xsl:if>
             </xsl:for-each>
         </fo:block>
         <fo:block margin-bottom="4pt" margin-top="0">
             <xsl:apply-templates select="ead:repository" mode="dsc"/>
             <xsl:apply-templates select="ead:origination" mode="dsc"/>
+            <xsl:apply-templates select="ead:unitid" mode="dsc"/>
             <xsl:apply-templates select="ead:unitdate" mode="dsc"/>
             <xsl:apply-templates select="ead:physdesc" mode="dsc"/>
             <xsl:apply-templates select="ead:physloc" mode="dsc"/>

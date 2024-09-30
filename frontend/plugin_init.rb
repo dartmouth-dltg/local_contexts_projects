@@ -8,12 +8,7 @@ Rails.application.config.after_initialize do
 
   # only add faceting if configured
   if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['staff_faceting'] == true
-    SearchResultData.class_eval do
-      self.singleton_class.send(:alias_method, :BASE_FACETS_pre_local_contexts_project, :BASE_FACETS)
-      def self.BASE_FACETS
-        self.BASE_FACETS_pre_local_contexts_project << "local_contexts_project_u_sbool"
-      end
-    end
+    Plugins::add_search_base_facets('local_contexts_project_u_sbool')
   end
 
   # one can choose to remove the Local Contexxts Projects from the facets in search
@@ -35,39 +30,19 @@ Rails.application.config.after_initialize do
       end
     end
   end
-
-  ActionView::PartialRenderer.class_eval do
-    alias_method :render_pre_local_contexts_project, :render
-    def render(context, options, block)
-      result = render_pre_local_contexts_project(context, options, block);
-
-      # Add our local contexts project specific templates to shared/templates
-      if options[:partial] == "shared/templates"
-        result += render(context, options.merge(:partial => "local_contexts_projects/render_templates"), nil)
-      end
-
-      result
-    end
-  end
+  Plugins::add_resolve_field('local_contexts_projects')
 
   ApplicationController.class_eval do
-
-    alias_method :find_opts_pre_local_contexts_project, :find_opts
     alias_method :browse_columns_pre_local_contexts_project, :browse_columns
 
-    def find_opts
-      orig = find_opts_pre_local_contexts_project
-      orig.merge('resolve[]' => orig['resolve[]'] + ['local_contexts_projects'])
+    def browse_columns
+      browse_columns = browse_columns_pre_local_contexts_project
+      browse_columns["local_contexts_project_browse_column_1"] = "title"
+      browse_columns["local_contexts_project_sort_column"] = "title"
+      browse_columns["local_contexts_project_sort_direction"] = "asc"
+
+      @browse_columns = browse_columns
     end
-
-     def browse_columns
-       browse_columns = browse_columns_pre_local_contexts_project
-       browse_columns["local_contexts_project_browse_column_1"] = "title"
-       browse_columns["local_contexts_project_sort_column"] = "title"
-       browse_columns["local_contexts_project_sort_direction"] = "asc"
-
-       @browse_columns = browse_columns
-     end
 
   end
 

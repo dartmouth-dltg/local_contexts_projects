@@ -15,7 +15,7 @@ class LocalContexts {
       $(this).addClass('fetching');
       self.lc_data_el.html('');
       if (self.fetch_type == "single") {
-        const projectId = $(this).closest('.record-pane').find('label[for=local_contexts_project_project_id_]').siblings('div.label-only').text();
+        const projectId = $(this).closest('.record-pane').find('label[for=local_contexts_project_project_id_]').siblings('div').text();
         self.fetchLocalContextData(projectId, $(this))
       }
       else {

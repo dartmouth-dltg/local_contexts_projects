@@ -5,13 +5,15 @@
 <%= render_aspace_partial :partial => "shared/form_messages", :locals => {:object => @local_contexts_project, :form => form} %>
 
 <% define_template "local_contexts_project", jsonmodel_definition(:local_contexts_project) do |form| %>
-  <fieldset>
-    <section id="local-contexts-project-information">
-      <%= form.label_and_textfield "project_id" %>
-      <%= form.label_and_textfield "project_name" %>
-      <%= form.label_and_boolean "project_is_public", {}, true %>
-    </section>
-  </fieldset>
+  <div id="basic-information">
+    <fieldset>
+      <section id="local-contexts-project-information">
+        <%= form.label_and_textfield "project_id" %>
+        <%= form.label_and_textfield "project_name" %>
+        <%= form.label_and_boolean "project_is_public", {}, true %>
+      </section>
+    </fieldset>
+  </div>
 <% end %>
 <% form.emit_template("local_contexts_project") %>
 
