@@ -4,7 +4,7 @@
         <% file_versions = instance['digital_object']['_resolved']['file_versions'] %>
         
         <!-- Local Contexts Project Begin -->
-        <% lcps = instance['digital_object']['_resolved']['local_contexts_projects'] %>
+        <% lcps = instance.dig('digital_object', '_resolved',' local_contexts_projects') %>
         <% project_ids = [] %>
         <!-- Local Contexts Project end -->
     
