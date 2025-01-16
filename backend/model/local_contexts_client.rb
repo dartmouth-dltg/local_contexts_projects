@@ -58,7 +58,6 @@ class LocalContextsClient
 
       headers.each {|k,v| req[k] = v }
 
-      puts "Request: #{req.to_hash.inspect}"
       begin
         response = http.request(req)
       rescue => e
