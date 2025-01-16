@@ -18,7 +18,7 @@ additional guidance on best practices.
 
 ## API Links
 
-- Development API: <a href="https://sandbox.localcontexts.org/api/v2/">https://sandbox.localcontexts.org/api/v2/v1/</a>
+- Development API: <a href="https://sandbox.localcontexts.org/api/v2/">https://sandbox.localcontexts.org/api/v2/</a>
 - Production API: <a href="https://localcontextshub.org/api/v2/">https://localcontextshub.org/api/v2/</a>
 - Documentation: <a href="https://localcontexts.org/support/api-guide/">Local Contexts API Documentation</a>.
 
