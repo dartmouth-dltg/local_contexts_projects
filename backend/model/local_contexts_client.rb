@@ -47,6 +47,11 @@ class LocalContextsClient
   end
 
   def do_http_request(suffix, type, headers = {})
+
+    if AppConfig[:local_contexts_api_path] == 'api/v2'
+      headers['X-Api-Key'] = AppConfig[:local_contexts_api_key]
+    end
+    
     get_url = url(suffix, type)
     http_request(get_url) do |http|
       req = Net::HTTP::Get.new(get_url.request_uri)

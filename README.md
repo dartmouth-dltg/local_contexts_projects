@@ -18,9 +18,9 @@ additional guidance on best practices.
 
 ## API Links
 
-- Development API: <a href="https://anth-ja77-lc-dev-42d5.uc.r.appspot.com/api/v1/">https://anth-ja77-lc-dev-42d5.uc.r.appspot.com/api/v1/</a>
-- Production API: <a href="https://localcontextshub.org/api/v1/">https://localcontextshub.org/api/v1/</a>
-- Documentation: <a href="https://github.com/biocodellc/localcontexts_db/wiki/API-Documentation">Local Contexts API Documentation</a>.
+- Development API: <a href="https://sandbox.localcontexts.org/api/v2/">https://sandbox.localcontexts.org/api/v2/v1/</a>
+- Production API: <a href="https://localcontextshub.org/api/v2/">https://localcontextshub.org/api/v2/</a>
+- Documentation: <a href="https://localcontexts.org/support/api-guide/">Local Contexts API Documentation</a>.
 
 ## Getting started
 
@@ -82,11 +82,20 @@ enable Local Contexts associated projects facets in that area.
 Set `open_to_collaborate` to `true` to display an Open to Collaborate Notice on the homepage.
 Please <a href="https://localcontexts.org/notices/cultural-institution-notices/">read more about using the 
 Open to Collaborate Notice</a> at Local Contexts. If you choose to display an Open to Collaborate Notice, 
-the Notice should also be added to your account in the Local Contexts Hub. 
+the Notice should also be added to your account in the Local Contexts Hub.
+
+Note that if you use version 2 of the API (default), you must supply a valid API key which can be generated 
+in your user account on the Hub.
+
+```
+  AppConfig[:local_contexts_api_key] = 'my_api_key'
+```
 
 Default Values
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
+
+    AppConfig[:local_contexts_api] = 'api/v2'
 
     AppConfig[:local_contexts_replace_xsl] = true
 
