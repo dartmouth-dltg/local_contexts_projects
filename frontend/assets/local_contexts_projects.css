@@ -96,7 +96,7 @@ a.fetching::after {
 }
 
 .local-contexts-manage-cache-btn a {
-  color: #000;
+  color: #000 !important;
 }
 
 /* reset cache */
