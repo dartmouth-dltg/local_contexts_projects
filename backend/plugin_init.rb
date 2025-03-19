@@ -35,7 +35,7 @@ unless AppConfig.has_key?(:local_contexts_api_path)
   AppConfig[:local_contexts_api_path] = "api/v2"
 end
 
-if AppConfig[:local_contexts_api_path] == 'app/v2'
+if AppConfig[:local_contexts_api_path] == 'api/v2'
   unless AppConfig.has_key?(:local_contexts_api_key)
     msg = "You need to set the following config.rb settings: AppConfig[:local_contexts_api_key]"
     Log.error(msg)
