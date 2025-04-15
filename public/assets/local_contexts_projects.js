@@ -162,7 +162,7 @@ class LocalContextsInit {
 
     let lc_data_html = "";
     let lc_img_html = "";
-    let lc_img_wrapper = $('<div id="local-contexts-img-wrapper"><span id="lc-label-images-wrapper"></span><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Click an image to find out more about these Local Contexts Labels &amp; Notices."></i></div>');
+    let lc_img_wrapper = $('<div id="local-contexts-img-wrapper"><span id="lc-label-images-wrapper"></span><i class="fa fa-question-circle" title="Click an image to find out more about these Local Contexts Labels &amp; Notices."></i></div>');
 
     if ($('#local-contexts-img-wrapper').length == 0) {
       $('.lds-ellipsis').remove()
@@ -197,7 +197,6 @@ class LocalContextsInit {
     this.img_html += lc_img_html;
     $('#lc-label-images-wrapper').html('').html(this.img_html);
 
-    $('[data-toggle="tooltip"]').tooltip();
   }
 
   renderTranslations(data, labelLanguage) {
