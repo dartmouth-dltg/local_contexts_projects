@@ -32,7 +32,7 @@ class IndexerCommon
           # only check if the object is not already tagged
           if doc['local_contexts_project_uris_u_sstr'].empty?
             if record_data['ancestors'].nil?
-              record_data = resolve_ancestors_for_pui(record)
+              record_data = check_ancestors_are_resolved(record)
             end
 
             get_local_contexts_data(record_data, doc)
@@ -54,7 +54,26 @@ class IndexerCommon
     }
   end
 
-  def self.resolve_ancestors_for_pui(record)
+  # do we really need to be this paranoid?
+  def self.check_ancestors_are_resolved(record)
+    record_data = record['record']
+
+    if record_data['ancestors'].nil?
+      record_data = resolve_ancestors(record)
+    else
+      record_data['ancestors'].each do |anc|
+        if anc['_resolved'].nil?
+          record_data = resolve_ancestors(record)
+          break
+        end
+      end
+    end
+
+    return record_data
+
+  end
+
+  def self.resolve_ancestors(record)
     JSONModel::HTTP.get_json(record['uri'], 'resolve[]' => @local_contexts_resolves)
   end
 
