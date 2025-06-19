@@ -74,6 +74,7 @@ span.local-contexts-placed-by-label::after {
 /* json */
 .lc-json {
   display: none;
+  white-space: pre-wrap;
 }
 
 .lc-json.shown {
