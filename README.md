@@ -250,12 +250,6 @@ The plugin adds a new background job `Local Contexts Projects Refresh Cache` whi
 Local Contexts Projects. Cache refresh has a delay between API requests to prevent overloading the Local Contexts API. This 
 delay is set by `AppConfig[:local_contexts_api_wait_time]` and defaults to 30 seconds between requests.
 
-## Notes
-
-The Local Contexts API does not support authentication at this time so LC Hub data for private projects
-cannot be displayed in ArchivesSpace. Should the LC API support authentication, the proposed
-plan is to authenticate and display the private project data only in the ArchivesSpace staff view.
-
 ## Reports
 
 The plugin adds an additional report: Local Contexts List. The report generates a list of all
