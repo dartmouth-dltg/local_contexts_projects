@@ -8,25 +8,40 @@ class LocalContexts {
     this.setupLocalContextsAction();
   }
 
+  controlLocalContextsDataVisibility(btn) {
+    if (this.lc_data_el.hasClass('lc-data-shown')) {
+      this.lc_data_el.removeClass('lc-data-shown');
+      btn.text('Show Local Contexts Data');
+    } else {
+      this.lc_data_el.addClass('lc-data-shown');
+      btn.text('Hide Local Contexts Data');
+    }
+  }
+
   setupLocalContextsAction() {
     const self = this;
 
-    $('#fetch-local-contexts-data').click( function() {
-      $(this).addClass('fetching');
-      self.lc_data_el.html('');
-      if (self.fetch_type == "single") {
-        const projectId = $(this).closest('.record-pane').find('label[for=local_contexts_project_project_id_]').siblings('div').text();
-        self.fetchLocalContextData(projectId, $(this))
-      }
-      else {
-        const projectIdsClass = $(this).closest('section').find('[class*=local-contexts-project-id]');
-        const btn = $(this);
-        $.each(projectIdsClass, function() {
-          const projectId = $(this).attr("class").match(/local-contexts-project-id-(.*)/i)[1];
-          if (projectId) {
-            self.fetchLocalContextData(projectId, btn)
-          }
-        });
+    $('#fetch-local-contexts-data').click( function(evt) {
+      evt.preventDefault();
+      if ($(this).hasClass('lc-data-fetched')) {
+        self.controlLocalContextsDataVisibility($(this));
+      } else {
+        $(this).addClass('fetching');
+        self.lc_data_el.html('');
+        if (self.fetch_type == "single") {
+          const projectId = $(this).closest('.record-pane').find('label[for=local_contexts_project_project_id_]').siblings('div').text();
+          self.fetchLocalContextData(projectId, $(this))
+        }
+        else {
+          const projectIdsClass = $(this).closest('section').find('[class*=local-contexts-project-id]');
+          const btn = $(this);
+          $.each(projectIdsClass, function() {
+            const projectId = $(this).attr("class").match(/local-contexts-project-id-(.*)/i)[1];
+            if (projectId) {
+              self.fetchLocalContextData(projectId, btn)
+            }
+          });
+        }
       }
     });
   }
@@ -49,7 +64,8 @@ class LocalContexts {
       else {
         self.renderLocalContextsError(id);
       }
-      btn.removeClass('fetching');
+      btn.removeClass('fetching').addClass('lc-data-fetched');
+      self.controlLocalContextsDataVisibility(btn);
     })
     .fail( function() {
       self.renderLocalContextsError(id);
@@ -177,7 +193,7 @@ class LocalContexts {
 
   renderLocalContextsData(new_json, json, id) {
     const self = this;
-    let lc_data_html = '<div class="lc-project-data-label">Project Id: <b>' + id + '</b><br /> Local Contexts Hub Project Name: <b>' + json.title + '</b></div>';
+    let lc_data_html = '<div class="lc-project-data-label lc-data-shown">Project Id: <b>' + id + '</b><br /> Local Contexts Hub Project Name: <b>' + json.title + '</b></div>';
 
     $.each(new_json, function(k,v) {
       $.each(v, function(idx, label) {

@@ -1,6 +1,11 @@
 /* data */
 #local-contexts-data-holder {
+  display: none;
   margin: 1em;
+}
+
+#local-contexts-data-holder.lc-data-shown {
+  display: block;
 }
 
 #local-contexts-data-holder > div {
