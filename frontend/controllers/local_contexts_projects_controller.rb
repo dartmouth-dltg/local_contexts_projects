@@ -107,7 +107,7 @@ class LocalContextsProjectsController < ApplicationController
     project_type = params[:type].nil? ? 'project' : params[:type]
     unless project_id.empty?
       res = JSONModel::HTTP::post_form("/local_contexts_projects/reset_cache", {:project_id => project_id, :type => project_type})
-      if response.code != '200'
+      if res.code != '200'
         render :json => I18n.t("local_contexts_project._frontend.messages.cache_reset_error").to_json
       else
         render :json => res.body

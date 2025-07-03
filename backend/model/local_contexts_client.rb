@@ -8,6 +8,7 @@ class LocalContextsClient
     @base_url = AppConfig[:local_contexts_base_url]
     @api_version_path = AppConfig[:local_contexts_api_path]
     @query_data_type = '?format=json'
+    @logger = Logger.new($stderr)
 
     @api_paths_map = {
       "project" => "projects",
@@ -30,23 +31,30 @@ class LocalContextsClient
     ]
   end
 
+  def check_json(data, parse_type)
+    if parse_type == 'fetch'
+      log_msg = "Couldn't parse response as JSON: #{data.inspect} -- #{data.body}"
+      error_msg = "Unrecognized response from Local Contexts API"
+      data = data.body
+    else
+      log_msg = "Couldn't parse response as JSON: #{data}"
+      error_msg = "Cached file data is not recognized"
+    end
 
-  def maybe_parse_json(response)
     begin
-      ASUtils.json_parse(response.body)
+      ASUtils.json_parse(data)
     rescue JSON::ParserError
-      Log.error("Couldn't parse response as JSON: #{response.inspect} -- #{response.body}")
-      raise ReferenceError.new("Unrecognized response from Local Contexts API")
+      @logger.error(log_msg)
+      raise ReferenceError.new(error_msg)
     end
   end
 
+  def maybe_parse_json(response)
+    check_json(response, 'fetch')
+  end
+
   def maybe_parse_cached_json(response)
-    begin
-      ASUtils.json_parse(response)
-    rescue JSON::ParserError
-      Log.error("Couldn't parse response as JSON: #{response}")
-      raise ReferenceError.new("Cached file data is not recognized")
-    end
+    check_json(response, 'cache')
   end
 
   def do_http_request(suffix, type, api_key = nil, headers = {})
@@ -66,7 +74,7 @@ class LocalContextsClient
         response 
       else
         error = maybe_parse_json(response)
-        Log.error(error)
+        @logger.error(error)
         raise ReferenceError.new(error["message"])
       end
     end
@@ -87,21 +95,32 @@ class LocalContextsClient
   end
 
   def check_disk_cache(cache_file)
-    logger = Logger.new($stderr)
     if File.exist?(cache_file)
       maybe_parse_cached_json(File.open(cache_file).read)
     else
-      logger.debug("Failed to fetch Local Contexts data for project: #{id}")
+      @logger.debug("Failed to fetch Local Contexts data for project: #{id}")
     end
   end
 
-  def get_json(suffix, type, id, use_cache, ignore_cache_time = false, api_key = nil, attempts = 0)
+  def attempt_request(suffix, type, ids, use_cache, ignore_cache_time, api_key, attempts)
+    res = do_http_request(suffix, type, api_key)
+    if res.respond_to?(:body)
+      write_lcp_cache(ids, res)
+      unless type == 'multi'
+        maybe_parse_json(res)
+      end
+    else
+      @logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now for project: #{ids}. Attempt: #{attempts}")
+      get_json(suffix, type, ids, use_cache, ignore_cache_time, api_key, attempts)
+    end
+  end
+
+  def get_json(suffix, type, ids, use_cache, ignore_cache_time = false, api_key = nil, attempts = 0)
     attempts += 1
-    logger = Logger.new($stderr)
     cache_time = AppConfig[:local_contexts_cache_time]
 
     unless type == 'multi'
-      cache_file = File.join(AppConfig[:local_contexts_cache_dirname], id + '.json')
+      cache_file = File.join(AppConfig[:local_contexts_cache_dirname], ids + '.json')
     end
 
     if attempts < 3
@@ -110,29 +129,18 @@ class LocalContextsClient
           cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
         end
         if !ignore_cache_time && (!File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time)))
-          res = do_http_request(suffix, type, api_key)
-          if res.respond_to?(:body)
-            write_lcp_cache(id, res)
-          else
-            logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now for project: #{id}")
-            get_json(suffix, type, id, use_cache, true, api_key, attempts)
-          end
+          attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
         end
-        unless type == 'multi'
+        # multi checks are *only* for cache updates
+        # we've ensured that we are only fetching project in need 
+        # of an update, so just fetch things.
+        if type == 'multi'
+          attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
+        else
           check_disk_cache(cache_file)
         end
       else
-        response = do_http_request(suffix, type, api_key)
-        if response.respond_to?(:body)      
-          logger.debug("getting response: #{response}")
-          write_lcp_cache(id, response)
-          unless type == 'multi'
-            maybe_parse_json(response)
-          end
-        else
-          logger.debug("Failed to get new Local Contexts data; trying cached version for project: #{id}. Attempt: #{attempts}")
-          get_json(suffix, type, id, use_cache, true, api_key, attempts)
-        end
+        attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
       end
     else
       unless type == 'multi'
@@ -141,12 +149,12 @@ class LocalContextsClient
     end
   end
 
-  def get_data_from_local_contexts_api(id, type, use_cache = true, api_key = nil)
+  def get_data_from_local_contexts_api(ids, type, use_cache = true, api_key = nil)
     if type == 'open_to_collaborate'
-      get_json(@api_paths_map[type], type, id, use_cache, api_key)
+      get_json(@api_paths_map[type], type, ids, use_cache, api_key)
     else
-      lc_api_path_for_type = File.join(@api_paths_map[type], id)
-      get_json(lc_api_path_for_type, type, id, use_cache, api_key)
+      lc_api_path_for_type = File.join(@api_paths_map[type], ids)
+      get_json(lc_api_path_for_type, type, ids, use_cache, api_key)
     end
   end
 
@@ -154,18 +162,20 @@ class LocalContextsClient
     get_data_from_local_contexts_api(project_id, type, false)
   end
 
-  def check_cache
-    logger = Logger.new($stderr)
+  def check_otc_notice_cache
     if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
-      logger.info('Checking cache for Open to Collaborate Notice')
-      logger.info("Using API Key: #{AppConfig[:local_contexts_api_key]}")
+      @logger.info('Checking cache for Open to Collaborate Notice')
       get_data_from_local_contexts_api('open_to_collaborate', 'open_to_collaborate')
     end
+  end
+
+  def check_cache
+    check_otc_notice_cache
     LocalContextsProject.each_with_index do |lcp, idx|
       if (AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true) || idx != 0
         sleep(AppConfig[:local_contexts_api_wait_time])
       end
-      logger.info("Checking cache for Local Contexts Project Id: #{lcp[:project_id]}")
+      @logger.info("Checking cache for Local Contexts Project Id: #{lcp[:project_id]}")
       get_data_from_local_contexts_api(lcp[:project_id], 'project')
     end
   end
@@ -186,10 +196,21 @@ class LocalContextsClient
     end
   end
 
+  def add_to_multi_update(lcp)
+    cache_time = AppConfig[:local_contexts_cache_time]
+    cache_file = File.join(AppConfig[:local_contexts_cache_dirname], lcp[:project_id] + '.json')
+    !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time))
+  end
+
   def check_cache_multi
+    check_otc_notice_cache
+    if (AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true) || idx != 0
+      sleep(AppConfig[:local_contexts_api_wait_time])
+    end
     lcp_multi_cache = {}
-    lcp_multi_cache[AppConfig[:local_contexts_api_key]] = ''
-    LocalContextsProject.each_with_index do |lcp|
+    lcp_multi_cache[AppConfig[:local_contexts_api_key]] = []
+    LocalContextsProject.each do |lcp|
+      next unless add_to_multi_update(lcp)
       if lcp[:project_api_key].nil?
         lcp_multi_cache[AppConfig[:local_contexts_api_key]] << lcp[:project_id]
       else
@@ -200,6 +221,7 @@ class LocalContextsClient
         end
       end
     end
+    @logger.info("Checking cache for Local Contexts projects: #{lcp_multi_cache.inspect}")
       
     lcp_multi_cache.each do |api_key, projects|
       get_data_from_local_contexts_api(projects.join(','), 'multi', true, api_key)
@@ -226,7 +248,7 @@ class LocalContextsClient
         yield(http)
       end
     rescue => e
-      Log.error("Could not connect to the Local Contexts API: #{e}")
+      @logger.error("Could not connect to the Local Contexts API: #{e}")
     end
   end
 

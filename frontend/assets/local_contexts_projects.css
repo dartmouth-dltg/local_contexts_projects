@@ -57,6 +57,12 @@ span.local-contexts-placed-by-label::after {
   display: block;
 }
 
+.local-contexts-translation-toggle {
+  display: table-cell;
+  width: auto;
+  cursor: pointer;
+}
+
 .local-contexts-translation-title {
   font-weight: bold
 }

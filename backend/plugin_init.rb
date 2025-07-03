@@ -190,11 +190,11 @@ end
 
 # check the cache on startup
 Thread.new do
-  LocalContextsClient.new.check_cache
+  LocalContextsClient.new.check_cache_multi
 end
 
 ArchivesSpaceService.settings.scheduler.cron(AppConfig[:local_contexts_refresh_cache_cron], :allow_overlapping => false) do
-  LocalContextsClient.new.check_cache
+  LocalContextsClient.new.check_cache_multi
 end
 
 Solr.add_search_hook do |query|

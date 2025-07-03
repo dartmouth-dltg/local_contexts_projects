@@ -272,9 +272,9 @@ class ResetLocalContextsCache {
     const successMsg = AS.renderTemplate("template_local_context_reset_cache_success")
     const errorMsg = AS.renderTemplate("template_local_context_reset_cache_error")
     $.when(this.resetCacheForProject(pid, lc_type))
-      .done( function(data) {
+      .done((data) => {
         if (pid == lc_type) {
-          if (!data.notice_type || data.notice_type != pid) {
+          if (!data.notice || !data.notice.notice_type || data.notice.notice_type != pid) {
             msg = errorMsg
           }
           else {
@@ -292,7 +292,11 @@ class ResetLocalContextsCache {
         $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
         btn.removeClass('fetching');
       })
-      .fail( function() {
+      .fail(() => {
+        $('#'+pid).parent('button').siblings('.local-contexts-pid').append(errorMsg)
+        btn.removeClass('fetching');
+      })
+      .always(() => {
         btn.removeClass('fetching');
       });
   }

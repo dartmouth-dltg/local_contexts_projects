@@ -23,7 +23,7 @@
           </span>
         {/if}
         {if label.translations && label.translations.length > 0}
-          <span class="local-contexts-translation-toggle btn btn-xs btn-default"><%= I18n.t("local_contexts_project.translations_toggle") %></span>
+          <span class="local-contexts-translation-toggle btn btn-xs btn-outline-secondary"><%= I18n.t("local_contexts_project.translations_toggle") %></span>
           {for translation in label.translations}
             {if translation.language_tag != '' && translation.language_tag != label.language_tag}
               <span class="local-contexts-translation-wrapper well" lang="${translation.language_tag}">
