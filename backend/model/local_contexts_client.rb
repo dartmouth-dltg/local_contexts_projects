@@ -15,6 +15,12 @@ class LocalContextsClient
       "institution" => "institutions",
       "open_to_collaborate" => "notices/open_to_collaborate/"
     }
+
+    # There's no trailing slash in the api v1 OTC url
+    if @api_version_path == 'api/v1'
+      @api_paths_map['open_to_collaborate'] = 'notices/open_to_collaborate'
+    end
+
     @HTTP_ERRORS = [
       EOFError,
       Errno::ECONNRESET,
