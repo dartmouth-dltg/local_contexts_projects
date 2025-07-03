@@ -13,7 +13,7 @@ class LocalContextsClient
       "user" => "users",
       "researcher" => "researchers",
       "institution" => "institutions",
-      "open_to_collaborate" => "notices/open_to_collaborate"
+      "open_to_collaborate" => "notices/open_to_collaborate/"
     }
     @HTTP_ERRORS = [
       EOFError,
@@ -139,6 +139,7 @@ class LocalContextsClient
     logger = Logger.new($stderr)
     if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
       logger.info('Checking cache for Open to Collaborate Notice')
+      logger.info("Using API Key: #{AppConfig[:local_contexts_api_key]}")
       get_data_from_local_contexts_api('open_to_collaborate', 'open_to_collaborate')
     end
     LocalContextsProject.each_with_index do |lcp, idx|
