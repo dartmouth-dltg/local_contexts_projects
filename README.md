@@ -22,6 +22,10 @@ additional guidance on best practices.
 - Production API: <a href="https://localcontextshub.org/api/v2/">https://localcontextshub.org/api/v2/</a>
 - Documentation: <a href="https://localcontexts.org/support/api-guide/">Local Contexts API Documentation</a>.
 
+### API Key Access & Restrictions
+
+See the [guide](https://localcontexts.org/support/api-guide/v2/#api-key-access) to key access and restrictions.
+
 ## Getting started
 
 This plugin has been tested with ArchivesSpace versions 3.1.0+.

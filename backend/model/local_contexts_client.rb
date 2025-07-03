@@ -57,13 +57,15 @@ class LocalContextsClient
       req = Net::HTTP::Get.new(get_url.request_uri)
 
       headers.each {|k,v| req[k] = v }
-      begin
-        response = http.request(req)
-      rescue => e
-        Log.error("Not a valid response from the Local Contexts API: #{e}")
-      end
+      response = http.request(req)
 
-      response
+      if response.code =~ /^2/
+        response 
+      else
+        error = maybe_parse_json(response)
+        Log.error(error)
+        raise ReferenceError.new(error["message"])
+      end
     end
   end
 
@@ -87,10 +89,10 @@ class LocalContextsClient
           cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
         end
         if !ignore_cache_time && (!File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time)))
-          begin
-            res = do_http_request(suffix, type)
+          res = do_http_request(suffix, type)
+          if res.respond_to?(:body)
             write_lcp_cache(cache_file, res)
-          rescue => e
+          else
             logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now for project: #{id}")
             get_json(suffix, type, id, use_cache, true, attempts)
           end
