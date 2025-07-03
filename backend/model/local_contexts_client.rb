@@ -8,18 +8,15 @@ class LocalContextsClient
     @base_url = AppConfig[:local_contexts_base_url]
     @api_version_path = AppConfig[:local_contexts_api_path]
     @query_data_type = '?format=json'
+
     @api_paths_map = {
       "project" => "projects",
+      "multi" => "projects/multi",
       "user" => "users",
       "researcher" => "researchers",
       "institution" => "institutions",
-      "open_to_collaborate" => "notices/open_to_collaborate/"
+      "open_to_collaborate" => "notices/open_to_collaborate"
     }
-
-    # There's no trailing slash in the api v1 OTC url
-    if @api_version_path == 'api/v1'
-      @api_paths_map['open_to_collaborate'] = 'notices/open_to_collaborate'
-    end
 
     @HTTP_ERRORS = [
       EOFError,
@@ -176,7 +173,7 @@ class LocalContextsClient
   private
 
   def url(suffix, type, params = {})
-    if type == "open_to_collaborate"
+    if type == "open_to_collaborate" && AppConfig[:local_contexts_api_path] == 'api/v1'
       URI(File.join(@base_url, @api_version_path, suffix + @query_data_type))
     else
       URI(File.join(@base_url, @api_version_path, suffix, @query_data_type))

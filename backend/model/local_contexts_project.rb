@@ -17,6 +17,7 @@ class LocalContextsProject < Sequel::Model(:local_contexts_project)
   def validate
     super
     validates_unique(:project_id, :message => "local contexts project id not unique")
+    validates_format(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i, :project_id, :message => "local contexts project invalid uuid")
   end
 
   def display_string
