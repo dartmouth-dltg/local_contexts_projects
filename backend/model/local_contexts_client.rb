@@ -135,10 +135,12 @@ class LocalContextsClient
       else
         attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
       end
-    else
+    elsif use_cache
       unless type == 'multi'
         check_disk_cache(cache_file, ids)
       end
+    else
+      {"lcp_fetch_error" => "Failed to fetch updated project information for #{ids}"}
     end
   end
 
