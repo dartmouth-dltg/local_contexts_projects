@@ -73,6 +73,7 @@ This plugin accepts several optional configuration options. These options
 - sets the cache time for Open to Collaborate Notice
 - sets the cache time for project data
 - sets the default time between repeated API calls when refreshing cache for all projects
+- allow for per project api keys
 
 If the base URL is not set in the config, the url is assumed to be `https://localcontextshub.org/`
 
@@ -114,6 +115,7 @@ Default Values
     AppConfig[:local_contexts_cache_time] = 604800 # 7 days
 
     AppConfig[:local_contexts_api_wait_time] = 30
+
 ```
 
 ## Using the Plugin
@@ -129,6 +131,7 @@ This new record contains three fields.
 - Project ID - the id of the project from the Local Contexts Hub (required)
 - Project Name - a user supplied name for easy linking (required)
 - Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
+- Project API Key - an API key associated with this project if it is different from your base API key (optional)
 
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 

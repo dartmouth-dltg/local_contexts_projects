@@ -21,7 +21,12 @@ class LocalContextsProject < Sequel::Model(:local_contexts_project)
   end
 
   def display_string
-    "#{project_id} : #{project_name}"
+    disp = "#{project_id} : #{project_name}"
+    unless project_api_key.nil?
+      disp += " : #{project_api_key}"
+    end
+
+    disp
   end
 
   def self.sequel_to_jsonmodel(objs, opts = {})

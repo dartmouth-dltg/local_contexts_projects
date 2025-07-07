@@ -58,9 +58,8 @@ class LocalContextsClient
   end
 
   def do_http_request(suffix, type, api_key = nil, headers = {})
-    
     if AppConfig[:local_contexts_api_path] == 'api/v2'
-      headers['X-Api-Key'] = api_key.nil? ? AppConfig[:local_contexts_api_key] : api_key
+      headers['X-Api-Key'] = (api_key.nil? || api_key.empty?) ? AppConfig[:local_contexts_api_key] : api_key
     end
 
     get_url = url(suffix, type)
@@ -90,15 +89,15 @@ class LocalContextsClient
       end
     else
       cache_file = File.join(AppConfig[:local_contexts_cache_dirname], ids + '.json')
-      File.open(cache_file,"w"){ |f| f << ASUtils.to_json(response.body) }
+      File.open(cache_file,"w"){ |f| f << response.body }
     end
   end
 
-  def check_disk_cache(cache_file)
+  def check_disk_cache(cache_file, ids)
     if File.exist?(cache_file)
       maybe_parse_cached_json(File.open(cache_file).read)
     else
-      @logger.debug("Failed to fetch Local Contexts data for project: #{id}")
+      @logger.debug("Failed to fetch Local Contexts data for project: #{ids}")
     end
   end
 
@@ -111,11 +110,11 @@ class LocalContextsClient
       end
     else
       @logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now for project: #{ids}. Attempt: #{attempts}")
-      get_json(suffix, type, ids, use_cache, ignore_cache_time, api_key, attempts)
+      get_json(suffix, type, ids, use_cache, api_key, ignore_cache_time, attempts)
     end
   end
 
-  def get_json(suffix, type, ids, use_cache, ignore_cache_time = false, api_key = nil, attempts = 0)
+  def get_json(suffix, type, ids, use_cache, api_key = nil, ignore_cache_time = false, attempts = 0)
     attempts += 1
     cache_time = AppConfig[:local_contexts_cache_time]
 
@@ -130,21 +129,15 @@ class LocalContextsClient
         end
         if !ignore_cache_time && (!File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time)))
           attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
-        end
-        # multi checks are *only* for cache updates
-        # we've ensured that we are only fetching project in need 
-        # of an update, so just fetch things.
-        if type == 'multi'
-          attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
         else
-          check_disk_cache(cache_file)
+          check_disk_cache(cache_file, ids)
         end
       else
         attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
       end
     else
       unless type == 'multi'
-        check_disk_cache(cache_file)
+        check_disk_cache(cache_file, ids)
       end
     end
   end
@@ -158,8 +151,8 @@ class LocalContextsClient
     end
   end
 
-  def reset_cache(project_id, type = "project")
-    get_data_from_local_contexts_api(project_id, type, false)
+  def reset_cache(project_id, type = "project", api_key)
+    get_data_from_local_contexts_api(project_id, type, false, api_key)
   end
 
   def check_otc_notice_cache
@@ -224,7 +217,8 @@ class LocalContextsClient
     @logger.info("Checking cache for Local Contexts projects: #{lcp_multi_cache.inspect}")
       
     lcp_multi_cache.each do |api_key, projects|
-      get_data_from_local_contexts_api(projects.join(','), 'multi', true, api_key)
+      next if projects.count == 0
+      get_data_from_local_contexts_api(projects.join(','), 'multi', false, api_key)
     end
   end
 

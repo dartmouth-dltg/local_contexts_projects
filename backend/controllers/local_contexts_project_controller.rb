@@ -5,24 +5,26 @@ class ArchivesSpaceService < Sinatra::Base
   .description("Fetch the data associated with a Local Contexts project, user, researcher, or institution id from Local Contexts API")
   .params(["id", String, "The Local Contexts id"],
           ["type", String, "The type of object to fetch"],
-          ["use_cache", BooleanParam, "Flag to indicate whether cached response should be used"])
+          ["use_cache", BooleanParam, "Flag to indicate whether cached response should be used"],
+          ["project_api_key", String, "Project Specific API Key", :optional => true])
   .permissions([])
   .returns([200, "json from the local contexts api"]) \
   do
     client = LocalContextsClient.new
-    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], params[:use_cache])
+    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], params[:use_cache], params[:project_api_key])
     json_response(api_response)
   end
 
   Endpoint.post('/local_contexts_projects/reset_cache')
   .description("Clear Local Contexts Projects file cache")
   .params(["project_id", String, "Project id"],
-          ["type", String, "Type of LC data - Project or Open to Collaborate Notice"])
+          ["type", String, "Type of LC data - Project or Open to Collaborate Notice"],
+          ["project_api_key", String, "Project Specific API Key", :optional => true])
   .permissions([:update_localcontexts_project_record])
   .returns([200, :updated]) \
   do
     client = LocalContextsClient.new
-    response = client.reset_cache(params[:project_id], params[:type])
+    response = client.reset_cache(params[:project_id], params[:type], params[:project_api_key])
     json_response(response)
   end
 
