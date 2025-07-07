@@ -8,13 +8,16 @@ class LocalContextsClient
     @base_url = AppConfig[:local_contexts_base_url]
     @api_version_path = AppConfig[:local_contexts_api_path]
     @query_data_type = '?format=json'
+
     @api_paths_map = {
       "project" => "projects",
+      "multi" => "projects/multi",
       "user" => "users",
       "researcher" => "researchers",
       "institution" => "institutions",
       "open_to_collaborate" => "notices/open_to_collaborate"
     }
+
     @HTTP_ERRORS = [
       EOFError,
       Errno::ECONNRESET,
@@ -57,13 +60,15 @@ class LocalContextsClient
       req = Net::HTTP::Get.new(get_url.request_uri)
 
       headers.each {|k,v| req[k] = v }
-      begin
-        response = http.request(req)
-      rescue => e
-        Log.error("Not a valid response from the Local Contexts API: #{e}")
-      end
+      response = http.request(req)
 
-      response
+      if response.code =~ /^2/
+        response 
+      else
+        error = maybe_parse_json(response)
+        Log.error(error)
+        raise ReferenceError.new(error["message"])
+      end
     end
   end
 
@@ -87,10 +92,10 @@ class LocalContextsClient
           cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
         end
         if !ignore_cache_time && (!File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time)))
-          begin
-            res = do_http_request(suffix, type)
+          res = do_http_request(suffix, type)
+          if res.respond_to?(:body)
             write_lcp_cache(cache_file, res)
-          rescue => e
+          else
             logger.debug("Failed to get new Local Contexts data after cache was found to be stale; using stale cached version for now for project: #{id}")
             get_json(suffix, type, id, use_cache, true, attempts)
           end
@@ -137,6 +142,7 @@ class LocalContextsClient
     logger = Logger.new($stderr)
     if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
       logger.info('Checking cache for Open to Collaborate Notice')
+      logger.info("Using API Key: #{AppConfig[:local_contexts_api_key]}")
       get_data_from_local_contexts_api('open_to_collaborate', 'open_to_collaborate')
     end
     LocalContextsProject.each_with_index do |lcp, idx|
@@ -167,7 +173,7 @@ class LocalContextsClient
   private
 
   def url(suffix, type, params = {})
-    if type == "open_to_collaborate"
+    if type == "open_to_collaborate" && AppConfig[:local_contexts_api_path] == 'api/v1'
       URI(File.join(@base_url, @api_version_path, suffix + @query_data_type))
     else
       URI(File.join(@base_url, @api_version_path, suffix, @query_data_type))

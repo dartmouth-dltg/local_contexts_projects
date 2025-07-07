@@ -22,6 +22,10 @@ additional guidance on best practices.
 - Production API: <a href="https://localcontextshub.org/api/v2/">https://localcontextshub.org/api/v2/</a>
 - Documentation: <a href="https://localcontexts.org/support/api-guide/">Local Contexts API Documentation</a>.
 
+### API Key Access & Restrictions
+
+See the [guide](https://localcontexts.org/support/api-guide/v2/#api-key-access) to key access and restrictions.
+
 ## Getting started
 
 This plugin has been tested with ArchivesSpace versions 3.1.0+.
@@ -249,12 +253,6 @@ need to ensure that the data displayed in ArchivesSpace is up to date.
 The plugin adds a new background job `Local Contexts Projects Refresh Cache` which will refresh the cached data for all
 Local Contexts Projects. Cache refresh has a delay between API requests to prevent overloading the Local Contexts API. This 
 delay is set by `AppConfig[:local_contexts_api_wait_time]` and defaults to 30 seconds between requests.
-
-## Notes
-
-The Local Contexts API does not support authentication at this time so LC Hub data for private projects
-cannot be displayed in ArchivesSpace. Should the LC API support authentication, the proposed
-plan is to authenticate and display the private project data only in the ArchivesSpace staff view.
 
 ## Reports
 

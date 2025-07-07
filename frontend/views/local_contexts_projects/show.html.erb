@@ -12,12 +12,15 @@
     <div class="record-pane">
       <section id="basic-information">
         <div class="readonly-context form-horizontal">
-          <h2><%= @local_contexts_project.project_name %>  <span class="label label-info"><%= I18n.t("local_contexts_project._singular") %></span><a class="btn btn-sm btn-default ml-auto" id="fetch-local-contexts-data"><%= I18n.t('local_contexts_project.fetch_btn') %></a></h2>
+          <h2><%= @local_contexts_project.project_name %>  <span class="label label-info badge"><%= I18n.t("local_contexts_project._singular") %></span></h2>
           <%= readonly_context :local_contexts_project, @local_contexts_project do |readonly| %>
             <%= readonly.label_and_textfield "project_id" %>
             <%= readonly.label_and_textfield "project_name" %>
             <%= readonly.label_and_boolean "project_is_public" %>
           <% end %>
+          <div class="mt-1 mb-3 ml-4">
+            <a class="btn btn-sm btn-default" id="fetch-local-contexts-data"><%= I18n.t('local_contexts_project.fetch_btn') %></a>
+          </div>
           <div id="local-contexts-data-holder" class=""></div>
           <%= render_aspace_partial :partial => "search/embedded", :locals => {
             :filter_term => {"local_contexts_project_uris_u_sstr" => @local_contexts_project.uri}.to_json,

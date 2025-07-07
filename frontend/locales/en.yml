@@ -110,4 +110,5 @@ en:
       local_contexts_projects_refresh_cache_job: Local Contexts Projects Refresh Cache
   
   validation_errors:
-    local_contexts_project_id_not_unique: A Project with this project id already exists. Project ids must be unique.
+    local_contexts_project_id_not_unique: A Local Contexts Project with this project id already exists. Project ids must be unique.
+    local_contexts_project_invalid_uuid: A Local Contexts Project id must be a valid uuid.
