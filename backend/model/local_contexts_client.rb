@@ -140,7 +140,9 @@ class LocalContextsClient
         check_disk_cache(cache_file, ids)
       end
     else
-      {"lcp_fetch_error" => "Failed to fetch updated project information for #{ids}"}
+      msg = "Failed to fetch updated project information for #{ids}"
+      @logger.error(msg)
+      {"lcp_fetch_error" => msg}
     end
   end
 
