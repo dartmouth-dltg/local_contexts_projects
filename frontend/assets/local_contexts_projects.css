@@ -82,6 +82,10 @@ span.local-contexts-placed-by-label::after {
   margin-top: 3em;
 }
 
+.disallow-project-api-keys {
+  display: none;
+}
+
 /* json */
 .lc-json {
   display: none;

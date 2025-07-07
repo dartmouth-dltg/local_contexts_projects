@@ -96,6 +96,11 @@ in your user account on the Hub.
   AppConfig[:local_contexts_api_key] = 'my_api_key'
 ```
 
+If you have more than one API key, you can expose a per project API key field by setting
+```
+  AppConfig[:allow_project_api_keys] = true
+```
+
 Default Values
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
@@ -115,6 +120,8 @@ Default Values
     AppConfig[:local_contexts_cache_time] = 604800 # 7 days
 
     AppConfig[:local_contexts_api_wait_time] = 30
+
+    AppConfig[:allow_project_api_keys] = false
 
 ```
 
