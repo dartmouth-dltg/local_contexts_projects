@@ -155,14 +155,14 @@ class LocalContextsClient
     end
   end
 
-  def reset_cache(project_id, type = "project", api_key)
+  def reset_cache(project_id, type = "project", api_key = nil)
     get_data_from_local_contexts_api(project_id, type, false, api_key)
   end
 
-  def check_otc_notice_cache
+  def check_otc_notice_cache(use_cache = true)
     if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
       @logger.info('Checking cache for Open to Collaborate Notice')
-      get_data_from_local_contexts_api('open_to_collaborate', 'open_to_collaborate')
+      get_data_from_local_contexts_api('open_to_collaborate', 'open_to_collaborate', use_cache)
     end
   end
 
@@ -193,21 +193,22 @@ class LocalContextsClient
     end
   end
 
-  def add_to_multi_update(lcp)
+  def add_to_multi_update(lcp, use_cache)
+    return true if use_cache == false
     cache_time = AppConfig[:local_contexts_cache_time]
     cache_file = File.join(AppConfig[:local_contexts_cache_dirname], lcp[:project_id] + '.json')
     !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time))
   end
 
-  def check_cache_multi
-    check_otc_notice_cache
+  def check_or_reset_cache_multi(use_cache = true)
+    check_otc_notice_cache(use_cache)
     if (AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true) || idx != 0
       sleep(AppConfig[:local_contexts_api_wait_time])
     end
     lcp_multi_cache = {}
     lcp_multi_cache[AppConfig[:local_contexts_api_key]] = []
     LocalContextsProject.each do |lcp|
-      next unless add_to_multi_update(lcp)
+      next unless add_to_multi_update(lcp, use_cache)
       if lcp[:project_api_key].nil?
         lcp_multi_cache[AppConfig[:local_contexts_api_key]] << lcp[:project_id]
       else
