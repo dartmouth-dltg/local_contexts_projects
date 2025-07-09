@@ -133,12 +133,13 @@ or create a new project.
 
 Access to the this area is governed by a new permission defined in the plugin: `update_localcontexts_project_record`
 
-This new record contains three fields.
+This new record contains three (or four if per project API keys are allowed) fields.
 
 - Project ID - the id of the project from the Local Contexts Hub (required)
 - Project Name - a user supplied name for easy linking (required)
 - Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
-- Project API Key - an API key associated with this project if it is different from your base API key (optional)
+- Project API Key - an API key associated with this project if it is different from your base API key (optional).
+Only visible if `AppConfig[:allow_project_api_keys] = true`.
 
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 
