@@ -223,7 +223,9 @@ class LocalContextsClient
       
     lcp_multi_cache.each do |api_key, projects|
       next if projects.count == 0
-      get_data_from_local_contexts_api(projects.join(','), 'multi', false, api_key)
+      projects.each_slice(AppConfig[:local_contexts_multi_request_limit]) do |project_slice|
+        get_data_from_local_contexts_api(project_slice.join(','), 'multi', false, api_key)
+      end
     end
   end
 

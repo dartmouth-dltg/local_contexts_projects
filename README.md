@@ -101,6 +101,10 @@ If you have more than one API key, you can expose a per project API key field by
   AppConfig[:allow_project_api_keys] = true
 ```
 
+The Local Contexts API does not limit the number of projects that can be requested in a single multi request
+using the `/projects/multi/{ids}` endpoint. However, this plugin defines a default of `10` projects per
+multi request. This can be changed by setting `AppConfig[:local_contexts_multi_request_limit]`.
+
 Default Values
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
@@ -122,6 +126,8 @@ Default Values
     AppConfig[:local_contexts_api_wait_time] = 30
 
     AppConfig[:allow_project_api_keys] = false
+
+    AppConfig[:local_contexts_multi_request_limit] = 10
 
 ```
 

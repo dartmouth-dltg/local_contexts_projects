@@ -13,6 +13,10 @@ unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
 end
 
+unless AppConfig.has_key?(:local_contexts_multi_request_limit)
+  AppConfig[:local_contexts_multi_request_limit] = 10
+end
+
 unless AppConfig.has_key?(:local_contexts_replace_xsl)
   AppConfig[:local_contexts_replace_xsl] = true
 end
