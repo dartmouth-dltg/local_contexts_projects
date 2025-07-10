@@ -12,7 +12,14 @@ class LocalContextsProjectsController < ApplicationController
   def fetch_lc_project_data
     project_id = params[:project_id]
     use_cache = params[:use_cache].nil? ? true : params[:use_cache]
-    project_json = JSONModel::HTTP::get_json("/local_contexts_projects/get_local_contexts_api_data", {:id => project_id, :type => 'project', :use_cache =>  use_cache})
+    project_api_key = params[:project_api_key]
+    project_json = JSONModel::HTTP::get_json(
+      "/local_contexts_projects/get_local_contexts_api_data",
+      {:id => project_id,
+        :type => 'project',
+        :use_cache =>  use_cache,
+        :project_api_key => project_api_key
+      })
 
     if project_json.nil?
       render :json => {"error":"Something went wrong. Unable to fetch and/or parse data for this id."}
@@ -106,8 +113,12 @@ class LocalContextsProjectsController < ApplicationController
     project_id = params[:project_id].nil? ? '' : params[:project_id]
     project_type = params[:type].nil? ? 'project' : params[:type]
     unless project_id.empty?
-      res = JSONModel::HTTP::post_form("/local_contexts_projects/reset_cache", {:project_id => project_id, :type => project_type})
-      if response.code != '200'
+      res = JSONModel::HTTP::post_form("/local_contexts_projects/reset_cache", {
+        :project_id => project_id,
+        :type => project_type,
+        :project_api_key => params[:project_api_key],
+      })
+      if res.code != '200'
         render :json => I18n.t("local_contexts_project._frontend.messages.cache_reset_error").to_json
       else
         render :json => res.body

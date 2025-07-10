@@ -6,6 +6,10 @@ Rails.application.config.after_initialize do
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org"
   end
 
+  unless AppConfig.has_key?(:local_contexts_allow_project_api_keys)
+    AppConfig[:local_contexts_allow_project_api_keys] = false
+  end
+
   # only add faceting if configured
   if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['staff_faceting'] == true
     Plugins::add_search_base_facets('local_contexts_project_u_sbool')

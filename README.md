@@ -73,6 +73,7 @@ This plugin accepts several optional configuration options. These options
 - sets the cache time for Open to Collaborate Notice
 - sets the cache time for project data
 - sets the default time between repeated API calls when refreshing cache for all projects
+- allow for per project api keys
 
 If the base URL is not set in the config, the url is assumed to be `https://localcontextshub.org/`
 
@@ -95,6 +96,15 @@ in your user account on the Hub.
   AppConfig[:local_contexts_api_key] = 'my_api_key'
 ```
 
+If you have more than one API key, you can expose a per project API key field by setting
+```
+  AppConfig[:allow_project_api_keys] = true
+```
+
+The Local Contexts API does not limit the number of projects that can be requested in a single multi request
+using the `/projects/multi/{ids}` endpoint. However, this plugin defines a default of `10` projects per
+multi request. This can be changed by setting `AppConfig[:local_contexts_multi_request_limit]`.
+
 Default Values
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
@@ -114,6 +124,11 @@ Default Values
     AppConfig[:local_contexts_cache_time] = 604800 # 7 days
 
     AppConfig[:local_contexts_api_wait_time] = 30
+
+    AppConfig[:allow_project_api_keys] = false
+
+    AppConfig[:local_contexts_multi_request_limit] = 10
+
 ```
 
 ## Using the Plugin
@@ -124,11 +139,13 @@ or create a new project.
 
 Access to the this area is governed by a new permission defined in the plugin: `update_localcontexts_project_record`
 
-This new record contains three fields.
+This new record contains three (or four if per project API keys are allowed) fields.
 
 - Project ID - the id of the project from the Local Contexts Hub (required)
 - Project Name - a user supplied name for easy linking (required)
 - Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
+- Project API Key - an API key associated with this project if it is different from your base API key (optional).
+Only visible if `AppConfig[:allow_project_api_keys] = true`.
 
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 

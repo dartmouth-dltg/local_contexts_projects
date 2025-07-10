@@ -47,9 +47,14 @@ en:
     messages:
     new_title: New Local Contexts Project
     placed_by_txt: Placed By
+    project_api_key: API Key for this Project (optional)
+    project_api_key_tooltip: |
+      <p>An API key associated with the project if it is different from your base API key. *Optional*</p>
     project_date_information: 'Local Contexts Labels and Notices for this material as of: '
     project_date_see_current: Please check the project in the Local Contexts Hub for current information.
     project_id: Project Id
+    project_id_tooltip: |
+      <p>The UUID of the Local Contexts Project. *Required*</p>
     project_information:
       _singular: >
         This material is related to a Local Contexts project which may have associated various Biocultural Labels,
@@ -58,8 +63,12 @@ en:
         This material is related to Local Contexts projects which may have associated various Biocultural Labels,
         Traditional Knowledge Labels, Notices, and Institution Notices with this material.
     project_is_public: Hub Project Public or Discoverable?
+    project_is_public_tooltip: |
+      <p>Indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects. *Optional*</p>
     project_link_text: View this project on the Local Contexts Hub
     project_name: Project Name
+    project_name_tooltip: |
+      <p>The name of the project to be used for linking within ArchivesSpace. *Required*</p>
     project_not_public_message: The information for the Local Contexts project is not publicly available.
     related_project_tooltip: Select a Local Contexts project.
     section_title: Local Contexts Information

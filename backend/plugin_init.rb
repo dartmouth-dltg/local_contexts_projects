@@ -13,6 +13,10 @@ unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
 end
 
+unless AppConfig.has_key?(:local_contexts_multi_request_limit)
+  AppConfig[:local_contexts_multi_request_limit] = 10
+end
+
 unless AppConfig.has_key?(:local_contexts_replace_xsl)
   AppConfig[:local_contexts_replace_xsl] = true
 end
@@ -190,11 +194,11 @@ end
 
 # check the cache on startup
 Thread.new do
-  LocalContextsClient.new.check_cache
+  LocalContextsClient.new.check_or_reset_cache_multi
 end
 
 ArchivesSpaceService.settings.scheduler.cron(AppConfig[:local_contexts_refresh_cache_cron], :allow_overlapping => false) do
-  LocalContextsClient.new.check_cache
+  LocalContextsClient.new.check_or_reset_cache_multi
 end
 
 Solr.add_search_hook do |query|

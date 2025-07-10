@@ -37,6 +37,12 @@
             <p style="font-size: 0.8em; margin-top: 0.5em"><%= notice['name'].html_safe %></p>
             <p style="font-size: 0.8em; margin-top: 0.5em"><img style="height: 3em" src="<%= notice['img_url'].html_safe %>" /></p>
             <p style="font-size: 0.8em; margin-top: 0.5em"><%= notice['default_text'].html_safe %></p>
+            <% if notice['translations'].length > 0 %>
+              <% notice['translations'].each do |translation| %>
+                <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_name'].html_safe %> (<%= translation['language'].html_safe %>)</p>
+                <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_text'].html_safe %></p>
+              <% end %>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>

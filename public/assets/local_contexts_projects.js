@@ -202,7 +202,7 @@ class LocalContextsInit {
   renderTranslations(data, labelLanguage) {
 
     const self = this;
-    let translations_html  = '<span class="local-contexts-translation-toggle btn btn-xs btn-default">Hide/Show Translations for this Project</span>';
+    let translations_html  = '<span class="local-contexts-translation-toggle btn btn-xs btn-outline-secondary">Hide/Show Translations for this Project</span>';
 
     $.each(data.translations, function() {
       let translationLanguageTag = '';

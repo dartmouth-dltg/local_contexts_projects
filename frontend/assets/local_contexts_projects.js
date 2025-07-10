@@ -233,8 +233,12 @@ class ResetLocalContextsCache {
     let project_ids = [];
     $('#tabledSearchResults td.sortable').each(function() {
       const p_id = $(this).text().split(":")[0].trim();
-      const p_title = $(this).text().split(":")[1].trim()
-      project_ids.push({"id" : p_id, "title" : p_title});
+      const p_title = $(this).text().split(":")[1].trim();
+      let p_api_key = '';
+      if (typeof $(this).text().split(":")[2] !== 'undefined') {
+        p_api_key = $(this).text().split(":")[2].trim();
+      }
+      project_ids.push({"id": p_id, "title": p_title, "project_api_key": p_api_key});
     });
 
     const $modal = AS.openCustomModal("quickModal",
@@ -259,22 +263,23 @@ class ResetLocalContextsCache {
       on("click", ".reset-local-contexts-cache-btn", function(event) {
         event.preventDefault();
         const pid = $(this).children('a').attr('id');
+        const project_api_key = $(this).children('a').data('project-api-key');
         const lc_type = pid == 'open_to_collaborate' ? pid : 'project';
-        self.setupResetCacheForProject(pid, lc_type, $(this));
+        self.setupResetCacheForProject(pid, lc_type, project_api_key, $(this));
       });
   }
 
-  setupResetCacheForProject(pid, lc_type, btn) {
+  setupResetCacheForProject(pid, lc_type, api_key = null, btn) {
     const self = this;
 
     let msg = '';
     btn.addClass('fetching');
     const successMsg = AS.renderTemplate("template_local_context_reset_cache_success")
     const errorMsg = AS.renderTemplate("template_local_context_reset_cache_error")
-    $.when(this.resetCacheForProject(pid, lc_type))
-      .done( function(data) {
+    $.when(this.resetCacheForProject(pid, lc_type, api_key))
+      .done((data) => {
         if (pid == lc_type) {
-          if (!data.notice_type || data.notice_type != pid) {
+          if (!data.notice || !data.notice.notice_type || data.notice.notice_type != pid) {
             msg = errorMsg
           }
           else {
@@ -292,19 +297,24 @@ class ResetLocalContextsCache {
         $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
         btn.removeClass('fetching');
       })
-      .fail( function() {
+      .fail(() => {
+        $('#'+pid).parent('button').siblings('.local-contexts-pid').append(errorMsg)
+        btn.removeClass('fetching');
+      })
+      .always(() => {
         btn.removeClass('fetching');
       });
   }
 
-  resetCacheForProject(pid, lc_type) {
+  resetCacheForProject(pid, lc_type, project_api_key = null) {
     const self = this;
     return $.ajax({
       url: self.frontendPrefix + "plugins/local_contexts_projects/reset_cache",
       method: 'POST',
       data: {
         project_id: pid,
-        type: lc_type
+        type: lc_type,
+        project_api_key: project_api_key,
       },
       dataType: 'json'
     })

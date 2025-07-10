@@ -23,7 +23,7 @@
           </span>
         {/if}
         {if label.translations && label.translations.length > 0}
-          <span class="local-contexts-translation-toggle btn btn-xs btn-default"><%= I18n.t("local_contexts_project.translations_toggle") %></span>
+          <span class="local-contexts-translation-toggle btn btn-xs btn-outline-secondary"><%= I18n.t("local_contexts_project.translations_toggle") %></span>
           {for translation in label.translations}
             {if translation.language_tag != '' && translation.language_tag != label.language_tag}
               <span class="local-contexts-translation-wrapper well" lang="${translation.language_tag}">
@@ -82,7 +82,7 @@
         <div class="reset-local-contexts-cache-list-item">
           <span class="local-contexts-pid">${pid.id} : ${pid.title}</span>
           <button class="btn btn-sm btn-primary reset-local-contexts-cache-btn">
-            <a id="${pid.id}" href="<%= url_for :controller => :local_contexts_projects, :action => :reset_cache %>">
+            <a id="${pid.id}" data-project-api-key="${pid.project_api_key}" href="<%= url_for :controller => :local_contexts_projects, :action => :reset_cache %>">
               <%= I18n.t("local_contexts_project._cache_reset.reset_one") %>
             </a>
           </button>

@@ -16,6 +16,9 @@
         "ifmissing" => "error"
       },
       "project_is_public" => {"type" => "boolean"},
+      "project_api_key" => {
+        "type" => "string",
+      },
       "linked_record" => {
         "type" => "object",
         "subtype" => "ref",

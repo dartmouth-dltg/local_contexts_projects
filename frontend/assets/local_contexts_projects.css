@@ -57,6 +57,12 @@ span.local-contexts-placed-by-label::after {
   display: block;
 }
 
+.local-contexts-translation-toggle {
+  display: table-cell;
+  width: auto;
+  cursor: pointer;
+}
+
 .local-contexts-translation-title {
   font-weight: bold
 }
@@ -74,6 +80,10 @@ span.local-contexts-placed-by-label::after {
 .lc-project-data-label,
 .lc-project-fetch-error {
   margin-top: 3em;
+}
+
+.disallow-project-api-keys {
+  display: none;
 }
 
 /* json */
