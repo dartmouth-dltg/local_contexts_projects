@@ -202,7 +202,8 @@ class LocalContextsClient
 
   def check_or_reset_cache_multi(use_cache = true)
     check_otc_notice_cache(use_cache)
-    if (AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true) || idx != 0
+    # only wait if we just hit the api for the notice
+    if AppConfig.has_key?(:local_contexts_projects) && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
       sleep(AppConfig[:local_contexts_api_wait_time])
     end
     lcp_multi_cache = {}
