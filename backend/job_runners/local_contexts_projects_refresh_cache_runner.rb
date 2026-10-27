@@ -1,7 +1,10 @@
 
 class LocalContextsProjectsRefreshCacheRunner < JobRunner
 
-  register_for_job_type('local_contexts_projects_refresh_cache_job')
+  # refreshing every project hits the Local Contexts API, so only let users who
+  # can manage Local Contexts projects create these jobs
+  register_for_job_type('local_contexts_projects_refresh_cache_job',
+                        :create_permissions => :update_localcontexts_project_record)
 
   def run
 
