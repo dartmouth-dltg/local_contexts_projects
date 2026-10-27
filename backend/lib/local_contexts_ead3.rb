@@ -5,7 +5,7 @@ class LocalContextsEAD3 < EAD3Serializer
 
   def serialize_local_contexts_collaborate(data, xml, fragments)
     if AppConfig[:plugins].include?('local_contexts_projects') && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
-      otc = LocalContextsClient.new.get_data_from_local_contexts_api("open_to_collaborate", 'open_to_collaborate', true)
+      otc = LocalContextsEADHelper.otc_notice(LocalContextsClient.new.get_data_from_local_contexts_api("open_to_collaborate", 'open_to_collaborate', true))
       if otc['name']
         xml.didnote {
           sanitize_mixed_content(otc['name'] , xml, fragments)
@@ -133,18 +133,20 @@ class LocalContextsEAD3 < EAD3Serializer
         }
       end
     end
-    if label_or_notice['community']
+    community = LocalContextsEADHelper.community_name(label_or_notice)
+    if community
       if digital_object
         xml.lb {}
-        sanitize_mixed_content("Placed By: " + label_or_notice['community'], xml, fragments)
+        sanitize_mixed_content("Placed By: " + community, xml, fragments)
       else
         xml.p {
-          sanitize_mixed_content("Placed By: " + label_or_notice['community'], xml, fragments)
+          sanitize_mixed_content("Placed By: " + community, xml, fragments)
         }
       end
     end
-    if label_or_notice['translations'] && label_or_notice['translations'].length > 0
-      label_or_notice['translations'].each do |translation|
+    translations = LocalContextsEADHelper.translations(label_or_notice)
+    if translations.length > 0
+      translations.each do |translation|
         if digital_object
           xml.lb {}
           sanitize_mixed_content(translation['translated_name']  + " (" + translation['language'] + ")", xml, fragments)

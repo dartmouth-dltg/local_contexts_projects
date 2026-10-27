@@ -1,43 +1,43 @@
 <div id="template_local_context_data"><!--
   {if label.language_tag != '' && label.language_tag != main_language}
-    <div class="lc-project-data-container" lang="${label.language_tag}">
+    <div class="lc-project-data-container" lang="${label.language_tag|h}">
   {else}
     <div class="lc-project-data-container">
   {/if}
-    <h4>${label.name}</h4>
+    <h4>${label.name|h}</h4>
     <p>
-      <img class="local-contexts-image" src="${label.img_url}" />
+      <img class="local-contexts-image" src="${label.img_url|h}" />
       <span class="local-contexts-description">
         {if label.audiofile && label.audiofile.length > 0}
           <span class="local-contexts-audio">
             <audio controls>
-              <source src="${label.audiofile}" />
-              Your browser does not support HTML5 audio. Here is a <a href="${label.audiofile}">link to the audio</a> instead.
+              <source src="${label.audiofile|h}" />
+              Your browser does not support HTML5 audio. Here is a <a href="${label.audiofile|h}">link to the audio</a> instead.
             </audio>
           </span>
         {/if}
-        ${label.label_text}
+        ${label.label_text|h}
         {if label.community && label.community.length > 0}
           <span class="local-contexts-placed-by">
-            <span class="local-contexts-placed-by-label"><%= I18n.t("local_contexts_project.placed_by_txt") %></span> ${label.community}
+            <span class="local-contexts-placed-by-label"><%= I18n.t("local_contexts_project.placed_by_txt") %></span> ${label.community|h}
           </span>
         {/if}
         {if label.translations && label.translations.length > 0}
           <span class="local-contexts-translation-toggle btn btn-xs btn-outline-secondary"><%= I18n.t("local_contexts_project.translations_toggle") %></span>
           {for translation in label.translations}
             {if translation.language_tag != '' && translation.language_tag != label.language_tag}
-              <span class="local-contexts-translation-wrapper well" lang="${translation.language_tag}">
+              <span class="local-contexts-translation-wrapper well" lang="${translation.language_tag|h}">
             {else}
               <span class="local-contexts-translation-wrapper well">
             {/if}
               {if translation.translated_name.length > 0}
-                <span class="local-contexts-translation-title">${translation.translated_name}</span>
+                <span class="local-contexts-translation-title">${translation.translated_name|h}</span>
               {/if}
               {if translation.language.length > 0}
-                <span class="local-contexts-translation-language">(${translation.language})</span>
+                <span class="local-contexts-translation-language">(${translation.language|h})</span>
               {/if }
               {if translation.translated_text.length > 0}
-                <span class="local-contexts-translation-translation">${translation.translated_text}</span>
+                <span class="local-contexts-translation-translation">${translation.translated_text|h}</span>
               {/if}
             <span>
           {/for}
@@ -51,7 +51,7 @@
   <div class="lc-project-fetch-error">
     <h4><%= I18n.t("local_contexts_project.fetch_error.title") %></h4>
     <p>
-      <%= I18n.t("local_contexts_project.fetch_error.message") %>: <b>${id})</b>. <%= I18n.t("local_contexts_project.fetch_error.message_append") %>
+      <%= I18n.t("local_contexts_project.fetch_error.message") %>: <b>${id|h})</b>. <%= I18n.t("local_contexts_project.fetch_error.message_append") %>
     </p>
   </div>
 --></div>
@@ -80,9 +80,9 @@
     {for pid in project_ids}
       <div class="reset-local-contexts-cache-list">
         <div class="reset-local-contexts-cache-list-item">
-          <span class="local-contexts-pid">${pid.id} : ${pid.title}</span>
+          <span class="local-contexts-pid">${pid.id|h} : ${pid.title|h}</span>
           <button class="btn btn-sm btn-primary reset-local-contexts-cache-btn">
-            <a id="${pid.id}" href="<%= url_for :controller => :local_contexts_projects, :action => :reset_cache %>">
+            <a id="${pid.id|h}" href="<%= url_for :controller => :local_contexts_projects, :action => :reset_cache %>">
               <%= I18n.t("local_contexts_project._cache_reset.reset_one") %>
             </a>
           </button>

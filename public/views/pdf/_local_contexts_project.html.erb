@@ -6,6 +6,8 @@
   # Everything below comes from the Local Contexts API, so it is escaped by
   # ERB. Urls are also limited to http(s): the PDF renderer fetches image urls.
   http_url = lambda {|url| url.to_s =~ %r{\Ahttps?://}i ? url.to_s : nil }
+  community_name = lambda {|item| c = item['community']; c = c['name'] if c.is_a?(Hash); c.to_s.empty? ? nil : c.to_s }
+  translations = lambda {|item| Array(item['translations']).select {|t| t.is_a?(Hash) } }
 %>
 
 <ul style="list-style: none;">
@@ -26,11 +28,11 @@
               <p style="font-size: 0.8em; margin-top: 0.5em"><img style="height: 3em" src="<%= http_url.call(label['img_url']) %>" /></p>
             <% end %>
             <p style="font-size: 0.8em; margin-top: 0.5em"><%= label['label_text'] %></p>
-            <% if label['community'] %>
-              <p style="font-size: 0.8em; margin-top: 0.5em"><b>Placed By</b>: <%= label['community'] %></p>
+            <% if community_name.call(label) %>
+              <p style="font-size: 0.8em; margin-top: 0.5em"><b>Placed By</b>: <%= community_name.call(label) %></p>
             <% end %>
-            <% if Array(label['translations']).length > 0 %>
-              <% label['translations'].each do |translation| %>
+            <% if translations.call(label).length > 0 %>
+              <% translations.call(label).each do |translation| %>
                 <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_name'] %> (<%= translation['language'] %>)</p>
                 <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_text'] %></p>
               <% end %>
@@ -44,8 +46,8 @@
               <p style="font-size: 0.8em; margin-top: 0.5em"><img style="height: 3em" src="<%= http_url.call(notice['img_url']) %>" /></p>
             <% end %>
             <p style="font-size: 0.8em; margin-top: 0.5em"><%= notice['default_text'] %></p>
-            <% if Array(notice['translations']).length > 0 %>
-              <% notice['translations'].each do |translation| %>
+            <% if translations.call(notice).length > 0 %>
+              <% translations.call(notice).each do |translation| %>
                 <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_name'] %> (<%= translation['language'] %>)</p>
                 <p style="font-size: 0.8em; margin-top: 0.5em"><%= translation['translated_text'] %></p>
               <% end %>

@@ -2,6 +2,29 @@ class LocalContextsEADHelper
 
   DEFAULT_EAD_TAG = 'odd'
 
+  # The Open to Collaborate response nests the notice under 'notice'; accept a
+  # flat notice too.
+  def self.otc_notice(otc)
+    return {} unless otc.is_a?(Hash)
+
+    notice = otc['notice']
+    notice = notice.first if notice.is_a?(Array)
+    notice.is_a?(Hash) ? notice : otc
+  end
+
+  # A label's community is a name in some API versions and an object with a
+  # 'name' in others.
+  def self.community_name(item)
+    community = item['community']
+    community = community['name'] if community.is_a?(Hash)
+    community.to_s.empty? ? nil : community.to_s
+  end
+
+  # Only well formed translations
+  def self.translations(item)
+    Array(item['translations']).select {|translation| translation.is_a?(Hash) }
+  end
+
   # EAD/EAD3 tag for a label or notice type; group is 'notices', 'tk_labels' or 'bc_labels'.
   # Types missing from the map fall back to a generic tag instead of failing the export.
   def self.ead_tag_for(group, type)

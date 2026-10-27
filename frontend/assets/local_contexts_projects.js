@@ -1,4 +1,27 @@
 /* local_context/frontend/assets/local_context.js */
+
+// All Local Contexts data comes from a third party, so it is escaped before it
+// is put in markup, and urls are limited to http(s).
+function lcEscapeHtml(value) {
+  return String(value === null || typeof value === 'undefined' ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function lcSafeUrl(url) {
+  return /^https?:\/\//i.test(url || '') ? url : '';
+}
+
+// A label's community is a name in some API versions and an object with a name in others.
+function lcCommunityName(community) {
+  if (community !== null && typeof community === 'object') {
+    community = community.name;
+  }
+  return (community === null || typeof community === 'undefined') ? '' : String(community);
+}
 class LocalContexts {
   constructor(type = "multi") {
     this.frontendPrefix = LOCALCONTEXTS_FRONTEND_PREFIX;
@@ -193,19 +216,26 @@ class LocalContexts {
 
   renderLocalContextsData(new_json, json, id) {
     const self = this;
-    let lc_data_html = '<div class="lc-project-data-label lc-data-shown">Project Id: <b>' + id + '</b><br /> Local Contexts Hub Project Name: <b>' + json.title + '</b></div>';
+    let lc_data_html = '<div class="lc-project-data-label lc-data-shown">Project Id: <b>' + lcEscapeHtml(id) + '</b><br /> Local Contexts Hub Project Name: <b>' + lcEscapeHtml(json.title) + '</b></div>';
 
     $.each(new_json, function(k,v) {
       $.each(v, function(idx, label) {
         if (typeof(label.default_text) !== 'undefined' && k == 'notice') {
           label['label_text'] = label.default_text;
         }
-        lc_data_html += AS.renderTemplate("template_local_context_data", {label: label, id: id, main_language: this.main_language});
+        // the template escapes text with |h; urls are also limited to http(s)
+        const safe_label = $.extend({}, label, {
+          img_url: lcSafeUrl(label.img_url),
+          audiofile: lcSafeUrl(label.audiofile),
+          community: lcCommunityName(label.community),
+          translations: Array.isArray(label.translations) ? label.translations : []
+        });
+        lc_data_html += AS.renderTemplate("template_local_context_data", {label: safe_label, id: id, main_language: this.main_language});
       })
     });
 
     this.lc_data_el.append(lc_data_html);
-    this.lc_data_el.append('<div><span class="btn btn-sm btn-primary show-lc-json">Hide/Show JSON data for this project</span></div><pre class="lc-json">' + JSON.stringify(json, undefined, 2) + '</pre>');
+    this.lc_data_el.append('<div><span class="btn btn-sm btn-primary show-lc-json">Hide/Show JSON data for this project</span></div><pre class="lc-json">' + lcEscapeHtml(JSON.stringify(json, undefined, 2)) + '</pre>');
 
   }
 
@@ -274,7 +304,9 @@ class ResetLocalContextsCache {
     $.when(this.resetCacheForProject(pid, lc_type))
       .done((data) => {
         if (pid == lc_type) {
-          if (!data.notice || !data.notice.notice_type || data.notice.notice_type != pid) {
+          // the notice is nested under 'notice' in some API versions and flat in others
+          const notice = data.notice || data;
+          if (!notice.notice_type || notice.notice_type != pid) {
             msg = errorMsg
           }
           else {
@@ -289,11 +321,11 @@ class ResetLocalContextsCache {
             msg = successMsg
           }
         }
-        $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
+        $(document.getElementById(pid)).parent('button').siblings('.local-contexts-pid').append(msg)
         btn.removeClass('fetching');
       })
       .fail(() => {
-        $('#'+pid).parent('button').siblings('.local-contexts-pid').append(errorMsg)
+        $(document.getElementById(pid)).parent('button').siblings('.local-contexts-pid').append(errorMsg)
         btn.removeClass('fetching');
       })
       .always(() => {

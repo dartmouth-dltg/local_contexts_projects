@@ -90,16 +90,18 @@ class LocalContextsMARCSerialize
     if label_or_notice['default_text']
         contents << label_or_notice['default_text']
     end
-    if label_or_notice['community']
-        contents << "Placed By: " + label_or_notice['community'] + "."
+    community = LocalContextsEADHelper.community_name(label_or_notice)
+    if community
+        contents << "Placed By: " + community + "."
     end
-    if label_or_notice['translations'] && label_or_notice['translations'].length > 0
-      label_or_notice['translations'].each do |translation|
+    translations = LocalContextsEADHelper.translations(label_or_notice)
+    if translations.length > 0
+      translations.each do |translation|
         contents << translation['translated_name']  + " (" + translation['language'] + ")."
         contents << translation['translated_text']
       end
     end
-    contents << "Label or Notice Image URL: " + label_or_notice['img_url']
+    contents << "Label or Notice Image URL: " + label_or_notice['img_url'].to_s
 
     contents.join(' ')
   end

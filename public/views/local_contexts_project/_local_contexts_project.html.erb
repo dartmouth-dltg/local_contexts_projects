@@ -58,6 +58,6 @@
     </div>
   </div>
   <script>
-    new LocalContexts('<%= raw(project_ids.to_json) %>');
+    new LocalContexts(<%= raw(ERB::Util.json_escape(project_ids.to_json.to_json)) %>);
   </script>
 <% end %>
