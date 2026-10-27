@@ -221,7 +221,7 @@ class LocalContexts {
           community: lcCommunityName(label.community),
           translations: Array.isArray(label.translations) ? label.translations : []
         });
-        lc_data_html += AS.renderTemplate("template_local_context_data", {label: safe_label, id: id, main_language: this.main_language});
+        lc_data_html += AS.renderTemplate("template_local_context_data", {label: safe_label, id: id, main_language: self.mainLanguage});
       })
     });
 

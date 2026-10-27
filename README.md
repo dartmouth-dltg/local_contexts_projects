@@ -98,7 +98,7 @@ in your user account on the Hub.
 
 If you have more than one API key, you can expose a per project API key field by setting
 ```
-  AppConfig[:allow_project_api_keys] = true
+  AppConfig[:local_contexts_allow_project_api_keys] = true
 ```
 
 The Local Contexts API does not limit the number of projects that can be requested in a single multi request
@@ -109,7 +109,7 @@ Default Values
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
 
-    AppConfig[:local_contexts_api] = 'api/v2'
+    AppConfig[:local_contexts_api_path] = 'api/v2'
 
     AppConfig[:local_contexts_replace_xsl] = true
 
@@ -125,7 +125,7 @@ Default Values
 
     AppConfig[:local_contexts_api_wait_time] = 30
 
-    AppConfig[:allow_project_api_keys] = false
+    AppConfig[:local_contexts_allow_project_api_keys] = false
 
     AppConfig[:local_contexts_multi_request_limit] = 10
 
@@ -145,7 +145,8 @@ This new record contains three (or four if per project API keys are allowed) fie
 - Project Name - a user supplied name for easy linking (required)
 - Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
 - Project API Key - an API key associated with this project if it is different from your base API key (optional).
-Only visible if `AppConfig[:allow_project_api_keys] = true`.
+Only visible if `AppConfig[:local_contexts_allow_project_api_keys] = true`. Once saved, the key is shown
+as `********`; leave that in place to keep the key, or replace or clear it.
 
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 

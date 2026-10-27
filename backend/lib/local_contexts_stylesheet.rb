@@ -46,7 +46,7 @@ module LocalContextsStylesheet
     end
 
     # copy next to the target and rename, so the stylesheet is never missing
-    tmp = "#{target}.lc-tmp"
+    tmp = "#{target}.#{Process.pid}.lc-tmp"
     FileUtils.cp(source, tmp)
     File.rename(tmp, target)
     logger.info("Installed the Local Contexts EAD to PDF stylesheet (#{result})")

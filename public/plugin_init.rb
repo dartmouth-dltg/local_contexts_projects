@@ -4,7 +4,6 @@ Rails.application.config.after_initialize do
 
   unless AppConfig.has_key?(:local_contexts_base_url)
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org"
-    AppConfig[:local_contexts_open_to_collab_url] = AppConfig[:local_contexts_base_url] + 'notice'
   end
 
   # only add faceting if configured

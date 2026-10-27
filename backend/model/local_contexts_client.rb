@@ -181,6 +181,9 @@ class LocalContextsClient
 
   def get_data_from_local_contexts_api(ids, type, use_cache = true, api_key = nil)
     validate_request!(ids, type)
+    # there is only one Open to Collaborate notice; the id is not part of its url,
+    # so callers must not be able to choose its cache file name
+    ids = 'open_to_collaborate' if type == 'open_to_collaborate'
     api_key = project_api_key_for(ids) if type == 'project'
 
     if type == 'open_to_collaborate'
