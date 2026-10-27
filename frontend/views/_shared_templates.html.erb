@@ -12,7 +12,7 @@
           <span class="local-contexts-audio">
             <audio controls>
               <source src="${label.audiofile|h}" />
-              Your browser does not support HTML5 audio. Here is a <a href="${label.audiofile|h}">link to the audio</a> instead.
+              <%= I18n.t("local_contexts_project.audio_unsupported") %> <a href="${label.audiofile|h}"><%= I18n.t("local_contexts_project.audio_link") %></a>
             </audio>
           </span>
         {/if}
@@ -47,6 +47,21 @@
   </div>
 --></div>
 
+<div id="template_local_context_project_header"><!--
+  <div class="lc-project-data-label lc-data-shown">
+    <%= I18n.t("local_contexts_project.project_id") %>: <b>${id|h}</b><br />
+    <%= I18n.t("local_contexts_project.hub_project_name") %>: <b>${title|h}</b>
+  </div>
+--></div>
+
+<div id="template_local_context_json"><!--
+  <div><span class="btn btn-sm btn-primary show-lc-json"><%= I18n.t("local_contexts_project.json_toggle") %></span></div><pre class="lc-json">${json|h}</pre>
+--></div>
+
+<div id="template_local_context_data_toggle_text"><!--
+  {if shown}<%= I18n.t("local_contexts_project.hide_data_btn") %>{else}<%= I18n.t("local_contexts_project.show_data_btn") %>{/if}
+--></div>
+
 <div id="template_local_context_error"><!--
   <div class="lc-project-fetch-error">
     <h4><%= I18n.t("local_contexts_project.fetch_error.title") %></h4>
@@ -68,7 +83,7 @@
     {if (open_to_collaborate)}
       <div class="reset-local-contexts-cache-list">
         <div class="reset-local-contexts-cache-list-item">
-          <span class="local-contexts-pid">Open To Collaborate Notice</span>
+          <span class="local-contexts-pid"><%= I18n.t("local_contexts_project.open_to_collaborate_notice") %></span>
           <button class="btn btn-sm btn-primary reset-local-contexts-cache-btn">
             <a id="open_to_collaborate" href="<%= url_for :controller => :local_contexts_projects, :action => :reset_cache %>">
               <%= I18n.t("local_contexts_project._cache_reset.reset_one") %>

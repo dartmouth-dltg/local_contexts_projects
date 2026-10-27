@@ -31,6 +31,14 @@ function lcOtcNotice(data) {
   return (notice && typeof notice === 'object') ? notice : data;
 }
 
+// Markup that contains text comes from the templates the PUI renders next to the
+// script (public/views/local_contexts_project/_templates.html.erb), so the text
+// can be localized with the locale files.
+function lcTemplate(name) {
+  const template = document.getElementById('lc-template-' + name);
+  return template ? template.innerHTML.trim() : '';
+}
+
 // Fills ${name} placeholders. Uses a replacer function so "$&" and the like in the
 // data are not treated as special replacement patterns. Values must already be safe markup.
 function lcFill(template, values) {
@@ -109,16 +117,11 @@ class LocalContextsDefaultTemplates {
   }
 
   defaultPlacedByTemplate() {
-    return  '<span class="local-contexts-placed-by">' +
-            '<span class="local-contexts-placed-by-label">Placed by:</span> ${label_community}' +
-            '</span>';
+    return lcTemplate('placed-by');
   }
 
   defaultAudioTemplate() {
-    return  '<span class="local-contexts-audio">' +
-            '<audio controls><source src="${audioSrc}" />' +
-            'Your browser does not support HTML5 audio. Here is a <a href="${audioSrc}">link to the audio</a> instead.' +
-            '</audio></span>';
+    return lcTemplate('audio');
   }
 }
 
@@ -197,11 +200,11 @@ class LocalContextsInit {
   renderLocalContextsData(new_json, id, project_title) {
     const self = this;
 
-    $(document.getElementById('lc-project-id-' + id)).parent('p').before('<h3 class="lc-project-title">Project Title: ' + lcEscapeHtml(project_title) + '</h3>');
+    $(document.getElementById('lc-project-id-' + id)).parent('p').before(lcFill(lcTemplate('project-title'), {title: lcEscapeHtml(project_title)}));
 
     let lc_data_html = "";
     let lc_img_html = "";
-    let lc_img_wrapper = $('<div id="local-contexts-img-wrapper"><span id="lc-label-images-wrapper"></span><i class="fa fa-question-circle" title="Click an image to find out more about these Local Contexts Labels &amp; Notices."></i></div>');
+    let lc_img_wrapper = $(lcTemplate('image-wrapper'));
 
     if ($('#local-contexts-img-wrapper').length == 0) {
       $('.lds-ellipsis').remove()
@@ -225,7 +228,7 @@ class LocalContextsInit {
 
         if (!self.img_urls.includes(label.img_url)) {
           self.img_urls.push(label.img_url);
-          const label_type = typeof(label.notice_type) !== 'undefined' ? 'Notice' : 'Label';
+          const label_type = lcTemplate(typeof(label.notice_type) !== 'undefined' ? 'label-type-notice' : 'label-type-label');
 
           lc_img_html += self.renderImageDataTemplate(label, label_type);
         }
@@ -241,7 +244,7 @@ class LocalContextsInit {
   renderTranslations(data, labelLanguage) {
 
     const self = this;
-    let translations_html  = '<span class="local-contexts-translation-toggle btn btn-xs btn-outline-secondary">Hide/Show Translations for this Project</span>';
+    let translations_html  = lcTemplate('translation-toggle');
 
     $.each(data.translations, function() {
       let translationLanguageTag = '';
@@ -266,8 +269,7 @@ class LocalContextsInit {
   }
 
   renderLocalContextsError(id) {
-    const error_msg = '<span class="local-contexts-error-msg bg-danger">Unable to Fetch Local Contexts Data for this project.</span>';
-    $(document.getElementById('lc-project-id-' + id)).after(error_msg);
+    $(document.getElementById('lc-project-id-' + id)).after(lcTemplate('error'));
   }
 
   renderFullDataTemplate(data, labelLanguage, translations) {
@@ -302,7 +304,11 @@ class LocalContextsInit {
   }
 
   renderImageDataTemplate(data, label_type) {
-    return '<img src="' + lcEscapeHtml(lcSafeUrl(data.img_url)) + '" alt="' + lcEscapeHtml(data.name) + '" title="Local Contexts ' + label_type + ': ' + lcEscapeHtml(data.name) + '" class="local-contexts-header-image" />';
+    return lcFill(lcTemplate('header-image'), {
+      img_url: lcEscapeHtml(lcSafeUrl(data.img_url)),
+      name: lcEscapeHtml(data.name),
+      label_type: lcEscapeHtml(label_type)
+    });
   }
 
   renderTranslationLanguage(language) {

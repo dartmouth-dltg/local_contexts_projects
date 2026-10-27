@@ -1,0 +1,12 @@
+<%# Templates for local_contexts_projects.js. The text comes from the locale files; ${name} placeholders are filled in by the script. %>
+<div id="lc-templates" hidden>
+  <template id="lc-template-error"><span class="local-contexts-error-msg bg-danger"><%= I18n.t("local_contexts_fetch_error") %></span></template>
+  <template id="lc-template-project-title"><h3 class="lc-project-title"><%= I18n.t("local_contexts_project_title", :title => "${title}") %></h3></template>
+  <template id="lc-template-image-wrapper"><div id="local-contexts-img-wrapper"><span id="lc-label-images-wrapper"></span><i class="fa fa-question-circle" title="<%= I18n.t("local_contexts_image_tooltip") %>"></i></div></template>
+  <template id="lc-template-header-image"><img src="${img_url}" alt="${name}" title="<%= I18n.t("local_contexts_header_image_title", :label_type => "${label_type}", :name => "${name}") %>" class="local-contexts-header-image" /></template>
+  <template id="lc-template-label-type-label"><%= I18n.t("local_contexts_label_type.label") %></template>
+  <template id="lc-template-label-type-notice"><%= I18n.t("local_contexts_label_type.notice") %></template>
+  <template id="lc-template-placed-by"><span class="local-contexts-placed-by"><span class="local-contexts-placed-by-label"><%= I18n.t("local_contexts_placed_by") %></span> ${label_community}</span></template>
+  <template id="lc-template-translation-toggle"><span class="local-contexts-translation-toggle btn btn-xs btn-outline-secondary"><%= I18n.t("local_contexts_translations_toggle") %></span></template>
+  <template id="lc-template-audio"><span class="local-contexts-audio"><audio controls><source src="${audioSrc}" /><%= I18n.t("local_contexts_audio_unsupported") %> <a href="${audioSrc}"><%= I18n.t("local_contexts_audio_link") %></a></audio></span></template>
+</div>

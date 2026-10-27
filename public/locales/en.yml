@@ -18,3 +18,14 @@ en:
       Traditional Knowledge Labels, and Notices with this material.
   local_contexts_section_title: Local Contexts Information
   local_contexts_more_html: For more more information about this notice, please <a href="https://localcontexts.org/notice/open-to-collaborate/">read more at Local Contexts</a>
+  local_contexts_audio_link: Link to the audio
+  local_contexts_audio_unsupported: Your browser does not support HTML5 audio.
+  local_contexts_fetch_error: Unable to Fetch Local Contexts Data for this project.
+  local_contexts_header_image_title: 'Local Contexts %{label_type}: %{name}'
+  local_contexts_image_tooltip: Click an image to find out more about these Local Contexts Labels & Notices.
+  local_contexts_label_type:
+    label: Label
+    notice: Notice
+  local_contexts_placed_by: 'Placed by:'
+  local_contexts_project_title: 'Project Title: %{title}'
+  local_contexts_translations_toggle: Hide/Show Translations for this Project

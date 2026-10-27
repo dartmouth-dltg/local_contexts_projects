@@ -57,6 +57,7 @@
 
     </div>
   </div>
+  <%= render :partial => 'local_contexts_project/templates' %>
   <script>
     new LocalContexts(<%= raw(ERB::Util.json_escape(project_ids.to_json.to_json)) %>);
   </script>

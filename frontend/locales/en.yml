@@ -41,11 +41,17 @@ en:
       success: Cache refreshed
       title: Refresh Cache for Local Contexts Data
 
+    audio_link: Link to the audio
+    audio_unsupported: Your browser does not support HTML5 audio.
     digital_object_note: The following provides information about %{title} (related digital object)
     display_string: Display String
     fetch_btn: See Local Contexts Data
+    hide_data_btn: Hide Local Contexts Data
+    hub_project_name: Local Contexts Hub Project Name
+    json_toggle: Hide/Show JSON data for this project
     messages:
     new_title: New Local Contexts Project
+    open_to_collaborate_notice: Open To Collaborate Notice
     placed_by_txt: Placed By
     project_api_key: API Key for this Project (optional)
     project_api_key_tooltip: |
@@ -72,6 +78,7 @@ en:
     project_not_public_message: The information for the Local Contexts project is not publicly available.
     related_project_tooltip: Select a Local Contexts project.
     section_title: Local Contexts Information
+    show_data_btn: Show Local Contexts Data
     translations_toggle: Hide/Show Translations for this label
     fetch_error:
       ead_message: Unable to fetch the Local Contexts data for this project. Try viewing the project on the Local Contexts Hub.

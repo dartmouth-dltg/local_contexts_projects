@@ -1,16 +1,7 @@
 /* local_context/frontend/assets/local_context.js */
 
-// All Local Contexts data comes from a third party, so it is escaped before it
-// is put in markup, and urls are limited to http(s).
-function lcEscapeHtml(value) {
-  return String(value === null || typeof value === 'undefined' ? '' : value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
+// All Local Contexts data comes from a third party. The templates escape text
+// with |h; urls are limited to http(s) here before they reach the templates.
 function lcSafeUrl(url) {
   return /^https?:\/\//i.test(url || '') ? url : '';
 }
@@ -34,10 +25,10 @@ class LocalContexts {
   controlLocalContextsDataVisibility(btn) {
     if (this.lc_data_el.hasClass('lc-data-shown')) {
       this.lc_data_el.removeClass('lc-data-shown');
-      btn.text('Show Local Contexts Data');
+      btn.text(AS.renderTemplate("template_local_context_data_toggle_text", {shown: false}).trim());
     } else {
       this.lc_data_el.addClass('lc-data-shown');
-      btn.text('Hide Local Contexts Data');
+      btn.text(AS.renderTemplate("template_local_context_data_toggle_text", {shown: true}).trim());
     }
   }
 
@@ -216,7 +207,7 @@ class LocalContexts {
 
   renderLocalContextsData(new_json, json, id) {
     const self = this;
-    let lc_data_html = '<div class="lc-project-data-label lc-data-shown">Project Id: <b>' + lcEscapeHtml(id) + '</b><br /> Local Contexts Hub Project Name: <b>' + lcEscapeHtml(json.title) + '</b></div>';
+    let lc_data_html = AS.renderTemplate("template_local_context_project_header", {id: id, title: json.title || ""});
 
     $.each(new_json, function(k,v) {
       $.each(v, function(idx, label) {
@@ -235,7 +226,7 @@ class LocalContexts {
     });
 
     this.lc_data_el.append(lc_data_html);
-    this.lc_data_el.append('<div><span class="btn btn-sm btn-primary show-lc-json">Hide/Show JSON data for this project</span></div><pre class="lc-json">' + lcEscapeHtml(JSON.stringify(json, undefined, 2)) + '</pre>');
+    this.lc_data_el.append(AS.renderTemplate("template_local_context_json", {json: JSON.stringify(json, undefined, 2)}));
 
   }
 
