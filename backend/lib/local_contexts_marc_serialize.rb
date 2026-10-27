@@ -25,6 +25,8 @@ class LocalContextsMARCSerialize
           project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
           project_ref = I18n.t("local_contexts_project.project_link_text") + " - Project ID and URL: " + project_id + ", " + project_url
           project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project', true)
+          # nothing to export if the project data could not be fetched
+          next unless project_json['title']
           lcp_preamble = project_json['title'] + " (" + project_ref + "). "
           construct_project_text(project_json, lcp_preamble).each do |marc_field|
             extra_fields << marc_field

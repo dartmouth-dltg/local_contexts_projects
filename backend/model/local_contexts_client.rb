@@ -94,11 +94,18 @@ class LocalContextsClient
     end
   end
 
+  # Callers always get a hash back. A hash without the expected keys (e.g. no
+  # 'title') means the data could not be fetched and there is no usable cache.
+  def fetch_error(ids)
+    {"lcp_fetch_error" => "Failed to fetch Local Contexts data for #{ids}"}
+  end
+
   def check_disk_cache(cache_file, ids)
     if File.exist?(cache_file)
-      maybe_parse_cached_json(File.open(cache_file).read)
+      maybe_parse_cached_json(File.read(cache_file))
     else
       @logger.debug("Failed to fetch Local Contexts data for project: #{ids}")
+      fetch_error(ids)
     end
   end
 
@@ -141,9 +148,8 @@ class LocalContextsClient
         check_disk_cache(cache_file, ids)
       end
     else
-      msg = "Failed to fetch updated project information for #{ids}"
-      @logger.error(msg)
-      {"lcp_fetch_error" => msg}
+      @logger.error("Failed to fetch updated project information for #{ids}")
+      fetch_error(ids)
     end
   end
 
@@ -184,6 +190,11 @@ class LocalContextsClient
       lc_api_path_for_type = File.join(@api_paths_map[type], escaped_ids)
       get_json(lc_api_path_for_type, type, ids, use_cache, api_key)
     end
+  rescue ReferenceError => e
+    # unparseable api response or cache file; multi requests are batch refreshes that report errors
+    raise if type == 'multi'
+    @logger.error("Local Contexts data for #{ids} is unusable: #{e.message}")
+    fetch_error(ids)
   end
 
   def reset_cache(project_id, type = "project", api_key = nil)

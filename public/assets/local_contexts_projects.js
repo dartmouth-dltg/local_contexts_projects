@@ -284,8 +284,10 @@ class OpenToCollaborate {
       dataType: 'json'
     })
     .done( function(data) {
-      const otc = self.parse_open_to_collaborate(data, about_lc_text)
-      $('#open-to-collaborate').html(otc);
+      if (data && data.name) {
+        const otc = self.parse_open_to_collaborate(data, about_lc_text)
+        $('#open-to-collaborate').html(otc);
+      }
     })
   }
 
