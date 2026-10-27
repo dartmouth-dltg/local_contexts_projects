@@ -6,6 +6,7 @@
   # Everything below comes from the Local Contexts API, so it is escaped by
   # ERB. Urls are also limited to http(s): the PDF renderer fetches image urls.
   http_url = lambda {|url| url.to_s =~ %r{\Ahttps?://}i ? url.to_s : nil }
+  project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
   community_name = lambda {|item| c = item['community']; c = c['name'] if c.is_a?(Hash); c.to_s.empty? ? nil : c.to_s }
   translations = lambda {|item| Array(item['translations']).select {|t| t.is_a?(Hash) } }
 %>
@@ -18,7 +19,7 @@
     <% if lcp['title'] %>
       <p style="font-size: 0.8em; margin-top: 0.5em"><b><%= lcp['title'] %></b></p>
       <p style="font-size: 0.8em; margin-top: 0.5em">
-        <a href="<%= http_url.call(lcp['project_page']) %>"><%= I18n.t("local_contexts_project_link_text") %> (Project ID: <%= project_id %>)</a>
+        <a href="<%= http_url.call(lcp['project_page']) || project_url %>"><%= I18n.t("local_contexts_project_link_text") %> (Project ID: <%= project_id %>)</a>
       </p>
       <% lcp.each do |k,v| %>
         <% if lc_labels.include?(k) %>
@@ -58,7 +59,7 @@
     <%# render error message if the project could not be fetched #%>
     <% else %>
       <p style="font-size: 0.8em; margin-top: 0.5em"><%= I18n.t("local_contexts_project.fetch_error.ead_message") %></p>
-      <p style="font-size: 0.8em; margin-top: 0.5em"><a href="<%= AppConfig[:local_contexts_base_url] %>projects/project/<%= project_id %>"><%= I18n.t("local_contexts_project_link_text") %> (Project ID: <%= project_id %>)</a></p>
+      <p style="font-size: 0.8em; margin-top: 0.5em"><a href="<%= project_url %>"><%= I18n.t("local_contexts_project_link_text") %> (Project ID: <%= project_id %>)</a></p>
     <% end %>
   </li>
 </ul>

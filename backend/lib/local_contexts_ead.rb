@@ -202,7 +202,7 @@ class LocalContextsEAD < EADSerializer
 
       # render error message if the project could not be fetched
       else
-        constructed_project_url = AppConfig[:local_contexts_base_url] + "projects/project/" + project_id
+        constructed_project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
         if digital_object
           xml.p {
             sanitize_mixed_content(I18n.t("local_contexts_project.fetch_error.ead_message"), xml, fragments)
