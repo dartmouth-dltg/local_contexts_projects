@@ -98,9 +98,14 @@ class LocalContextsProjectsController < ApplicationController
   def clear_cache
     if params[:project_id]
       res = JSONModel::HTTP::post_form("/local_contexts_projects/clear_cache", {:project_id => params[:project_id]})
-      begin ASUtils.json_parse(res.body)['success']
+      cleared = begin
+                  res.code == '200' && ASUtils.json_parse(res.body)['success'] == true
+                rescue JSON::ParserError
+                  false
+                end
+      if cleared
         flash[:success] = I18n.t("local_contexts_project._frontend.messages.cache_clear_success")
-      rescue
+      else
         flash[:error] = I18n.t("local_contexts_project._frontend.messages.cache_clear_error")
       end
     end

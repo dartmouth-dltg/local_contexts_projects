@@ -225,13 +225,15 @@ class LocalContextsClient
     if dir_path.include?('local_contexts_cache')
       filename = cache_file_for(project_id)
       begin
-        File.delete(filename) 
-        {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_success')}
-      rescue
-        {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
+        # nothing to clear if there is no cache file yet
+        File.delete(filename) if File.exist?(filename)
+        {"success" => true, "cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_success')}
+      rescue SystemCallError => e
+        @logger.error("Could not clear Local Contexts cache for #{project_id}: #{e.message}")
+        {"success" => false, "cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
       end
     else
-      {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
+      {"success" => false, "cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_error')}
     end
   end
 
