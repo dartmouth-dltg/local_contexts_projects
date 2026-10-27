@@ -6,8 +6,8 @@ class LocalContextsProjectsController < ApplicationController
   def fetch_lc_project_data
     unless params[:id].nil?
       type = params[:type].nil? ? 'project' : params[:type]
-      use_cache = params[:use_cache].nil? ? true : params[:use_cache]
-      res = archivesspace.get_data_from_local_contexts_api(params[:id], type, use_cache)
+      # always use the cache on the public side; the backend refreshes it when stale
+      res = archivesspace.get_data_from_local_contexts_api(params[:id], type, true)
       render :json => res
     end
   end

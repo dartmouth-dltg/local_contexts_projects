@@ -13,8 +13,23 @@ class ArchivesSpaceService < Sinatra::Base
   .returns([200, "json from the local contexts api"]) \
   do
     raise BadParamsException.new("type" => ["Unsupported type"]) unless LC_CLIENT_TYPES.include?(params[:type])
+
+    # This endpoint is open to every user, including the anonymous public
+    # interface, so it only serves projects that have been added here...
+    if params[:type] == 'project'
+      lcp = LocalContextsProject[:project_id => params[:id]]
+      # ...and, for the public interface, only projects marked as public
+      if lcp.nil? || (lcp.project_is_public != 1 && current_user.username == User.PUBLIC_USERNAME)
+        raise NotFoundException.new("Local Contexts project not found")
+      end
+    end
+
+    # bypassing the cache hits the Local Contexts API on every request, so it is
+    # limited to users who can manage projects (who also have reset_cache)
+    use_cache = params[:use_cache] || !current_user.can?(:update_localcontexts_project_record)
+
     client = LocalContextsClient.new
-    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], params[:use_cache])
+    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], use_cache)
     json_response(api_response)
   end
 
