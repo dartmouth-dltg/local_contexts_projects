@@ -25,6 +25,12 @@ class LocalContextsEADHelper
     Array(item['translations']).select {|translation| translation.is_a?(Hash) }
   end
 
+  # "Translated name (Language)", tolerating either part being missing
+  def self.translation_heading(translation)
+    language = translation['language'].to_s
+    [translation['translated_name'].to_s, language.empty? ? nil : "(#{language})"].compact.join(' ').strip
+  end
+
   # EAD/EAD3 tag for a label or notice type; group is 'notices', 'tk_labels' or 'bc_labels'.
   # Types missing from the map fall back to a generic tag instead of failing the export.
   def self.ead_tag_for(group, type)

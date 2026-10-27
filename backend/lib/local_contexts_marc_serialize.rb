@@ -97,7 +97,7 @@ class LocalContextsMARCSerialize
     translations = LocalContextsEADHelper.translations(label_or_notice)
     if translations.length > 0
       translations.each do |translation|
-        contents << translation['translated_name']  + " (" + translation['language'] + ")."
+        contents << LocalContextsEADHelper.translation_heading(translation) + "."
         contents << translation['translated_text']
       end
     end

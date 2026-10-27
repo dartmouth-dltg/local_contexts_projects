@@ -23,6 +23,7 @@ en:
   local_contexts_fetch_error: Unable to Fetch Local Contexts Data for this project.
   local_contexts_header_image_title: 'Local Contexts %{label_type}: %{name}'
   local_contexts_image_tooltip: Click an image to find out more about these Local Contexts Labels & Notices.
+  local_contexts_otc_translations_toggle: Hide/Show Translations for this Notice
   local_contexts_label_type:
     label: Label
     notice: Notice

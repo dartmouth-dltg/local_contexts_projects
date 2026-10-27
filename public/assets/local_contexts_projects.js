@@ -47,6 +47,23 @@ function lcFill(template, values) {
   });
 }
 
+// Markup for a label's or notice's translations, with the show/hide toggle first.
+function lcTranslationsHtml(translations, parentLanguage, translationTemplate, toggleHtml) {
+  let html = toggleHtml;
+  $.each(translations, function() {
+    // only mark the language when it differs from the enclosing label or notice
+    const languageTag = (this.language_tag && this.language_tag != parentLanguage) ? 'lang="' + lcEscapeHtml(this.language_tag) + '"' : '';
+    const language = this.language ? '<span class="local-contexts-translation-language">(' + lcEscapeHtml(this.language) + ')</span>' : '';
+    html += lcFill(translationTemplate, {
+      translation_language_tag: languageTag,
+      translation_title: lcEscapeHtml(this.translated_name) + '&nbsp;',
+      translation_language: language,
+      translation_translation: lcEscapeHtml(this.translated_text)
+    });
+  });
+  return html;
+}
+
 class LocalContexts {
   constructor(project_ids) {
     this.localCfgDefaults = this.checkLocalConfigDefaults()
@@ -242,30 +259,7 @@ class LocalContextsInit {
   }
 
   renderTranslations(data, labelLanguage) {
-
-    const self = this;
-    let translations_html  = lcTemplate('translation-toggle');
-
-    $.each(data.translations, function() {
-      let translationLanguageTag = '';
-      let language = '';
-      // check enclosing label language and then main language
-      if (this.language_tag != '' && this.language_tag != labelLanguage) {
-        translationLanguageTag = 'lang="' + lcEscapeHtml(this.language_tag) + '"'
-      }
-      
-      if (this.language != '') {
-        language = self.renderTranslationLanguage(this.language);
-      }
-      translations_html += lcFill(self.translationsTemplate, {
-        translation_language_tag: translationLanguageTag,
-        translation_title: lcEscapeHtml(this.translated_name) + '&nbsp;',
-        translation_language: language,
-        translation_translation: lcEscapeHtml(this.translated_text)
-      });
-    });
-
-    return translations_html;
+    return lcTranslationsHtml(data.translations, labelLanguage, this.translationsTemplate, lcTemplate('translation-toggle'));
   }
 
   renderLocalContextsError(id) {
@@ -310,10 +304,6 @@ class LocalContextsInit {
       label_type: lcEscapeHtml(label_type)
     });
   }
-
-  renderTranslationLanguage(language) {
-    return '<span class="local-contexts-translation-language">(' + lcEscapeHtml(language) + ')</span>';
-  }
 }
 
 class OpenToCollaborate {
@@ -337,12 +327,24 @@ class OpenToCollaborate {
     })
   }
 
+  // same translations markup as for project labels and notices, including local template overrides
+  translationsTemplate() {
+    const templates = (typeof LocalContextsLocalTemplates === 'function') ? new LocalContextsLocalTemplates() : new LocalContextsDefaultTemplates();
+    return templates.defaultTranslationsTemplate;
+  }
+
   parse_open_to_collaborate(json, about_lc_text) {
+    let translations = '';
+    if (Array.isArray(json.translations) && json.translations.length > 0) {
+      translations = lcTranslationsHtml(json.translations, json.language_tag, this.translationsTemplate(), lcTemplate('otc-translation-toggle'));
+    }
+
     const otcHtml = '<h3>' + lcEscapeHtml(json.name) + '</h3>' +
                   '<div><p>' +
                   '<img class="local-contexts-image" src="' + lcEscapeHtml(lcSafeUrl(json.img_url)) + '" />' +
                   '<span class="local-contexts-description">' +
-                  lcEscapeHtml(json.default_text) + 
+                  lcEscapeHtml(json.default_text) +
+                  translations +
                   '<br /><br />' +
                   about_lc_text + 
                   '</span>' +

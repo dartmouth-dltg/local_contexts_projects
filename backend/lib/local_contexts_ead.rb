@@ -21,6 +21,14 @@ class LocalContextsEAD < EADSerializer
           xml.p {
             sanitize_mixed_content(otc['default_text'], xml, fragments)
           }
+          LocalContextsEADHelper.translations(otc).each do |translation|
+            xml.p {
+              sanitize_mixed_content(LocalContextsEADHelper.translation_heading(translation), xml, fragments)
+            }
+            xml.p {
+              sanitize_mixed_content(translation['translated_text'].to_s, xml, fragments)
+            }
+          end
         }
       end
     end
@@ -123,7 +131,7 @@ class LocalContextsEAD < EADSerializer
     if translations.length > 0
       translations.each do |translation|
         xml.p {
-          sanitize_mixed_content(translation['translated_name']  + " (" + translation['language'] + ")", xml, fragments)
+          sanitize_mixed_content(LocalContextsEADHelper.translation_heading(translation), xml, fragments)
         }
         xml.p {
           sanitize_mixed_content(translation['translated_text'], xml, fragments)
