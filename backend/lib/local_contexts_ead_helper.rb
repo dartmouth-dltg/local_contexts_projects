@@ -1,5 +1,17 @@
 class LocalContextsEADHelper
 
+  DEFAULT_EAD_TAG = 'odd'
+
+  # EAD/EAD3 tag for a label or notice type; group is 'notices', 'tk_labels' or 'bc_labels'.
+  # Types missing from the map fall back to a generic tag instead of failing the export.
+  def self.ead_tag_for(group, type)
+    tag = AppConfig[:local_contexts_label_ead_tag_map].dig(group, type)
+    return tag if tag
+
+    Log.info("Label or notice type: #{type} not found in AppConfig[:local_contexts_label_ead_tag_map]['#{group}']. Please add a mapping to an EAD/EAD3 tag. Using <#{DEFAULT_EAD_TAG}>.")
+    DEFAULT_EAD_TAG
+  end
+
   def self.include_lcps?(lcps)
     lcps_to_use = []
 

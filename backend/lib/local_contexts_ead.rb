@@ -162,13 +162,7 @@ class LocalContextsEAD < EADSerializer
           # labels
           if lc_labels.include?(k)
             v.each do |label|
-              unless digital_object
-                begin
-                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][k][label['label_type']]
-                rescue
-                  logger.info("Label Type: #{label['label_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
-                end
-              end
+              tag_name = LocalContextsEADHelper.ead_tag_for(k, label['label_type']) unless digital_object
               if digital_object
                 xml.p {
                   sanitize_mixed_content(label['name'] + " (" + label['language'] + ")", xml, fragments)
@@ -186,13 +180,7 @@ class LocalContextsEAD < EADSerializer
           # notices
           elsif k == 'notice'
             v.each do |notice|
-              unless digital_object
-                begin
-                  tag_name = AppConfig[:local_contexts_label_ead_tag_map]['notices'][notice['notice_type']]
-                rescue
-                  logger.info("Label Type: #{notice['notice_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
-                end
-              end
+              tag_name = LocalContextsEADHelper.ead_tag_for('notices', notice['notice_type']) unless digital_object
               if digital_object
                 xml.p {
                   sanitize_mixed_content(notice['name'], xml, fragments)

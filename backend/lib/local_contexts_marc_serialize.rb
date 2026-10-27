@@ -6,6 +6,9 @@ require 'aspace_logger'
 
 class LocalContextsMARCSerialize
 
+  # general note, for types missing from the tag map
+  DEFAULT_MARC_MAP = {'tag_number' => '500', 'subfield' => 'a'}.freeze
+
   DataField = Struct.new(:tag, :ind1, :ind2, :subfields)
   SubField = Struct.new(:code, :text)
   
@@ -67,7 +70,11 @@ class LocalContextsMARCSerialize
   end
 
   def marc_map(label_or_notice, type)
-    marc_map = AppConfig[:local_contexts_label_marc_tag_map][label_or_notice][type]
+    marc_map = AppConfig[:local_contexts_label_marc_tag_map].dig(label_or_notice, type)
+    if marc_map.nil?
+      Log.info("Label or notice type: #{type} not found in AppConfig[:local_contexts_label_marc_tag_map]['#{label_or_notice}']. Please add a mapping to a MARC tag. Using 500 $a.")
+      marc_map = DEFAULT_MARC_MAP
+    end
     tag_number = marc_map['tag_number']
     indicator = marc_map['indicator'].nil? ? ' ' : marc_map['indicator']
     subfield = marc_map['subfield']
