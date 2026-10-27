@@ -234,11 +234,7 @@ class ResetLocalContextsCache {
     $('#tabledSearchResults td.sortable').each(function() {
       const p_id = $(this).text().split(":")[0].trim();
       const p_title = $(this).text().split(":")[1].trim();
-      let p_api_key = '';
-      if (typeof $(this).text().split(":")[2] !== 'undefined') {
-        p_api_key = $(this).text().split(":")[2].trim();
-      }
-      project_ids.push({"id": p_id, "title": p_title, "project_api_key": p_api_key});
+      project_ids.push({"id": p_id, "title": p_title});
     });
 
     const $modal = AS.openCustomModal("quickModal",
@@ -263,20 +259,19 @@ class ResetLocalContextsCache {
       on("click", ".reset-local-contexts-cache-btn", function(event) {
         event.preventDefault();
         const pid = $(this).children('a').attr('id');
-        const project_api_key = $(this).children('a').data('project-api-key');
         const lc_type = pid == 'open_to_collaborate' ? pid : 'project';
-        self.setupResetCacheForProject(pid, lc_type, project_api_key, $(this));
+        self.setupResetCacheForProject(pid, lc_type, $(this));
       });
   }
 
-  setupResetCacheForProject(pid, lc_type, api_key = null, btn) {
+  setupResetCacheForProject(pid, lc_type, btn) {
     const self = this;
 
     let msg = '';
     btn.addClass('fetching');
     const successMsg = AS.renderTemplate("template_local_context_reset_cache_success")
     const errorMsg = AS.renderTemplate("template_local_context_reset_cache_error")
-    $.when(this.resetCacheForProject(pid, lc_type, api_key))
+    $.when(this.resetCacheForProject(pid, lc_type))
       .done((data) => {
         if (pid == lc_type) {
           if (!data.notice || !data.notice.notice_type || data.notice.notice_type != pid) {
@@ -306,15 +301,14 @@ class ResetLocalContextsCache {
       });
   }
 
-  resetCacheForProject(pid, lc_type, project_api_key = null) {
+  resetCacheForProject(pid, lc_type) {
     const self = this;
     return $.ajax({
       url: self.frontendPrefix + "plugins/local_contexts_projects/reset_cache",
       method: 'POST',
       data: {
         project_id: pid,
-        type: lc_type,
-        project_api_key: project_api_key,
+        type: lc_type
       },
       dataType: 'json'
     })

@@ -1,30 +1,33 @@
 require 'aspace_logger'
 class ArchivesSpaceService < Sinatra::Base
 
+  # types the staff and public interfaces may request; the rest are internal
+  LC_CLIENT_TYPES = ['project', 'open_to_collaborate'].freeze
+
   Endpoint.get('/local_contexts_projects/get_local_contexts_api_data')
   .description("Fetch the data associated with a Local Contexts project, user, researcher, or institution id from Local Contexts API")
   .params(["id", String, "The Local Contexts id"],
           ["type", String, "The type of object to fetch"],
-          ["use_cache", BooleanParam, "Flag to indicate whether cached response should be used"],
-          ["project_api_key", String, "Project Specific API Key", :optional => true])
+          ["use_cache", BooleanParam, "Flag to indicate whether cached response should be used"])
   .permissions([])
   .returns([200, "json from the local contexts api"]) \
   do
+    raise BadParamsException.new("type" => ["Unsupported type"]) unless LC_CLIENT_TYPES.include?(params[:type])
     client = LocalContextsClient.new
-    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], params[:use_cache], params[:project_api_key])
+    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], params[:use_cache])
     json_response(api_response)
   end
 
   Endpoint.post('/local_contexts_projects/reset_cache')
   .description("Clear Local Contexts Projects file cache")
   .params(["project_id", String, "Project id"],
-          ["type", String, "Type of LC data - Project or Open to Collaborate Notice"],
-          ["project_api_key", String, "Project Specific API Key", :optional => true])
+          ["type", String, "Type of LC data - Project or Open to Collaborate Notice"])
   .permissions([:update_localcontexts_project_record])
   .returns([200, :updated]) \
   do
+    raise BadParamsException.new("type" => ["Unsupported type"]) unless LC_CLIENT_TYPES.include?(params[:type])
     client = LocalContextsClient.new
-    response = client.reset_cache(params[:project_id], params[:type], params[:project_api_key])
+    response = client.reset_cache(params[:project_id], params[:type])
     json_response(response)
   end
 

@@ -1,5 +1,6 @@
 require 'net/http'
 require 'fileutils'
+require 'erb'
 require 'aspace_logger'
 
 class LocalContextsClient
@@ -84,11 +85,11 @@ class LocalContextsClient
 
     if parsed_response.kind_of?(Array)
       parsed_response.each do |project|
-        cache_file = File.join(AppConfig[:local_contexts_cache_dirname], project['unique_id'] + '.json')
+        cache_file = cache_file_for(project['unique_id'])
         File.open(cache_file,"w"){ |f| f << ASUtils.to_json(project) }
       end
     else
-      cache_file = File.join(AppConfig[:local_contexts_cache_dirname], ids + '.json')
+      cache_file = cache_file_for(ids)
       File.open(cache_file,"w"){ |f| f << response.body }
     end
   end
@@ -119,7 +120,7 @@ class LocalContextsClient
     cache_time = AppConfig[:local_contexts_cache_time]
 
     unless type == 'multi'
-      cache_file = File.join(AppConfig[:local_contexts_cache_dirname], ids + '.json')
+      cache_file = cache_file_for(ids)
     end
 
     if attempts < 3
@@ -146,11 +147,41 @@ class LocalContextsClient
     end
   end
 
+  def validate_request!(ids, type)
+    unless @api_paths_map.has_key?(type)
+      raise BadParamsException.new("type" => ["Unrecognized Local Contexts type: #{type}"])
+    end
+
+    if ids.to_s.strip.empty?
+      raise BadParamsException.new("id" => ["A Local Contexts id is required"])
+    end
+  end
+
+  # We don't control the format of Local Contexts ids, so rather than rejecting
+  # unexpected ones, escape them wherever they become part of a path or url.
+  # Escaping leaves ordinary (uuid) ids unchanged, so existing cache files stay valid.
+  def escape_id(id)
+    ERB::Util.url_encode(id.to_s)
+  end
+
+  def cache_file_for(id)
+    File.join(AppConfig[:local_contexts_cache_dirname], escape_id(id) + '.json')
+  end
+
+  # project api keys never leave the backend: look the key up by project id
+  def project_api_key_for(project_id)
+    LocalContextsProject.where(:project_id => project_id).get(:project_api_key)
+  end
+
   def get_data_from_local_contexts_api(ids, type, use_cache = true, api_key = nil)
+    validate_request!(ids, type)
+    api_key = project_api_key_for(ids) if type == 'project'
+
     if type == 'open_to_collaborate'
       get_json(@api_paths_map[type], type, ids, use_cache, api_key)
     else
-      lc_api_path_for_type = File.join(@api_paths_map[type], ids)
+      escaped_ids = ids.to_s.split(',').map {|id| escape_id(id) }.join(',')
+      lc_api_path_for_type = File.join(@api_paths_map[type], escaped_ids)
       get_json(lc_api_path_for_type, type, ids, use_cache, api_key)
     end
   end
@@ -181,7 +212,7 @@ class LocalContextsClient
     # let's be very careful here
     dir_path = AppConfig[:local_contexts_cache_dirname]
     if dir_path.include?('local_contexts_cache')
-      filename = File.join(dir_path, project_id + '.json')
+      filename = cache_file_for(project_id)
       begin
         File.delete(filename) 
         {"cache_clear_msg" => I18n.t('local_contexts_project._frontend.messages.cache_clear_success')}
@@ -196,7 +227,7 @@ class LocalContextsClient
   def add_to_multi_update(lcp, use_cache)
     return true if use_cache == false
     cache_time = AppConfig[:local_contexts_cache_time]
-    cache_file = File.join(AppConfig[:local_contexts_cache_dirname], lcp[:project_id] + '.json')
+    cache_file = cache_file_for(lcp[:project_id])
     !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time))
   end
 
