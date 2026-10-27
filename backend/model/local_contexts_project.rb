@@ -8,8 +8,10 @@ class LocalContextsProject < Sequel::Model(:local_contexts_project)
 
   include Relationships
 
+  # No json_property: the link is created from the record side, and listing every
+  # linked record in each project's JSON would bloat it (and the records and index
+  # documents it is resolved into). The staff interface lists them via search.
   define_relationship(:name => :local_contexts_project,
-                      :json_property => 'linked_records',
                       :contains_references_to_types => proc {[
                         Accession, ArchivalObject, Resource, DigitalObject, DigitalObjectComponent
                       ]})

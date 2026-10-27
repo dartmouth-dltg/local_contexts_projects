@@ -34,7 +34,7 @@ class LocalContextsProjectsController < ApplicationController
   end
 
   def show
-    @local_contexts_project = JSONModel(:local_contexts_project).find(params[:id], "resolve[]" => ["linked_record"])
+    @local_contexts_project = JSONModel(:local_contexts_project).find(params[:id])
   end
 
   def new
