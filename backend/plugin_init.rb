@@ -58,7 +58,7 @@ unless AppConfig.has_key?(:local_contexts_api_wait_time)
   AppConfig[:local_contexts_api_wait_time] = 30 # 30 seconds recommended by Local Contexts
 end
 
-AppConfig[:local_contexts_label_ead_tag_map] = {
+lc_ead_tag_map_defaults = {
   # Notices
   'notices' => {
     'traditional_knowledge' => 'userestrict',
@@ -106,11 +106,17 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
   }
 }
 
+# Defaults for a type can be overridden in config.rb with the same nested
+# structure; only the types you list are replaced.
+AppConfig[:local_contexts_label_ead_tag_map] = lc_ead_tag_map_defaults.merge(AppConfig.has_key?(:local_contexts_label_ead_tag_map) ? AppConfig[:local_contexts_label_ead_tag_map] : {}) {|_group, defaults, overrides|
+  overrides.is_a?(Hash) ? defaults.merge(overrides) : defaults
+}
+
 # FIXME: Incomplete & needs further review
 # May also require additional logic in MARC serializer if contents 
 # need to be split across multiple subfields
 # or if multiple indicators are necessary
-AppConfig[:local_contexts_label_marc_tag_map] = {
+lc_marc_tag_map_defaults = {
   # Notices
   'notices' => {
     'traditional_knowledge' => {'tag_number' => '540', 'subfield' => 'a'},
@@ -156,6 +162,12 @@ AppConfig[:local_contexts_label_marc_tag_map] = {
     'clan' => {'tag_number' => '561', 'indicator' => '0', 'subfield' => 'a'},
     'outreach' => {'tag_number' => '540', 'subfield' => 'a'}
   }
+}
+
+# Defaults for a type can be overridden in config.rb with the same nested
+# structure; only the types you list are replaced.
+AppConfig[:local_contexts_label_marc_tag_map] = lc_marc_tag_map_defaults.merge(AppConfig.has_key?(:local_contexts_label_marc_tag_map) ? AppConfig[:local_contexts_label_marc_tag_map] : {}) {|_group, defaults, overrides|
+  overrides.is_a?(Hash) ? defaults.merge(overrides) : defaults
 }
 
 Permission.define("manage_localcontexts_records",

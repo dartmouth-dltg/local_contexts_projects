@@ -179,46 +179,84 @@ Local Contexts Labels & Notices to EAD/EAD3 Tag Map
 ```
 AppConfig[:local_contexts_label_ead_tag_map] = {
   # Notices
-  'traditional_knowledge' => 'userestrict',
-  'biocultural' => 'userestrict',
-  'attribution_incomplete' => 'custodhist',
-  'open_to_collaborate' => 'odd',
+  'notices' => {
+    'traditional_knowledge' => 'userestrict',
+    'biocultural' => 'userestrict',
+    'attribution_incomplete' => 'custodhist',
+    'open_to_collaborate' => 'odd',
+  },
 
   # TK Labels
-  'attribution' => 'custodhist',
-  'clan' => 'custodhist',
-  'family' => 'custodhist',
-  'outreach' => 'userestrict',
-  'tk_multiple_community' => 'custodhist',
-  'non_verified' => 'accessrestrict',
-  'verified' => 'accessrestrict',
-  'non_commercial' => 'userestrict',
-  'commercial' => 'userestrict',
-  'culturally_sensitive' => 'accessrestrict',
-  'community_voice' => 'custodhist',
-  'community_use_only' => 'userestrict',
-  'seasonal' => 'accessrestrict',
-  'women_general' => 'accessrestrict',
-  'men_general' => 'accessrestrict',
-  'men_restricted' => 'accessrestrict',
-  'women_restricted' => 'accessrestrict',
-  'secret_sacred' => 'accessrestrict',
-  'open_to_collaboration' => 'userestrict',
-  'creative' => 'custodhist',
+  'tk_labels' => {
+    'attribution' => 'custodhist',
+    'clan' => 'custodhist',
+    'family' => 'custodhist',
+    'outreach' => 'userestrict',
+    'tk_multiple_community' => 'custodhist',
+    'non_verified' => 'accessrestrict',
+    'verified' => 'accessrestrict',
+    'non_commercial' => 'userestrict',
+    'commercial' => 'userestrict',
+    'culturally_sensitive' => 'accessrestrict',
+    'community_voice' => 'custodhist',
+    'community_use_only' => 'userestrict',
+    'seasonal' => 'accessrestrict',
+    'women_general' => 'accessrestrict',
+    'men_general' => 'accessrestrict',
+    'men_restricted' => 'accessrestrict',
+    'women_restricted' => 'accessrestrict',
+    'secret_sacred' => 'accessrestrict',
+    'open_to_collaboration' => 'userestrict',
+    'creative' => 'custodhist',
+  },
 
   # BC Labels
-  'provenance' => 'custodhist',
-  'commercialization' => 'userestrict',
-  'non_commercial' => 'userestrict',
-  'collaboration' => 'userestrict',
-  'consent_verified' => 'accessrestrict',
-  'consent_non_verified' => 'accessrestrict',
-  'multiple_community' => 'custodhist',
-  'research' => 'userestrict',
-  'clan' => 'custodhist',
-  'outreach' => 'userestrict'
+  'bc_labels' => {
+    'provenance' => 'custodhist',
+    'commercialization' => 'userestrict',
+    'non_commercial' => 'userestrict',
+    'collaboration' => 'userestrict',
+    'consent_verified' => 'accessrestrict',
+    'consent_non_verified' => 'accessrestrict',
+    'multiple_community' => 'custodhist',
+    'research' => 'userestrict',
+    'clan' => 'custodhist',
+    'outreach' => 'userestrict'
+  }
 }
 ```
+
+The map is grouped by `notices`, `tk_labels` and `bc_labels`, keyed by the type given by the
+Local Contexts Hub. You can change any of these in `config/config.rb`; use the same grouped structure
+and list only the types you want to change. Your entries are merged over the defaults above, so
+anything you do not list keeps its default. For example
+
+```
+AppConfig[:local_contexts_label_ead_tag_map] = {
+  'tk_labels' => {
+    'outreach' => 'odd'
+  }
+}
+```
+
+If a label or notice type is not in the map (for example a new type added by Local Contexts), the
+plugin logs a message and uses `<odd>`.
+
+### Staff MARC Note
+Local Contexts data in MARC exports is mapped with `AppConfig[:local_contexts_label_marc_tag_map]`. It uses the
+same `notices` / `tk_labels` / `bc_labels` grouping, and each type maps to a MARC tag number, an optional
+first indicator and a subfield, for example
+
+```
+AppConfig[:local_contexts_label_marc_tag_map] = {
+  'tk_labels' => {
+    'verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'}
+  }
+}
+```
+
+It is merged over the plugin defaults in the same way. Types that are not mapped are exported as a
+general note (`500 $a`). The default mapping is a work in progress and should be reviewed before use.
 
 ### <a name="staff-pdf-exports-note"></a>Staff PDF Exports Note
 
