@@ -8,6 +8,7 @@ require_relative 'lib/local_contexts_ead3'
 require_relative 'lib/local_contexts_serializer'
 require_relative 'lib/aspace_patches'
 require_relative 'lib/local_contexts_marc_serialize'
+require_relative 'lib/local_contexts_stylesheet'
 
 unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
@@ -195,18 +196,11 @@ ArchivesSpaceService.loaded_hook do
   end 
   
   unless AppConfig[:local_contexts_replace_xsl] == false
-
-    lc_xsl_orig_filename = "as-ead-pdf-lc-moved-orig.xsl"
-    as_ead_pdf_filename = "as-ead-pdf.xsl"
-
-    if File.file?(File.join(ASUtils.find_base_directory, 'stylesheets', lc_xsl_orig_filename))
-      logger.info("Local Contexts EAD to PDF stylesheet has already been moved to main stylesheet directory")
-    else
-      logger.info("Copying Local Contexts EAD to PDF stylesheet to main stylesheet directory. Old stylesheet has been renamed #{lc_xsl_orig_filename}.")
-      pdf_xsl_file = File.join(ASUtils.find_base_directory, 'stylesheets', as_ead_pdf_filename)
-      lc_pdf_xsl_file = File.join(ASUtils.find_local_directories(nil, 'local_contexts_projects').shift, 'stylesheets', as_ead_pdf_filename)
-      FileUtils.mv(pdf_xsl_file, File.join(ASUtils.find_base_directory, 'stylesheets', lc_xsl_orig_filename))
-      FileUtils.cp(lc_pdf_xsl_file, File.join(ASUtils.find_base_directory, 'stylesheets', as_ead_pdf_filename))
+    begin
+      LocalContextsStylesheet.install(logger)
+    rescue StandardError => e
+      # don't stop ArchivesSpace starting; staff PDF exports just won't show Local Contexts images
+      logger.error("Could not install the Local Contexts EAD to PDF stylesheet: #{e.message}")
     end
   end
   

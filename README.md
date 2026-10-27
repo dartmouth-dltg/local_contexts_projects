@@ -266,12 +266,20 @@ PDF Exports on the staff side rely on (and require) an updated EAD to PDF styles
   AppConfig[:local_contexts_replace_xsl] = false
 ```
 
-the plugin will move the current version of `as-ead-pdf.xsl` aside (renaming it to `as-ead-pdf-lc-moved-orig.xsl`)
-and copy the plugin version into the stylesheet directory
+each time ArchivesSpace starts the plugin makes sure the plugin version of `as-ead-pdf.xsl` is installed in the
+stylesheet directory
 
 ```
   ARCHIVESSPACE_BASE_DIRECTORY/stylesheets
 ```
+
+If the stylesheet there is not the plugin's (the first time, or after an ArchivesSpace upgrade replaced it), the
+plugin first copies it to `as-ead-pdf-lc-moved-orig.xsl`, replacing any earlier backup, and then installs the plugin
+version. If it is an older plugin version, it is simply replaced, so updating the plugin updates the stylesheet
+at the next restart. Nothing is changed when the files already match.
+
+To go back to the original stylesheet, set `AppConfig[:local_contexts_replace_xsl] = false` and copy
+`as-ead-pdf-lc-moved-orig.xsl` over `as-ead-pdf.xsl`.
 
 If you have already customized this stylesheet, set 
 
