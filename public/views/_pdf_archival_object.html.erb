@@ -9,18 +9,15 @@
       <% end %>
       <% if project_ids.length > 0 %>
         <dt><%= I18n.t('local_contexts_section_title') %></dt>
+        <%# no lists here: the core PDF stylesheet draws a bullet before every li (li::before) %>
         <dd>
-          <ul style="list-style: none;">
-            <li>
-              <p style="font-size: 0.8em; margin-top: 0.5em">
-                <% if project_ids.length > 1 %>
-                  <%= I18n.t("local_contexts_project_information._plural") %>
-                <% else %>
-                  <%= I18n.t("local_contexts_project_information._singular") %>
-                <% end %>
-              </p>
-            </li>
-          </ul>
+          <p style="font-size: 0.8em; margin-top: 0.5em">
+            <% if project_ids.length > 1 %>
+              <%= I18n.t("local_contexts_project_information._plural") %>
+            <% else %>
+              <%= I18n.t("local_contexts_project_information._singular") %>
+            <% end %>
+          </p>
         </dd>
         <% project_ids.each do |pid| %>
           <dd>
