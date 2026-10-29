@@ -1,4 +1,4 @@
-<%= stylesheet_link_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects.css" %>
+<%= stylesheet_link_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects.css?v=#{AppConfig[:local_contexts_projects_sui_asset_version]}" %>
 <script>
   var LOCALCONTEXTS_FRONTEND_PREFIX = "<%= AppConfig[:frontend_proxy_prefix] %>";
   var USE_OPEN_TO_COLLABORATE = false;
@@ -6,4 +6,4 @@
     USE_OPEN_TO_COLLABORATE = true;
   <% end %>
 </script>
-<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects.js" %>
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects.js?v=#{AppConfig[:local_contexts_projects_sui_asset_version]}" %>
