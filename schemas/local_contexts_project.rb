@@ -18,25 +18,6 @@
       "project_is_public" => {"type" => "boolean"},
       "project_api_key" => {
         "type" => "string",
-      },
-      "linked_record" => {
-        "type" => "object",
-        "subtype" => "ref",
-        "readonly" => "true",
-        "properties" => {
-          "ref" => {
-            "type" => [{"type" => "JSONModel(:accession) uri"},
-                       {"type" => "JSONModel(:resource) uri"},
-                       {"type" => "JSONModel(:archival_object) uri"},
-                       {"type" => "JSONModel(:digital_object) uri"},
-                       {"type" => "JSONModel(:digital_object_component) uri"}],
-            "ifmissing" => "error"
-          },
-          "_resolved" => {
-            "type" => "object",
-            "readonly" => "true"
-          }
-        }
       }
     }
   }

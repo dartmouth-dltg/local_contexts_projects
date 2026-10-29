@@ -9,24 +9,19 @@
       <% end %>
       <% if project_ids.length > 0 %>
         <h3><%= I18n.t("local_contexts_section_title") %></h3>
-          <ul>
-            <li>
-              <ul style="list-style: none;">
-                <li>
-                  <p style="font-size: 0.8em; margin-top: 0.5em">
-                    <% if project_ids.length > 1 %>
-                      <%= I18n.t("local_contexts_project_information._plural") %>
-                    <% else %>
-                      <%= I18n.t("local_contexts_project_information._singular") %>
-                    <% end %>
-                  </p>
-                </li>
-              </ul>
-            </li>
+          <%# no lists here: the core PDF stylesheet draws a bullet before every li (li::before) %>
+          <div class="local-contexts-section">
+            <p style="font-size: 0.8em; margin-top: 0.5em">
+              <% if project_ids.length > 1 %>
+                <%= I18n.t("local_contexts_project_information._plural") %>
+              <% else %>
+                <%= I18n.t("local_contexts_project_information._singular") %>
+              <% end %>
+            </p>
             <% project_ids.each do |pid| %>
-              <li><%= render(:partial => 'local_contexts_project', :locals => {:project_id => pid}) %></li>
+              <%= render(:partial => 'local_contexts_project', :locals => {:project_id => pid}) %>
             <% end %>
-          </ul>
+          </div>
       <% end %>
     <% end %>
 <% end %>

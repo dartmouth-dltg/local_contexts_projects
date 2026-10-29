@@ -98,7 +98,7 @@ in your user account on the Hub.
 
 If you have more than one API key, you can expose a per project API key field by setting
 ```
-  AppConfig[:allow_project_api_keys] = true
+  AppConfig[:local_contexts_allow_project_api_keys] = true
 ```
 
 The Local Contexts API does not limit the number of projects that can be requested in a single multi request
@@ -109,7 +109,7 @@ Default Values
 ```
     AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
 
-    AppConfig[:local_contexts_api] = 'api/v2'
+    AppConfig[:local_contexts_api_path] = 'api/v2'
 
     AppConfig[:local_contexts_replace_xsl] = true
 
@@ -125,7 +125,7 @@ Default Values
 
     AppConfig[:local_contexts_api_wait_time] = 30
 
-    AppConfig[:allow_project_api_keys] = false
+    AppConfig[:local_contexts_allow_project_api_keys] = false
 
     AppConfig[:local_contexts_multi_request_limit] = 10
 
@@ -145,7 +145,8 @@ This new record contains three (or four if per project API keys are allowed) fie
 - Project Name - a user supplied name for easy linking (required)
 - Hub Project Public or Discoverable? - a boolean which indicates whether the Local Contexts Hub project has a public facing view. Defaults to true and should be checked for public or discoverable projects.
 - Project API Key - an API key associated with this project if it is different from your base API key (optional).
-Only visible if `AppConfig[:allow_project_api_keys] = true`.
+Only visible if `AppConfig[:local_contexts_allow_project_api_keys] = true`. Once saved, the key is shown
+as `********`; leave that in place to keep the key, or replace or clear it.
 
 Once you have created one or more projects, you can then link one or more to a record type of your choice.
 
@@ -179,46 +180,84 @@ Local Contexts Labels & Notices to EAD/EAD3 Tag Map
 ```
 AppConfig[:local_contexts_label_ead_tag_map] = {
   # Notices
-  'traditional_knowledge' => 'userestrict',
-  'biocultural' => 'userestrict',
-  'attribution_incomplete' => 'custodhist',
-  'open_to_collaborate' => 'odd',
+  'notices' => {
+    'traditional_knowledge' => 'userestrict',
+    'biocultural' => 'userestrict',
+    'attribution_incomplete' => 'custodhist',
+    'open_to_collaborate' => 'odd',
+  },
 
   # TK Labels
-  'attribution' => 'custodhist',
-  'clan' => 'custodhist',
-  'family' => 'custodhist',
-  'outreach' => 'userestrict',
-  'tk_multiple_community' => 'custodhist',
-  'non_verified' => 'accessrestrict',
-  'verified' => 'accessrestrict',
-  'non_commercial' => 'userestrict',
-  'commercial' => 'userestrict',
-  'culturally_sensitive' => 'accessrestrict',
-  'community_voice' => 'custodhist',
-  'community_use_only' => 'userestrict',
-  'seasonal' => 'accessrestrict',
-  'women_general' => 'accessrestrict',
-  'men_general' => 'accessrestrict',
-  'men_restricted' => 'accessrestrict',
-  'women_restricted' => 'accessrestrict',
-  'secret_sacred' => 'accessrestrict',
-  'open_to_collaboration' => 'userestrict',
-  'creative' => 'custodhist',
+  'tk_labels' => {
+    'attribution' => 'custodhist',
+    'clan' => 'custodhist',
+    'family' => 'custodhist',
+    'outreach' => 'userestrict',
+    'tk_multiple_community' => 'custodhist',
+    'non_verified' => 'accessrestrict',
+    'verified' => 'accessrestrict',
+    'non_commercial' => 'userestrict',
+    'commercial' => 'userestrict',
+    'culturally_sensitive' => 'accessrestrict',
+    'community_voice' => 'custodhist',
+    'community_use_only' => 'userestrict',
+    'seasonal' => 'accessrestrict',
+    'women_general' => 'accessrestrict',
+    'men_general' => 'accessrestrict',
+    'men_restricted' => 'accessrestrict',
+    'women_restricted' => 'accessrestrict',
+    'secret_sacred' => 'accessrestrict',
+    'open_to_collaboration' => 'userestrict',
+    'creative' => 'custodhist',
+  },
 
   # BC Labels
-  'provenance' => 'custodhist',
-  'commercialization' => 'userestrict',
-  'non_commercial' => 'userestrict',
-  'collaboration' => 'userestrict',
-  'consent_verified' => 'accessrestrict',
-  'consent_non_verified' => 'accessrestrict',
-  'multiple_community' => 'custodhist',
-  'research' => 'userestrict',
-  'clan' => 'custodhist',
-  'outreach' => 'userestrict'
+  'bc_labels' => {
+    'provenance' => 'custodhist',
+    'commercialization' => 'userestrict',
+    'non_commercial' => 'userestrict',
+    'collaboration' => 'userestrict',
+    'consent_verified' => 'accessrestrict',
+    'consent_non_verified' => 'accessrestrict',
+    'multiple_community' => 'custodhist',
+    'research' => 'userestrict',
+    'clan' => 'custodhist',
+    'outreach' => 'userestrict'
+  }
 }
 ```
+
+The map is grouped by `notices`, `tk_labels` and `bc_labels`, keyed by the type given by the
+Local Contexts Hub. You can change any of these in `config/config.rb`; use the same grouped structure
+and list only the types you want to change. Your entries are merged over the defaults above, so
+anything you do not list keeps its default. For example
+
+```
+AppConfig[:local_contexts_label_ead_tag_map] = {
+  'tk_labels' => {
+    'outreach' => 'odd'
+  }
+}
+```
+
+If a label or notice type is not in the map (for example a new type added by Local Contexts), the
+plugin logs a message and uses `<odd>`.
+
+### Staff MARC Note
+Local Contexts data in MARC exports is mapped with `AppConfig[:local_contexts_label_marc_tag_map]`. It uses the
+same `notices` / `tk_labels` / `bc_labels` grouping, and each type maps to a MARC tag number, an optional
+first indicator and a subfield, for example
+
+```
+AppConfig[:local_contexts_label_marc_tag_map] = {
+  'tk_labels' => {
+    'verified' => {'tag_number' => '506', 'indicator' => '1', 'subfield' => 'a'}
+  }
+}
+```
+
+It is merged over the plugin defaults in the same way. Types that are not mapped are exported as a
+general note (`500 $a`). The default mapping is a work in progress and should be reviewed before use.
 
 ### <a name="staff-pdf-exports-note"></a>Staff PDF Exports Note
 
@@ -228,12 +267,20 @@ PDF Exports on the staff side rely on (and require) an updated EAD to PDF styles
   AppConfig[:local_contexts_replace_xsl] = false
 ```
 
-the plugin will move the current version of `as-ead-pdf.xsl` aside (renaming it to `as-ead-pdf-lc-moved-orig.xsl`)
-and copy the plugin version into the stylesheet directory
+each time ArchivesSpace starts the plugin makes sure the plugin version of `as-ead-pdf.xsl` is installed in the
+stylesheet directory
 
 ```
   ARCHIVESSPACE_BASE_DIRECTORY/stylesheets
 ```
+
+If the stylesheet there is not the plugin's (the first time, or after an ArchivesSpace upgrade replaced it), the
+plugin first copies it to `as-ead-pdf-lc-moved-orig.xsl`, replacing any earlier backup, and then installs the plugin
+version. If it is an older plugin version, it is simply replaced, so updating the plugin updates the stylesheet
+at the next restart. Nothing is changed when the files already match.
+
+To go back to the original stylesheet, set `AppConfig[:local_contexts_replace_xsl] = false` and copy
+`as-ead-pdf-lc-moved-orig.xsl` over `as-ead-pdf.xsl`.
 
 If you have already customized this stylesheet, set 
 

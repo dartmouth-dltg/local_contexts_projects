@@ -1,4 +1,18 @@
 /* local_context/frontend/assets/local_context.js */
+
+// All Local Contexts data comes from a third party. The templates escape text
+// with |h; urls are limited to http(s) here before they reach the templates.
+function lcSafeUrl(url) {
+  return /^https?:\/\//i.test(url || '') ? url : '';
+}
+
+// A label's community is a name in some API versions and an object with a name in others.
+function lcCommunityName(community) {
+  if (community !== null && typeof community === 'object') {
+    community = community.name;
+  }
+  return (community === null || typeof community === 'undefined') ? '' : String(community);
+}
 class LocalContexts {
   constructor(type = "multi") {
     this.frontendPrefix = LOCALCONTEXTS_FRONTEND_PREFIX;
@@ -11,10 +25,10 @@ class LocalContexts {
   controlLocalContextsDataVisibility(btn) {
     if (this.lc_data_el.hasClass('lc-data-shown')) {
       this.lc_data_el.removeClass('lc-data-shown');
-      btn.text('Show Local Contexts Data');
+      btn.text(AS.renderTemplate("template_local_context_data_toggle_text", {shown: false}).trim());
     } else {
       this.lc_data_el.addClass('lc-data-shown');
-      btn.text('Hide Local Contexts Data');
+      btn.text(AS.renderTemplate("template_local_context_data_toggle_text", {shown: true}).trim());
     }
   }
 
@@ -193,19 +207,26 @@ class LocalContexts {
 
   renderLocalContextsData(new_json, json, id) {
     const self = this;
-    let lc_data_html = '<div class="lc-project-data-label lc-data-shown">Project Id: <b>' + id + '</b><br /> Local Contexts Hub Project Name: <b>' + json.title + '</b></div>';
+    let lc_data_html = AS.renderTemplate("template_local_context_project_header", {id: id, title: json.title || ""});
 
     $.each(new_json, function(k,v) {
       $.each(v, function(idx, label) {
         if (typeof(label.default_text) !== 'undefined' && k == 'notice') {
           label['label_text'] = label.default_text;
         }
-        lc_data_html += AS.renderTemplate("template_local_context_data", {label: label, id: id, main_language: this.main_language});
+        // the template escapes text with |h; urls are also limited to http(s)
+        const safe_label = $.extend({}, label, {
+          img_url: lcSafeUrl(label.img_url),
+          audiofile: lcSafeUrl(label.audiofile),
+          community: lcCommunityName(label.community),
+          translations: Array.isArray(label.translations) ? label.translations : []
+        });
+        lc_data_html += AS.renderTemplate("template_local_context_data", {label: safe_label, id: id, main_language: self.mainLanguage});
       })
     });
 
     this.lc_data_el.append(lc_data_html);
-    this.lc_data_el.append('<div><span class="btn btn-sm btn-primary show-lc-json">Hide/Show JSON data for this project</span></div><pre class="lc-json">' + JSON.stringify(json, undefined, 2) + '</pre>');
+    this.lc_data_el.append(AS.renderTemplate("template_local_context_json", {json: JSON.stringify(json, undefined, 2)}));
 
   }
 
@@ -234,11 +255,7 @@ class ResetLocalContextsCache {
     $('#tabledSearchResults td.sortable').each(function() {
       const p_id = $(this).text().split(":")[0].trim();
       const p_title = $(this).text().split(":")[1].trim();
-      let p_api_key = '';
-      if (typeof $(this).text().split(":")[2] !== 'undefined') {
-        p_api_key = $(this).text().split(":")[2].trim();
-      }
-      project_ids.push({"id": p_id, "title": p_title, "project_api_key": p_api_key});
+      project_ids.push({"id": p_id, "title": p_title});
     });
 
     const $modal = AS.openCustomModal("quickModal",
@@ -263,23 +280,24 @@ class ResetLocalContextsCache {
       on("click", ".reset-local-contexts-cache-btn", function(event) {
         event.preventDefault();
         const pid = $(this).children('a').attr('id');
-        const project_api_key = $(this).children('a').data('project-api-key');
         const lc_type = pid == 'open_to_collaborate' ? pid : 'project';
-        self.setupResetCacheForProject(pid, lc_type, project_api_key, $(this));
+        self.setupResetCacheForProject(pid, lc_type, $(this));
       });
   }
 
-  setupResetCacheForProject(pid, lc_type, api_key = null, btn) {
+  setupResetCacheForProject(pid, lc_type, btn) {
     const self = this;
 
     let msg = '';
     btn.addClass('fetching');
     const successMsg = AS.renderTemplate("template_local_context_reset_cache_success")
     const errorMsg = AS.renderTemplate("template_local_context_reset_cache_error")
-    $.when(this.resetCacheForProject(pid, lc_type, api_key))
+    $.when(this.resetCacheForProject(pid, lc_type))
       .done((data) => {
         if (pid == lc_type) {
-          if (!data.notice || !data.notice.notice_type || data.notice.notice_type != pid) {
+          // the notice is nested under 'notice' in some API versions and flat in others
+          const notice = data.notice || data;
+          if (!notice.notice_type || notice.notice_type != pid) {
             msg = errorMsg
           }
           else {
@@ -294,11 +312,11 @@ class ResetLocalContextsCache {
             msg = successMsg
           }
         }
-        $('#'+pid).parent('button').siblings('.local-contexts-pid').append(msg)
+        $(document.getElementById(pid)).parent('button').siblings('.local-contexts-pid').append(msg)
         btn.removeClass('fetching');
       })
       .fail(() => {
-        $('#'+pid).parent('button').siblings('.local-contexts-pid').append(errorMsg)
+        $(document.getElementById(pid)).parent('button').siblings('.local-contexts-pid').append(errorMsg)
         btn.removeClass('fetching');
       })
       .always(() => {
@@ -306,15 +324,14 @@ class ResetLocalContextsCache {
       });
   }
 
-  resetCacheForProject(pid, lc_type, project_api_key = null) {
+  resetCacheForProject(pid, lc_type) {
     const self = this;
     return $.ajax({
       url: self.frontendPrefix + "plugins/local_contexts_projects/reset_cache",
       method: 'POST',
       data: {
         project_id: pid,
-        type: lc_type,
-        project_api_key: project_api_key,
+        type: lc_type
       },
       dataType: 'json'
     })

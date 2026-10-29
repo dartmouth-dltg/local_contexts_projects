@@ -45,7 +45,7 @@
         </p>
         <% project_ids.each do |pid| %>
           <p>
-            <a id="lc-project-id-<%= pid %>" href="<%= AppConfig[:local_contexts_base_url] %>projects/<%= pid %>"><%= I18n.t("local_contexts_project_link_text") %> (ID: <%= pid %>)</a>
+            <a id="lc-project-id-<%= pid %>" href="<%= File.join(AppConfig[:local_contexts_base_url], 'projects', pid) %>"><%= I18n.t("local_contexts_project_link_text") %> (ID: <%= pid %>)</a>
             <% if inherited_level %>
               <span class="local-contexts-inherited"><%= I18n.t("local_contexts_project_information.inherited") %> <a href="<%= inherited_parent_uri %>"><%= inherited_level %></a>.</span>
             <% end %>
@@ -57,7 +57,8 @@
 
     </div>
   </div>
+  <%= render :partial => 'local_contexts_project/templates' %>
   <script>
-    new LocalContexts('<%= raw(project_ids.to_json) %>');
+    new LocalContexts(<%= raw(ERB::Util.json_escape(project_ids.to_json.to_json)) %>);
   </script>
 <% end %>

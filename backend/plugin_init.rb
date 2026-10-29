@@ -8,9 +8,18 @@ require_relative 'lib/local_contexts_ead3'
 require_relative 'lib/local_contexts_serializer'
 require_relative 'lib/aspace_patches'
 require_relative 'lib/local_contexts_marc_serialize'
+require_relative 'lib/local_contexts_stylesheet'
 
 unless AppConfig.has_key?(:local_contexts_base_url)
   AppConfig[:local_contexts_base_url] = "https://localcontextshub.org/"
+end
+
+unless AppConfig.has_key?(:local_contexts_projects)
+  AppConfig[:local_contexts_projects] = {
+    'staff_faceting' => false,
+    'public_faceting' => false,
+    'open_to_collaborate' => false
+  }
 end
 
 unless AppConfig.has_key?(:local_contexts_multi_request_limit)
@@ -50,7 +59,7 @@ unless AppConfig.has_key?(:local_contexts_api_wait_time)
   AppConfig[:local_contexts_api_wait_time] = 30 # 30 seconds recommended by Local Contexts
 end
 
-AppConfig[:local_contexts_label_ead_tag_map] = {
+lc_ead_tag_map_defaults = {
   # Notices
   'notices' => {
     'traditional_knowledge' => 'userestrict',
@@ -98,11 +107,17 @@ AppConfig[:local_contexts_label_ead_tag_map] = {
   }
 }
 
+# Defaults for a type can be overridden in config.rb with the same nested
+# structure; only the types you list are replaced.
+AppConfig[:local_contexts_label_ead_tag_map] = lc_ead_tag_map_defaults.merge(AppConfig.has_key?(:local_contexts_label_ead_tag_map) ? AppConfig[:local_contexts_label_ead_tag_map] : {}) {|_group, defaults, overrides|
+  overrides.is_a?(Hash) ? defaults.merge(overrides) : defaults
+}
+
 # FIXME: Incomplete & needs further review
 # May also require additional logic in MARC serializer if contents 
 # need to be split across multiple subfields
 # or if multiple indicators are necessary
-AppConfig[:local_contexts_label_marc_tag_map] = {
+lc_marc_tag_map_defaults = {
   # Notices
   'notices' => {
     'traditional_knowledge' => {'tag_number' => '540', 'subfield' => 'a'},
@@ -150,6 +165,12 @@ AppConfig[:local_contexts_label_marc_tag_map] = {
   }
 }
 
+# Defaults for a type can be overridden in config.rb with the same nested
+# structure; only the types you list are replaced.
+AppConfig[:local_contexts_label_marc_tag_map] = lc_marc_tag_map_defaults.merge(AppConfig.has_key?(:local_contexts_label_marc_tag_map) ? AppConfig[:local_contexts_label_marc_tag_map] : {}) {|_group, defaults, overrides|
+  overrides.is_a?(Hash) ? defaults.merge(overrides) : defaults
+}
+
 Permission.define("manage_localcontexts_records",
                   "The ability to create/update/delete Local Contexts Project records",
                   :level => "repository")
@@ -175,18 +196,11 @@ ArchivesSpaceService.loaded_hook do
   end 
   
   unless AppConfig[:local_contexts_replace_xsl] == false
-
-    lc_xsl_orig_filename = "as-ead-pdf-lc-moved-orig.xsl"
-    as_ead_pdf_filename = "as-ead-pdf.xsl"
-
-    if File.file?(File.join(ASUtils.find_base_directory, 'stylesheets', lc_xsl_orig_filename))
-      logger.info("Local Contexts EAD to PDF stylesheet has already been moved to main stylesheet directory")
-    else
-      logger.info("Copying Local Contexts EAD to PDF stylesheet to main stylesheet directory. Old stylesheet has been renamed #{lc_xsl_orig_filename}.")
-      pdf_xsl_file = File.join(ASUtils.find_base_directory, 'stylesheets', as_ead_pdf_filename)
-      lc_pdf_xsl_file = File.join(ASUtils.find_local_directories(nil, 'local_contexts_projects').shift, 'stylesheets', as_ead_pdf_filename)
-      FileUtils.mv(pdf_xsl_file, File.join(ASUtils.find_base_directory, 'stylesheets', lc_xsl_orig_filename))
-      FileUtils.cp(lc_pdf_xsl_file, File.join(ASUtils.find_base_directory, 'stylesheets', as_ead_pdf_filename))
+    begin
+      LocalContextsStylesheet.install(logger)
+    rescue StandardError => e
+      # don't stop ArchivesSpace starting; staff PDF exports just won't show Local Contexts images
+      logger.error("Could not install the Local Contexts EAD to PDF stylesheet: #{e.message}")
     end
   end
   

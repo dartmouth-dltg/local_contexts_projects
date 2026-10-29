@@ -5,7 +5,7 @@ class LocalContextsEAD < EADSerializer
 
   def serialize_local_contexts_collaborate(data, xml, fragments)
     if AppConfig[:plugins].include?('local_contexts_projects') && AppConfig[:local_contexts_projects]['open_to_collaborate'] == true
-      otc = LocalContextsClient.new.get_data_from_local_contexts_api("open_to_collaborate", 'open_to_collaborate', true)
+      otc = LocalContextsEADHelper.otc_notice(LocalContextsClient.new.get_data_from_local_contexts_api("open_to_collaborate", 'open_to_collaborate', true))
       if otc['name']
         xml.note {
           xml.p {
@@ -21,6 +21,14 @@ class LocalContextsEAD < EADSerializer
           xml.p {
             sanitize_mixed_content(otc['default_text'], xml, fragments)
           }
+          LocalContextsEADHelper.translations(otc).each do |translation|
+            xml.p {
+              sanitize_mixed_content(LocalContextsEADHelper.translation_heading(translation), xml, fragments)
+            }
+            xml.p {
+              sanitize_mixed_content(translation['translated_text'].to_s, xml, fragments)
+            }
+          end
         }
       end
     end
@@ -113,15 +121,17 @@ class LocalContextsEAD < EADSerializer
         sanitize_mixed_content(label_or_notice['default_text'], xml, fragments)
       }
     end
-    if label_or_notice['community']
+    community = LocalContextsEADHelper.community_name(label_or_notice)
+    if community
       xml.p {
-        sanitize_mixed_content("Placed By: " + label_or_notice['community'], xml, fragments)
+        sanitize_mixed_content("Placed By: " + community, xml, fragments)
       }
     end
-    if label_or_notice['translations'] && label_or_notice['translations'].length > 0
-      label_or_notice['translations'].each do |translation|
+    translations = LocalContextsEADHelper.translations(label_or_notice)
+    if translations.length > 0
+      translations.each do |translation|
         xml.p {
-          sanitize_mixed_content(translation['translated_name']  + " (" + translation['language'] + ")", xml, fragments)
+          sanitize_mixed_content(LocalContextsEADHelper.translation_heading(translation), xml, fragments)
         }
         xml.p {
           sanitize_mixed_content(translation['translated_text'], xml, fragments)
@@ -162,13 +172,7 @@ class LocalContextsEAD < EADSerializer
           # labels
           if lc_labels.include?(k)
             v.each do |label|
-              unless digital_object
-                begin
-                  tag_name = AppConfig[:local_contexts_label_ead_tag_map][k][label['label_type']]
-                rescue
-                  logger.info("Label Type: #{label['label_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
-                end
-              end
+              tag_name = LocalContextsEADHelper.ead_tag_for(k, label['label_type']) unless digital_object
               if digital_object
                 xml.p {
                   sanitize_mixed_content(label['name'] + " (" + label['language'] + ")", xml, fragments)
@@ -186,13 +190,7 @@ class LocalContextsEAD < EADSerializer
           # notices
           elsif k == 'notice'
             v.each do |notice|
-              unless digital_object
-                begin
-                  tag_name = AppConfig[:local_contexts_label_ead_tag_map]['notices'][notice['notice_type']]
-                rescue
-                  logger.info("Label Type: #{notice['notice_type']} not found in AppConfig[:local_contexts_label_ead_tag_map]. Please add a mapping to an EAD/EAD 3 tag.")
-                end
-              end
+              tag_name = LocalContextsEADHelper.ead_tag_for('notices', notice['notice_type']) unless digital_object
               if digital_object
                 xml.p {
                   sanitize_mixed_content(notice['name'], xml, fragments)
@@ -212,7 +210,7 @@ class LocalContextsEAD < EADSerializer
 
       # render error message if the project could not be fetched
       else
-        constructed_project_url = AppConfig[:local_contexts_base_url] + "projects/project/" + project_id
+        constructed_project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
         if digital_object
           xml.p {
             sanitize_mixed_content(I18n.t("local_contexts_project.fetch_error.ead_message"), xml, fragments)

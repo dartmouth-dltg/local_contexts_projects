@@ -3,42 +3,102 @@ class IndexerCommon
   @@record_types << :local_contexts_project
   @@global_types << :local_contexts_project
 
-  @local_contexts_resolves = [
+  LOCAL_CONTEXTS_TYPES = ['accession', 'resource', 'archival_object', 'digital_object', 'digital_object_component'].freeze
+  LOCAL_CONTEXTS_CHILD_TYPES = ['archival_object', 'digital_object_component'].freeze
+
+  # The PUI shows resolved projects, inherited projects and projects on linked
+  # digital objects. The PUI indexer only builds documents for record inheritance
+  # types (by default just archival objects); for every other type (resources,
+  # accessions, digital objects, components) the PUI shows the staff indexer's
+  # document. So both indexers need these resolved, in the batch fetch rather than
+  # with a GET per record.
+  LOCAL_CONTEXTS_RESOLVES = [
     'ancestors',
     'ancestors::local_contexts_projects',
     'instances::digital_object::local_contexts_projects',
     'local_contexts_projects'
-  ]
-  @@resolved_attributes += @local_contexts_resolves
-  AppConfig[:record_inheritance_resolves] += @local_contexts_resolves
+  ].freeze
+  LOCAL_CONTEXTS_RESOLVES.each {|attr| add_attribute_to_resolve(attr)}
+
+  # Inherited projects are only needed in the document the PUI shows for a type
+  def self.local_contexts_pui_document?(indexer, type)
+    pui = defined?(PUIIndexer) && indexer.is_a?(PUIIndexer)
+    inheritance_type = defined?(RecordInheritance) && RecordInheritance.has_type?(type)
+    inheritance_type ? pui : !pui
+  end
+
+  # Core builds each staff document's json from the whole record, so with
+  # ancestors resolved every archival object and component would store a full
+  # copy of each ancestor. The hooks read ancestors from the record, so drop the
+  # resolved copies from the json once they have all run. Other plugins that do
+  # the same check the shared flag, so the json is only rewritten once. (The PUI
+  # indexer removes ancestors from its own documents.)
+  def self.strip_resolved_ancestors_from_json(doc, record)
+    return if record['resolved_ancestors_stripped'] || doc['json'].nil?
+    return unless Array(record['record']['ancestors']).any? {|anc| anc.is_a?(Hash) && anc['_resolved'] }
+
+    json = ASUtils.json_parse(doc['json'])
+    Array(json['ancestors']).each {|anc| anc.delete('_resolved') if anc.is_a?(Hash) }
+    doc['json'] = ASUtils.to_json(json)
+    record['resolved_ancestors_stripped'] = true
+  end
+
+  # final_doc_rules (archivesspace #3667) runs after all plugin hooks. Only add it
+  # where core has it: the hook ordering below checks for it to detect older releases
+  LOCAL_CONTEXTS_CORE_FINAL_DOC_RULES = Object.private_method_defined?(:final_doc_rules) || method_defined?(:final_doc_rules)
+
+  if LOCAL_CONTEXTS_CORE_FINAL_DOC_RULES
+    module LocalContextsStripResolvedAncestors
+      def final_doc_rules
+        super
+        unless defined?(PUIIndexer) && is_a?(PUIIndexer)
+          add_document_prepare_hook {|doc, record| IndexerCommon.strip_resolved_ancestors_from_json(doc, record) }
+        end
+      end
+    end
+    prepend LocalContextsStripResolvedAncestors
+  end
 
   add_indexer_initialize_hook do |indexer|
     if AppConfig[:plugins].include?('local_contexts_projects')
-      indexer.add_document_prepare_hook {|doc, record|
-        record_data = record['record']
+      # child types whose PUI document this indexer builds
+      inherited_types = LOCAL_CONTEXTS_CHILD_TYPES.select {|type| local_contexts_pui_document?(indexer, type) }
+
+      hook = proc {|doc, record|
         doc['local_contexts_project_uris_u_sstr'] = []
         doc['local_contexts_project_u_sbool'] = nil
-        if ['accession', 'resource', 'archival_object', 'digital_object', 'digital_object_component'].include?(doc['primary_type']) && record['record']['local_contexts_projects']
-          unless record['record']['local_contexts_projects'].empty?
-            doc['local_contexts_project_u_sbool'] = true
-            record_data['local_contexts_projects'].each do |lcp|
-              doc['local_contexts_project_uris_u_sstr'] << lcp['ref']
-            end
-          end
+        next unless LOCAL_CONTEXTS_TYPES.include?(doc['primary_type'])
+
+        lcps = Array(record['record']['local_contexts_projects'])
+        unless lcps.empty?
+          doc['local_contexts_project_u_sbool'] = true
+          doc['local_contexts_project_uris_u_sstr'].concat(lcps.map {|lcp| lcp['ref']})
         end
 
-        if ['archival_object', 'digital_object_component'].include?(doc['primary_type'])
-          doc['inherited_local_contexts_projects_u_sstr'] = []
-          # only check if the object is not already tagged
-          if doc['local_contexts_project_uris_u_sstr'].empty?
-            if record_data['ancestors'].nil?
-              record_data = check_ancestors_are_resolved(record)
-            end
+        next unless inherited_types.include?(doc['primary_type'])
 
-            get_local_contexts_data(record_data, doc)
-          end
-        end
+        doc['inherited_local_contexts_projects_u_sstr'] = []
+        # only check if the object is not already tagged
+        next unless lcps.empty?
+
+        ancestors = local_contexts_resolved_ancestors(record)
+        ancestor = ancestors.find {|anc| anc['_resolved'] && !Array(anc['_resolved']['local_contexts_projects']).empty?}
+        doc['inherited_local_contexts_projects_u_sstr'] << local_contexts_inherited_data(ancestor['_resolved']) if ancestor
       }
+
+      # PUIIndexer's own prepare hook deletes record['record']['ancestors']. Before
+      # final_doc_rules (archivesspace #3667) it ran ahead of plugin hooks, so go
+      # first there or every AO costs a backend GET
+      if indexer.respond_to?(:final_doc_rules, true)
+        indexer.add_document_prepare_hook(&hook)
+      else
+        indexer.instance_variable_get(:@document_prepare_hooks).unshift(hook)
+      end
+
+      # older releases: strip after this plugin's hooks instead (see above)
+      unless LOCAL_CONTEXTS_CORE_FINAL_DOC_RULES || (defined?(PUIIndexer) && indexer.is_a?(PUIIndexer))
+        indexer.add_document_prepare_hook {|doc, record| IndexerCommon.strip_resolved_ancestors_from_json(doc, record) }
+      end
     end
   end
 
@@ -54,54 +114,31 @@ class IndexerCommon
     }
   end
 
-  # do we really need to be this paranoid?
-  def self.check_ancestors_are_resolved(record)
-    record_data = record['record']
-
-    if record_data['ancestors'].nil?
-      record_data = resolve_ancestors(record)
-    else
-      record_data['ancestors'].each do |anc|
-        if anc['_resolved'].nil?
-          record_data = resolve_ancestors(record)
-          break
-        end
-      end
+  # fall back to fetching the record if ancestors somehow arrived unresolved
+  def self.local_contexts_resolved_ancestors(record)
+    ancestors = record['record']['ancestors']
+    if ancestors.nil? || ancestors.any? {|anc| anc['_resolved'].nil?}
+      record_data = JSONModel::HTTP.get_json(record['uri'], 'resolve[]' => LOCAL_CONTEXTS_RESOLVES)
+      ancestors = record_data && record_data['ancestors']
     end
-
-    return record_data
-
+    Array(ancestors)
   end
 
-  def self.resolve_ancestors(record)
-    JSONModel::HTTP.get_json(record['uri'], 'resolve[]' => @local_contexts_resolves)
-  end
+  def self.local_contexts_inherited_data(anc)
+    level = case anc['jsonmodel_type']
+            when 'digital_object' then 'digital object'
+            when 'digital_object_component' then 'digital object component'
+            else anc['level']
+            end
 
-  def self.get_local_contexts_data(record, doc)
-    inherited_lcps = []
-    inherit_level = nil
-    inherit_uri = nil
-    if record['ancestors'] && record['ancestors'].length > 0
-      record['ancestors'].each do |anc|
-        anc_data = anc['_resolved']
-        next if anc_data['local_contexts_projects'].nil?
-        break if inherited_lcps.length > 0
-        inherit_uri = anc_data['uri']
-        if anc_data['jsonmodel_type'] == 'digital_object'
-          inherit_level = 'digital object'
-        elsif anc_data['jsonmodel_type'] == 'digital_object_component'
-          inherit_level = 'digital object component'
-        else 
-          inherit_level = anc_data['level']
-        end
-        anc_data['local_contexts_projects'].each do |lcp|
-          inherited_lcps << lcp['_resolved']
-        end
-      end
-      if inherited_lcps.length > 0
-        doc['inherited_local_contexts_projects_u_sstr'] << {'local_contexts_projects' => inherited_lcps, 'level' => inherit_level, 'parent_uri' =>inherit_uri}.to_json
-      end
-    end
+    {
+      # every untagged descendant stores a copy, so keep only what the PUI reads
+      'local_contexts_projects' => anc['local_contexts_projects'].map {|lcp| lcp['_resolved'] }.compact.map {|project|
+        project.slice('project_id', 'project_is_public')
+      },
+      'level' => level,
+      'parent_uri' => anc['uri']
+    }.to_json
   end
 
 end

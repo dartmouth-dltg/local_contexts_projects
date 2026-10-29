@@ -1,5 +1,69 @@
 /* local_context/public/assets/local_context.js */
 
+// All Local Contexts data comes from a third party, so it is escaped before it
+// is put in markup, and urls are limited to http(s).
+function lcEscapeHtml(value) {
+  return String(value === null || typeof value === 'undefined' ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function lcSafeUrl(url) {
+  return /^https?:\/\//i.test(url || '') ? url : '';
+}
+
+// A label's community is a name in some API versions and an object with a name in others.
+function lcCommunityName(community) {
+  if (community !== null && typeof community === 'object') {
+    community = community.name;
+  }
+  return (community === null || typeof community === 'undefined') ? '' : String(community);
+}
+
+// The Open to Collaborate response nests the notice under 'notice'; accept a flat notice too.
+function lcOtcNotice(data) {
+  if (!data) { return null; }
+  let notice = data.notice;
+  if (Array.isArray(notice)) { notice = notice[0]; }
+  return (notice && typeof notice === 'object') ? notice : data;
+}
+
+// Markup that contains text comes from the templates the PUI renders next to the
+// script (public/views/local_contexts_project/_templates.html.erb), so the text
+// can be localized with the locale files.
+function lcTemplate(name) {
+  const template = document.getElementById('lc-template-' + name);
+  return template ? template.innerHTML.trim() : '';
+}
+
+// Fills ${name} placeholders. Uses a replacer function so "$&" and the like in the
+// data are not treated as special replacement patterns. Values must already be safe markup.
+function lcFill(template, values) {
+  return template.replace(/\$\{(\w+)\}/g, function(match, key) {
+    return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : match;
+  });
+}
+
+// Markup for a label's or notice's translations, with the show/hide toggle first.
+function lcTranslationsHtml(translations, parentLanguage, translationTemplate, toggleHtml) {
+  let html = toggleHtml;
+  $.each(translations, function() {
+    // only mark the language when it differs from the enclosing label or notice
+    const languageTag = (this.language_tag && this.language_tag != parentLanguage) ? 'lang="' + lcEscapeHtml(this.language_tag) + '"' : '';
+    const language = this.language ? '<span class="local-contexts-translation-language">(' + lcEscapeHtml(this.language) + ')</span>' : '';
+    html += lcFill(translationTemplate, {
+      translation_language_tag: languageTag,
+      translation_title: lcEscapeHtml(this.translated_name) + '&nbsp;',
+      translation_language: language,
+      translation_translation: lcEscapeHtml(this.translated_text)
+    });
+  });
+  return html;
+}
+
 class LocalContexts {
   constructor(project_ids) {
     this.localCfgDefaults = this.checkLocalConfigDefaults()
@@ -70,16 +134,11 @@ class LocalContextsDefaultTemplates {
   }
 
   defaultPlacedByTemplate() {
-    return  '<span class="local-contexts-placed-by">' +
-            '<span class="local-contexts-placed-by-label">Placed by:</span> ${label_community}' +
-            '</span>';
+    return lcTemplate('placed-by');
   }
 
   defaultAudioTemplate() {
-    return  '<span class="local-contexts-audio">' +
-            '<audio controls><source src="${audioSrc}" />' +
-            'Your browser does not support HTML5 audio. Here is a <a href="${audioSrc}">link to the audio</a> instead.' +
-            '</audio></span>';
+    return lcTemplate('audio');
   }
 }
 
@@ -158,11 +217,11 @@ class LocalContextsInit {
   renderLocalContextsData(new_json, id, project_title) {
     const self = this;
 
-    $('a#lc-project-id-' + id).parent('p').before('<h3 class="lc-project-title">Project Title: ' + project_title + '</h3>');
+    $(document.getElementById('lc-project-id-' + id)).parent('p').before(lcFill(lcTemplate('project-title'), {title: lcEscapeHtml(project_title)}));
 
     let lc_data_html = "";
     let lc_img_html = "";
-    let lc_img_wrapper = $('<div id="local-contexts-img-wrapper"><span id="lc-label-images-wrapper"></span><i class="fa fa-question-circle" title="Click an image to find out more about these Local Contexts Labels &amp; Notices."></i></div>');
+    let lc_img_wrapper = $(lcTemplate('image-wrapper'));
 
     if ($('#local-contexts-img-wrapper').length == 0) {
       $('.lds-ellipsis').remove()
@@ -178,7 +237,7 @@ class LocalContextsInit {
           label['label_text'] = label.default_text;
         }
 
-        if (label.translations && label.translations.length > 0) {
+        if (Array.isArray(label.translations) && label.translations.length > 0) {
           translations = self.renderTranslations(label, labelLanguage);
         }
 
@@ -186,48 +245,25 @@ class LocalContextsInit {
 
         if (!self.img_urls.includes(label.img_url)) {
           self.img_urls.push(label.img_url);
-          const label_type = typeof(label.notice_type) !== 'undefined' ? 'Notice' : 'Label';
+          const label_type = lcTemplate(typeof(label.notice_type) !== 'undefined' ? 'label-type-notice' : 'label-type-label');
 
           lc_img_html += self.renderImageDataTemplate(label, label_type);
         }
       })
     });
 
-    $('#' + this.lc_data_el_prefix + id).append(lc_data_html);
+    $(document.getElementById(this.lc_data_el_prefix + id)).append(lc_data_html);
     this.img_html += lc_img_html;
     $('#lc-label-images-wrapper').html('').html(this.img_html);
 
   }
 
   renderTranslations(data, labelLanguage) {
-
-    const self = this;
-    let translations_html  = '<span class="local-contexts-translation-toggle btn btn-xs btn-outline-secondary">Hide/Show Translations for this Project</span>';
-
-    $.each(data.translations, function() {
-      let translationLanguageTag = '';
-      let language = '';
-      // check enclosing label language and then main language
-      if (this.language_tag != '' && this.language_tag != labelLanguage) {
-        translationLanguageTag = 'lang="' + this.language_tag + '"'
-      }
-      
-      if (this.language != '') {
-        language = self.renderTranslationLanguage(this.language);
-      }
-      translations_html += self.translationsTemplate
-                              .replace('${translation_language_tag}', translationLanguageTag)
-                              .replace('${translation_title}', this.translated_name + '&nbsp;')
-                              .replace('${translation_language}', language)
-                              .replace('${translation_translation}', this.translated_text);
-    });
-
-    return translations_html;
+    return lcTranslationsHtml(data.translations, labelLanguage, this.translationsTemplate, lcTemplate('translation-toggle'));
   }
 
   renderLocalContextsError(id) {
-    const error_msg = '<span class="local-contexts-error-msg bg-danger">Unable to Fetch Local Contexts Data for this project.</span>';
-    $('a#lc-project-id-' + id).after(error_msg);
+    $(document.getElementById('lc-project-id-' + id)).after(lcTemplate('error'));
   }
 
   renderFullDataTemplate(data, labelLanguage, translations) {
@@ -236,37 +272,37 @@ class LocalContextsInit {
     let audio = '';
 
     if (labelLanguage != this.mainLanguage && labelLanguage != '') {
-      labelLanguageTag = 'lang="' + data.language_tag + '"';
+      labelLanguageTag = 'lang="' + lcEscapeHtml(data.language_tag) + '"';
     }
 
-    if (typeof(data.community) !== 'undefined') {
-      placedBy = this.placedByTemplate.replace('${label_community}', data.community);
+    const community = lcCommunityName(data.community);
+    if (community !== '') {
+      placedBy = lcFill(this.placedByTemplate, {label_community: lcEscapeHtml(community)});
     }
 
-    if (typeof(data.audiofile) != 'undefined' && data.audiofile != null) {
-      audio = this.audioTemplate.replace(/\${audioSrc}/gi, data.audiofile);
+    if (lcSafeUrl(data.audiofile) != '') {
+      audio = lcFill(this.audioTemplate, {audioSrc: lcEscapeHtml(lcSafeUrl(data.audiofile))});
     }
 
-    const data_html = this.fullDataTemplate
-                        .replace('${label_language_tag}', labelLanguageTag)
-                        .replace('${label_placed_by}', placedBy)
-                        .replace('${label_audio}', audio)
-                        .replace('${label_name}', data.name)
-                        .replace('${label_default_text}',data.label_text)
-                        .replace('${label_img_url}', data.img_url)
-                        .replace('${label_img_alt}', data.name)
-                        .replace('${label_community}', data.community)
-                        .replace('${label_translations}', translations);
-
-    return data_html;
+    return lcFill(this.fullDataTemplate, {
+      label_language_tag: labelLanguageTag,
+      label_placed_by: placedBy,
+      label_audio: audio,
+      label_name: lcEscapeHtml(data.name),
+      label_default_text: lcEscapeHtml(data.label_text),
+      label_img_url: lcEscapeHtml(lcSafeUrl(data.img_url)),
+      label_img_alt: lcEscapeHtml(data.name),
+      label_community: lcEscapeHtml(community),
+      label_translations: translations
+    });
   }
 
   renderImageDataTemplate(data, label_type) {
-    return '<img src="' + data.img_url + '" alt="' + data.name + '" title="Local Contexts ' + label_type + ': ' + data.name + '" class="local-contexts-header-image" />';
-  }
-
-  renderTranslationLanguage(language) {
-    return '<span class="local-contexts-translation-language">(' + language + '</span>';
+    return lcFill(lcTemplate('header-image'), {
+      img_url: lcEscapeHtml(lcSafeUrl(data.img_url)),
+      name: lcEscapeHtml(data.name),
+      label_type: lcEscapeHtml(label_type)
+    });
   }
 }
 
@@ -284,17 +320,31 @@ class OpenToCollaborate {
       dataType: 'json'
     })
     .done( function(data) {
-      const otc = self.parse_open_to_collaborate(data, about_lc_text)
-      $('#open-to-collaborate').html(otc);
+      const notice = lcOtcNotice(data);
+      if (notice && notice.name) {
+        $('#open-to-collaborate').html(self.parse_open_to_collaborate(notice, about_lc_text));
+      }
     })
   }
 
+  // same translations markup as for project labels and notices, including local template overrides
+  translationsTemplate() {
+    const templates = (typeof LocalContextsLocalTemplates === 'function') ? new LocalContextsLocalTemplates() : new LocalContextsDefaultTemplates();
+    return templates.defaultTranslationsTemplate;
+  }
+
   parse_open_to_collaborate(json, about_lc_text) {
-    const otcHtml = '<h3>' + json.name + '</h3>' +
+    let translations = '';
+    if (Array.isArray(json.translations) && json.translations.length > 0) {
+      translations = lcTranslationsHtml(json.translations, json.language_tag, this.translationsTemplate(), lcTemplate('otc-translation-toggle'));
+    }
+
+    const otcHtml = '<h3>' + lcEscapeHtml(json.name) + '</h3>' +
                   '<div><p>' +
-                  '<img class="local-contexts-image" src="' + json.img_url + '" />' +
+                  '<img class="local-contexts-image" src="' + lcEscapeHtml(lcSafeUrl(json.img_url)) + '" />' +
                   '<span class="local-contexts-description">' +
-                  json.default_text + 
+                  lcEscapeHtml(json.default_text) +
+                  translations +
                   '<br /><br />' +
                   about_lc_text + 
                   '</span>' +

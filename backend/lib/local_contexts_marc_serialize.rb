@@ -6,6 +6,9 @@ require 'aspace_logger'
 
 class LocalContextsMARCSerialize
 
+  # general note, for types missing from the tag map
+  DEFAULT_MARC_MAP = {'tag_number' => '500', 'subfield' => 'a'}.freeze
+
   DataField = Struct.new(:tag, :ind1, :ind2, :subfields)
   SubField = Struct.new(:code, :text)
   
@@ -25,6 +28,8 @@ class LocalContextsMARCSerialize
           project_url = File.join(AppConfig[:local_contexts_base_url], 'projects', project_id)
           project_ref = I18n.t("local_contexts_project.project_link_text") + " - Project ID and URL: " + project_id + ", " + project_url
           project_json = LocalContextsClient.new.get_data_from_local_contexts_api(project_id, 'project', true)
+          # nothing to export if the project data could not be fetched
+          next unless project_json['title']
           lcp_preamble = project_json['title'] + " (" + project_ref + "). "
           construct_project_text(project_json, lcp_preamble).each do |marc_field|
             extra_fields << marc_field
@@ -65,7 +70,11 @@ class LocalContextsMARCSerialize
   end
 
   def marc_map(label_or_notice, type)
-    marc_map = AppConfig[:local_contexts_label_marc_tag_map][label_or_notice][type]
+    marc_map = AppConfig[:local_contexts_label_marc_tag_map].dig(label_or_notice, type)
+    if marc_map.nil?
+      Log.info("Label or notice type: #{type} not found in AppConfig[:local_contexts_label_marc_tag_map]['#{label_or_notice}']. Please add a mapping to a MARC tag. Using 500 $a.")
+      marc_map = DEFAULT_MARC_MAP
+    end
     tag_number = marc_map['tag_number']
     indicator = marc_map['indicator'].nil? ? ' ' : marc_map['indicator']
     subfield = marc_map['subfield']
@@ -81,16 +90,18 @@ class LocalContextsMARCSerialize
     if label_or_notice['default_text']
         contents << label_or_notice['default_text']
     end
-    if label_or_notice['community']
-        contents << "Placed By: " + label_or_notice['community'] + "."
+    community = LocalContextsEADHelper.community_name(label_or_notice)
+    if community
+        contents << "Placed By: " + community + "."
     end
-    if label_or_notice['translations'] && label_or_notice['translations'].length > 0
-      label_or_notice['translations'].each do |translation|
-        contents << translation['translated_name']  + " (" + translation['language'] + ")."
+    translations = LocalContextsEADHelper.translations(label_or_notice)
+    if translations.length > 0
+      translations.each do |translation|
+        contents << LocalContextsEADHelper.translation_heading(translation) + "."
         contents << translation['translated_text']
       end
     end
-    contents << "Label or Notice Image URL: " + label_or_notice['img_url']
+    contents << "Label or Notice Image URL: " + label_or_notice['img_url'].to_s
 
     contents.join(' ')
   end

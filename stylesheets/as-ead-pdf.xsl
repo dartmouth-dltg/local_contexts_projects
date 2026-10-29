@@ -1293,18 +1293,6 @@
     </xsl:choose>
   </xsl:template>
   <!-- Local Contexts end -->
-  <xsl:template match="ead:extref">
-    <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
-      <xsl:choose>
-        <xsl:when test="text()">
-          <xsl:value-of select="."/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="@*:href"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </fo:basic-link>
-  </xsl:template>
   <xsl:template match="ead:extrefloc">
     <fo:basic-link external-destination="url('{@*:href}')" xsl:use-attribute-sets="ref">
       <xsl:choose>

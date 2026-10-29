@@ -12,13 +12,11 @@ class LocalContextsProjectsController < ApplicationController
   def fetch_lc_project_data
     project_id = params[:project_id]
     use_cache = params[:use_cache].nil? ? true : params[:use_cache]
-    project_api_key = params[:project_api_key]
     project_json = JSONModel::HTTP::get_json(
       "/local_contexts_projects/get_local_contexts_api_data",
       {:id => project_id,
         :type => 'project',
-        :use_cache =>  use_cache,
-        :project_api_key => project_api_key
+        :use_cache =>  use_cache
       })
 
     if project_json.nil?
@@ -36,7 +34,7 @@ class LocalContextsProjectsController < ApplicationController
   end
 
   def show
-    @local_contexts_project = JSONModel(:local_contexts_project).find(params[:id], "resolve[]" => ["linked_record"])
+    @local_contexts_project = JSONModel(:local_contexts_project).find(params[:id])
   end
 
   def new
@@ -100,9 +98,14 @@ class LocalContextsProjectsController < ApplicationController
   def clear_cache
     if params[:project_id]
       res = JSONModel::HTTP::post_form("/local_contexts_projects/clear_cache", {:project_id => params[:project_id]})
-      begin ASUtils.json_parse(res.body)['success']
+      cleared = begin
+                  res.code == '200' && ASUtils.json_parse(res.body)['success'] == true
+                rescue JSON::ParserError
+                  false
+                end
+      if cleared
         flash[:success] = I18n.t("local_contexts_project._frontend.messages.cache_clear_success")
-      rescue
+      else
         flash[:error] = I18n.t("local_contexts_project._frontend.messages.cache_clear_error")
       end
     end
@@ -115,8 +118,7 @@ class LocalContextsProjectsController < ApplicationController
     unless project_id.empty?
       res = JSONModel::HTTP::post_form("/local_contexts_projects/reset_cache", {
         :project_id => project_id,
-        :type => project_type,
-        :project_api_key => params[:project_api_key],
+        :type => project_type
       })
       if res.code != '200'
         render :json => I18n.t("local_contexts_project._frontend.messages.cache_reset_error").to_json
