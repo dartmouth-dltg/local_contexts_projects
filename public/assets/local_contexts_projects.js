@@ -298,11 +298,12 @@ class LocalContextsInit {
   }
 
   renderImageDataTemplate(data, label_type) {
+    // the template holds data-src so a copy of the template markup that is not inert never requests "${img_url}"
     return lcFill(lcTemplate('header-image'), {
       img_url: lcEscapeHtml(lcSafeUrl(data.img_url)),
       name: lcEscapeHtml(data.name),
       label_type: lcEscapeHtml(label_type)
-    });
+    }).replace(' data-src=', ' src=');
   }
 }
 
