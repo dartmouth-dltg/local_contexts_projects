@@ -312,6 +312,12 @@ or for all projects. Cache refresh for all projects is controlled by a new backg
 A cache check also runs every week (Sunday, 1am) and will refresh any cache that is older than the cache times specified. In practice, this means that the use of the on-demand cache refresh will only be necessary for cases where you know that a project has been updated and you 
 need to ensure that the data displayed in ArchivesSpace is up to date.
 
+### Asset Cache Busting
+
+The css and javascript files for both the pui and staff interfaces are loaded with a query string
+derived from an MD5 hash of their contents (computed on startup), so browsers only fetch new copies
+when the files change.
+
 ## Background Job
 
 The plugin adds a new background job `Local Contexts Projects Refresh Cache` which will refresh the cached data for all

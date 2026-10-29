@@ -1,5 +1,5 @@
 <%= javascript_include_tag("embedded_search") %>
-<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects_show.js" %>
+<%= javascript_include_tag "#{AppConfig[:frontend_proxy_prefix]}assets/local_contexts_projects_show.js?v=#{AppConfig[:local_contexts_projects_sui_asset_version]}" %>
 <% allow_project_api_keys = AppConfig[:local_contexts_allow_project_api_keys] ? "" : "disallow-project-api-keys" %>
 <%= setup_context :object => @local_contexts_project, :title => @local_contexts_project.project_name %>
 
