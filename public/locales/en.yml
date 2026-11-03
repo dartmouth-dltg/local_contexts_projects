@@ -21,6 +21,10 @@ en:
   local_contexts_audio_link: Link to the audio
   local_contexts_audio_unsupported: Your browser does not support HTML5 audio.
   local_contexts_fetch_error: Unable to Fetch Local Contexts Data for this project.
+  # the PDF partial uses the same key as the EAD export (frontend/locales/en.yml); the PUI doesn't load plugin frontend locales
+  local_contexts_project:
+    fetch_error:
+      ead_message: Unable to fetch the Local Contexts data for this project. Try viewing the project on the Local Contexts Hub.
   local_contexts_header_image_title: 'Local Contexts %{label_type}: %{name}'
   local_contexts_image_tooltip: Click an image to find out more about these Local Contexts Labels & Notices.
   local_contexts_otc_translations_toggle: Hide/Show Translations for this Notice

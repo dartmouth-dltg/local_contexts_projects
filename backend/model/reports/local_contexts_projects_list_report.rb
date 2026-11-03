@@ -1,6 +1,8 @@
 class LocalContextsProjectsListReport < AbstractReport
 
-  register_report
+  register_report(
+    params: [['include_suppressed', 'IncludeSuppressed', 'Include suppressed records']]
+  )
 
   def fix_row(row)
     row[:record_uri] = File.join(AppConfig[:frontend_proxy_url],
@@ -35,7 +37,7 @@ class LocalContextsProjectsListReport < AbstractReport
     LEFT JOIN
       local_contexts_project on local_contexts_project.id = lcpr.local_contexts_project_id
     WHERE
-      lcpr.resource_id IS NOT NULL
+      lcpr.resource_id IS NOT NULL#{suppressed_filter('resource')}
     ORDER BY
       title
   )
@@ -56,7 +58,7 @@ class LocalContextsProjectsListReport < AbstractReport
     LEFT JOIN
       local_contexts_project on local_contexts_project.id = lcpr.local_contexts_project_id
     WHERE
-      lcpr.accession_id IS NOT NULL
+      lcpr.accession_id IS NOT NULL#{suppressed_filter('accession')}
     ORDER BY
       title
   )
@@ -77,7 +79,7 @@ class LocalContextsProjectsListReport < AbstractReport
     LEFT JOIN
       local_contexts_project on local_contexts_project.id = lcpr.local_contexts_project_id
     WHERE
-      lcpr.archival_object_id IS NOT NULL
+      lcpr.archival_object_id IS NOT NULL#{suppressed_filter('archival_object')}
     ORDER BY
       title
   )
@@ -98,7 +100,7 @@ class LocalContextsProjectsListReport < AbstractReport
     LEFT JOIN
       local_contexts_project on local_contexts_project.id = lcpr.local_contexts_project_id
     WHERE
-      lcpr.digital_object_id IS NOT NULL
+      lcpr.digital_object_id IS NOT NULL#{suppressed_filter('digital_object')}
     ORDER BY
       title
   )
@@ -119,7 +121,7 @@ class LocalContextsProjectsListReport < AbstractReport
     LEFT JOIN
       local_contexts_project on local_contexts_project.id = lcpr.local_contexts_project_id
     WHERE
-      lcpr.digital_object_component_id IS NOT NULL
+      lcpr.digital_object_component_id IS NOT NULL#{suppressed_filter('digital_object_component')}
     ORDER BY
       title
   )

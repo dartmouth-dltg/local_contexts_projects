@@ -126,7 +126,7 @@ class LocalContextsDefaultTemplates {
   }
 
   defaultTranslationsTemplate() {
-    return  '<span class="local-contexts-translation-wrapper well" ${translation_language_tag}>' +
+    return  '<span class="local-contexts-translation-wrapper p-2 border rounded" ${translation_language_tag}>' +
             '<span class="local-contexts-translation-title">${translation_title}</span>' +
             '${translation_language}' +
             '<span class="local-contexts-translation-translation">${translation_translation}</span>'  +
