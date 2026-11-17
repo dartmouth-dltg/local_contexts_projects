@@ -37,14 +37,13 @@ class ArchivesSpaceService < Sinatra::Base
 
     client = LocalContextsClient.new
 
-    # Public requests are served from the disk cache only (stale or not). A
-    # missing or stale cache used to trigger a live Local Contexts API call per
-    # anonymous page view, retried with 60s timeouts and with no memory of
-    # failures, so an outage tied up PUI and backend threads. The cache is
-    # refreshed on backend startup, by the scheduled refresh, on project
-    # creation, and by staff views / manual refresh.
+    # Public requests used to make a live Local Contexts API call per anonymous
+    # page view whenever the cache was missing or stale, with 60s timeouts and
+    # no memory of failures, so an API outage tied up PUI and backend threads.
+    # They now make a limited number of short attempts (one request per project
+    # at a time, with a cooldown after failures) and otherwise use the cache.
     if lc_public_request?
-      api_response = client.get_cached_data(params[:id], params[:type])
+      api_response = client.get_public_data(params[:id], params[:type])
     else
       # bypassing the cache hits the Local Contexts API on every request, so it is
       # limited to users who can manage projects (who also have reset_cache)

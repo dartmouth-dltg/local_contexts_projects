@@ -129,6 +129,12 @@ Default Values
 
     AppConfig[:local_contexts_multi_request_limit] = 10
 
+    AppConfig[:local_contexts_public_api_attempts] = 2
+
+    AppConfig[:local_contexts_public_api_timeout] = 5
+
+    AppConfig[:local_contexts_public_api_failure_cooldown] = 900
+
 ```
 
 ## Using the Plugin
@@ -299,7 +305,14 @@ See the `samples` directory in the plugin for sample exports and screenshots.
 The plugin implements a simple caching mechanism to decrease render times in the staff interface and PUI
 and prevent overloading the Local Contexts API. Cache invalidation is controlled
 by the time limits specified by `AppConfig[:local_contexts_cache_time]` and `AppConfig[:local_contexts_open_to_collaborate_cache_time]`
-If a staff user views an object linked to a Local Contexts Project whose cache is out of date, the Local Contexts API is called and the cache for that project is refreshed. The public interface always uses the cached version, even if it is out of date, and never calls the Local Contexts API itself; its cache is kept current by the refresh on backend startup, the scheduled refresh (`AppConfig[:local_contexts_refresh_cache_cron]`), project creation, and staff views or manual refreshes.
+If a staff user views an object linked to a Local Contexts Project whose cache is out of date, the Local Contexts API is called and the cache for that project is refreshed. When the public interface finds an out-of-date or missing cache, it tries the Local Contexts API up to
+`AppConfig[:local_contexts_public_api_attempts]` times (default `2`; `0` means never), with a timeout of
+`AppConfig[:local_contexts_public_api_timeout]` seconds (default `5`) per attempt, and then falls back to the cached
+version, even if it is out of date. Only one public request per project calls the API at a time (others get the
+cache), and after a failed refresh public requests for that project use the cache without calling the API for
+`AppConfig[:local_contexts_public_api_failure_cooldown]` seconds (default `900`). The cache is also kept current
+by the refresh on backend startup, the scheduled refresh (`AppConfig[:local_contexts_refresh_cache_cron]`),
+project creation, and staff views or manual refreshes.
 
 Cache files are located in a new directory in the ArchivesSpace data directory named `local_contexts_cache`. This
 directory is created by the plugin during ArchivesSpace startup if it is not present.

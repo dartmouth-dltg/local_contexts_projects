@@ -59,6 +59,22 @@ unless AppConfig.has_key?(:local_contexts_api_wait_time)
   AppConfig[:local_contexts_api_wait_time] = 30 # 30 seconds recommended by Local Contexts
 end
 
+# Public interface requests for a project whose cache is missing or stale try
+# the Local Contexts API this many times (0 = cache only) with a short timeout,
+# then fall back to the cache. After a failed refresh, public requests for that
+# project use the cache without calling the API for the cooldown period.
+unless AppConfig.has_key?(:local_contexts_public_api_attempts)
+  AppConfig[:local_contexts_public_api_attempts] = 2
+end
+
+unless AppConfig.has_key?(:local_contexts_public_api_timeout)
+  AppConfig[:local_contexts_public_api_timeout] = 5 # seconds, per attempt
+end
+
+unless AppConfig.has_key?(:local_contexts_public_api_failure_cooldown)
+  AppConfig[:local_contexts_public_api_failure_cooldown] = 900 # 15 minutes
+end
+
 lc_ead_tag_map_defaults = {
   # Notices
   'notices' => {

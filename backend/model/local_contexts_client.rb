@@ -58,13 +58,13 @@ class LocalContextsClient
     check_json(response, 'cache')
   end
 
-  def do_http_request(suffix, type, api_key = nil, headers = {})
+  def do_http_request(suffix, type, api_key = nil, headers = {}, timeout: 60)
     if AppConfig[:local_contexts_api_path] == 'api/v2'
       headers['X-Api-Key'] = (api_key.nil? || api_key.empty?) ? AppConfig[:local_contexts_api_key] : api_key
     end
 
     get_url = url(suffix, type)
-    http_request(get_url) do |http|
+    http_request(get_url, timeout) do |http|
       req = Net::HTTP::Get.new(get_url.request_uri)
 
       headers.each {|k,v| req[k] = v }
@@ -124,7 +124,6 @@ class LocalContextsClient
 
   def get_json(suffix, type, ids, use_cache, api_key = nil, ignore_cache_time = false, attempts = 0)
     attempts += 1
-    cache_time = AppConfig[:local_contexts_cache_time]
 
     unless type == 'multi'
       cache_file = cache_file_for(ids)
@@ -132,10 +131,7 @@ class LocalContextsClient
 
     if attempts < 3
       if use_cache
-        if type == "open_to_collaborate"
-          cache_time = AppConfig[:local_contexts_open_to_collaborate_cache_time]
-        end
-        if !ignore_cache_time && (!File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time)))
+        if !ignore_cache_time && cache_stale?(cache_file, type)
           attempt_request(suffix, type, ids, use_cache, true, api_key, attempts)
         else
           check_disk_cache(cache_file, ids)
@@ -174,6 +170,16 @@ class LocalContextsClient
     File.join(AppConfig[:local_contexts_cache_dirname], escape_id(id) + '.json')
   end
 
+  def cache_stale?(cache_file, type)
+    cache_time = type == 'open_to_collaborate' ? AppConfig[:local_contexts_open_to_collaborate_cache_time] : AppConfig[:local_contexts_cache_time]
+    !File.exist?(cache_file) || (File.mtime(cache_file) < (Time.now - cache_time))
+  end
+
+  def api_path_for(ids, type)
+    return @api_paths_map[type] if type == 'open_to_collaborate'
+    File.join(@api_paths_map[type], ids.to_s.split(',').map {|id| escape_id(id) }.join(','))
+  end
+
   # project api keys never leave the backend: look the key up by project id
   def project_api_key_for(project_id)
     LocalContextsProject.where(:project_id => project_id).get(:project_api_key)
@@ -186,13 +192,7 @@ class LocalContextsClient
     ids = 'open_to_collaborate' if type == 'open_to_collaborate'
     api_key = project_api_key_for(ids) if type == 'project'
 
-    if type == 'open_to_collaborate'
-      get_json(@api_paths_map[type], type, ids, use_cache, api_key)
-    else
-      escaped_ids = ids.to_s.split(',').map {|id| escape_id(id) }.join(',')
-      lc_api_path_for_type = File.join(@api_paths_map[type], escaped_ids)
-      get_json(lc_api_path_for_type, type, ids, use_cache, api_key)
-    end
+    get_json(api_path_for(ids, type), type, ids, use_cache, api_key)
   rescue ReferenceError => e
     # unparseable api response or cache file; multi requests are batch refreshes that report errors
     raise if type == 'multi'
@@ -200,15 +200,88 @@ class LocalContextsClient
     fetch_error(ids)
   end
 
-  # Cached data only, never calling the Local Contexts API (stale cache is
-  # returned as is). Used for public requests.
-  def get_cached_data(ids, type)
+  # Per-process bookkeeping for public refreshes: ids being refreshed right now,
+  # and when each id last failed to refresh.
+  @public_refresh_lock = Mutex.new
+  @public_refresh_in_flight = {}
+  @public_refresh_failed_at = {}
+
+  class << self
+    # True if this thread may call the API for ids: no other public request is
+    # refreshing it and it has not failed within the cooldown period.
+    def claim_public_refresh(ids)
+      @public_refresh_lock.synchronize do
+        failed_at = @public_refresh_failed_at[ids]
+        next false if failed_at && failed_at > Time.now - AppConfig[:local_contexts_public_api_failure_cooldown]
+        next false if @public_refresh_in_flight[ids]
+        @public_refresh_in_flight[ids] = true
+      end
+    end
+
+    def release_public_refresh(ids, succeeded)
+      @public_refresh_lock.synchronize do
+        @public_refresh_in_flight.delete(ids)
+        succeeded ? @public_refresh_failed_at.delete(ids) : (@public_refresh_failed_at[ids] = Time.now)
+      end
+    end
+  end
+
+  # Used for public (PUI) requests. A fresh cache is returned as is. A missing
+  # or stale cache is refreshed from the Local Contexts API with up to
+  # AppConfig[:local_contexts_public_api_attempts] short-timeout attempts, then
+  # falls back to the cache (stale or not). Only one public request per id calls
+  # the API at a time, and after a failure public requests for that id use the
+  # cache until the cooldown passes, so an API outage cannot tie up PUI and
+  # backend threads.
+  def get_public_data(ids, type)
     validate_request!(ids, type)
     ids = 'open_to_collaborate' if type == 'open_to_collaborate'
-    check_disk_cache(cache_file_for(ids), ids)
+    cache_file = cache_file_for(ids)
+
+    if AppConfig[:local_contexts_public_api_attempts].to_i > 0 &&
+       cache_stale?(cache_file, type) &&
+       self.class.claim_public_refresh(ids)
+      fresh = nil
+      begin
+        fresh = fetch_for_public(ids, type, cache_file)
+      ensure
+        self.class.release_public_refresh(ids, !fresh.nil?)
+      end
+      return fresh if fresh
+    end
+
+    check_disk_cache(cache_file, ids)
   rescue ReferenceError => e
     @logger.error("Cached Local Contexts data for #{ids} is unusable: #{e.message}")
     fetch_error(ids)
+  end
+
+  def fetch_for_public(ids, type, cache_file)
+    api_key = type == 'project' ? project_api_key_for(ids) : nil
+    timeout = AppConfig[:local_contexts_public_api_timeout]
+
+    AppConfig[:local_contexts_public_api_attempts].to_i.times do |i|
+      begin
+        res = do_http_request(api_path_for(ids, type), type, api_key, timeout: timeout)
+      rescue ReferenceError => e
+        # the API answered with an error (e.g. bad key, unknown project); retrying won't help
+        @logger.error("Local Contexts API refused public refresh for #{ids}: #{e.message}")
+        return nil
+      end
+
+      if res.respond_to?(:body)
+        data = maybe_parse_json(res)
+        write_lcp_cache(ids, res)
+        return data
+      end
+
+      @logger.warn("Public refresh of Local Contexts data for #{ids} failed (attempt #{i + 1})")
+    end
+
+    nil
+  rescue ReferenceError => e
+    @logger.error("Local Contexts API returned unusable data for #{ids}: #{e.message}")
+    nil
   end
 
   def reset_cache(project_id, type = "project", api_key = nil)
@@ -298,13 +371,13 @@ class LocalContextsClient
     end
   end
 
-  def http_request(url)
+  def http_request(url, timeout = 60)
     begin
       Net::HTTP.start(url.host, url.port,
                       :use_ssl => url.scheme == 'https',
-                      :read_timeout => 60,
-                      :open_timeout => 60,
-                      :ssl_timeout => 60) do |http|
+                      :read_timeout => timeout,
+                      :open_timeout => timeout,
+                      :ssl_timeout => timeout) do |http|
         yield(http)
       end
     rescue => e
