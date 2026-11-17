@@ -200,6 +200,17 @@ class LocalContextsClient
     fetch_error(ids)
   end
 
+  # Cached data only, never calling the Local Contexts API (stale cache is
+  # returned as is). Used for public requests.
+  def get_cached_data(ids, type)
+    validate_request!(ids, type)
+    ids = 'open_to_collaborate' if type == 'open_to_collaborate'
+    check_disk_cache(cache_file_for(ids), ids)
+  rescue ReferenceError => e
+    @logger.error("Cached Local Contexts data for #{ids} is unusable: #{e.message}")
+    fetch_error(ids)
+  end
+
   def reset_cache(project_id, type = "project", api_key = nil)
     get_data_from_local_contexts_api(project_id, type, false, api_key)
   end

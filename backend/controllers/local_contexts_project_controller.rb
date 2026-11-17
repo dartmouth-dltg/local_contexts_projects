@@ -4,6 +4,17 @@ class ArchivesSpaceService < Sinatra::Base
   # types the staff and public interfaces may request; the rest are internal
   LC_CLIENT_TYPES = ['project', 'open_to_collaborate'].freeze
 
+  # The PUI's public user, or a request with no session at all
+  def lc_public_request?
+    current_user.anonymous? || current_user.username == User.PUBLIC_USERNAME
+  end
+
+  # The project records include non-public projects, so they are for staff
+  # (and the indexer) only; the PUI only uses get_local_contexts_api_data.
+  def lc_deny_public_request!
+    raise AccessDeniedException.new("Access denied") if lc_public_request?
+  end
+
   Endpoint.get('/local_contexts_projects/get_local_contexts_api_data')
   .description("Fetch the data associated with a Local Contexts project, user, researcher, or institution id from Local Contexts API")
   .params(["id", String, "The Local Contexts id"],
@@ -19,17 +30,29 @@ class ArchivesSpaceService < Sinatra::Base
     if params[:type] == 'project'
       lcp = LocalContextsProject[:project_id => params[:id]]
       # ...and, for the public interface, only projects marked as public
-      if lcp.nil? || (lcp.project_is_public != 1 && current_user.username == User.PUBLIC_USERNAME)
+      if lcp.nil? || (lcp.project_is_public != 1 && lc_public_request?)
         raise NotFoundException.new("Local Contexts project not found")
       end
     end
 
-    # bypassing the cache hits the Local Contexts API on every request, so it is
-    # limited to users who can manage projects (who also have reset_cache)
-    use_cache = params[:use_cache] || !current_user.can?(:update_localcontexts_project_record)
-
     client = LocalContextsClient.new
-    api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], use_cache)
+
+    # Public requests are served from the disk cache only (stale or not). A
+    # missing or stale cache used to trigger a live Local Contexts API call per
+    # anonymous page view, retried with 60s timeouts and with no memory of
+    # failures, so an outage tied up PUI and backend threads. The cache is
+    # refreshed on backend startup, by the scheduled refresh, on project
+    # creation, and by staff views / manual refresh.
+    if lc_public_request?
+      api_response = client.get_cached_data(params[:id], params[:type])
+    else
+      # bypassing the cache hits the Local Contexts API on every request, so it is
+      # limited to users who can manage projects (who also have reset_cache)
+      use_cache = params[:use_cache] || !current_user.can?(:update_localcontexts_project_record)
+
+      api_response = client.get_data_from_local_contexts_api(params[:id], params[:type], use_cache)
+    end
+
     json_response(api_response)
   end
 
@@ -85,6 +108,7 @@ class ArchivesSpaceService < Sinatra::Base
     .permissions([])
     .returns([200, "[(:local_contexts_project)]"]) \
   do
+    lc_deny_public_request!
     handle_listing(LocalContextsProject, params)
   end
 
@@ -96,6 +120,7 @@ class ArchivesSpaceService < Sinatra::Base
     .permissions([])
     .returns([200, "(:local_contexts_project)"]) \
   do
+    lc_deny_public_request!
     json = LocalContextsProject.to_jsonmodel(params[:id])
     json_response(resolve_references(json, params[:resolve]))
   end

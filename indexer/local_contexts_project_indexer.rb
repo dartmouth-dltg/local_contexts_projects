@@ -142,3 +142,39 @@ class IndexerCommon
   end
 
 end
+
+# Linked projects arrive resolved (local_contexts_projects::_resolved, also under
+# instances::digital_object and ancestors). Project records have no publish
+# flag, so extract_string_values put every project's name and id, including
+# projects with project_is_public false, into fullrecord_published (public
+# keyword search). Mark non-public projects publish: false before the full-text
+# fields are built (sanitize_json runs first, on the same object), so their text
+# goes into the staff fullrecord only. The PUI reads project_is_public, not
+# publish, so display is unchanged. Requires a reindex for existing documents.
+module LocalContextsNonPublicProjectScrub
+  def self.mark!(node)
+    case node
+    when Hash
+      node.each do |key, val|
+        if key == 'local_contexts_projects' && val.is_a?(Array)
+          val.each do |link|
+            resolved = link.is_a?(Hash) && link['_resolved']
+            if resolved.is_a?(Hash) && !resolved['project_is_public']
+              resolved['publish'] = false
+            end
+          end
+        end
+        mark!(val)
+      end
+    when Array
+      node.each { |val| mark!(val) }
+    end
+    node
+  end
+
+  def sanitize_json(json)
+    LocalContextsNonPublicProjectScrub.mark!(super)
+  end
+end
+
+IndexerCommon.prepend(LocalContextsNonPublicProjectScrub)

@@ -299,7 +299,7 @@ See the `samples` directory in the plugin for sample exports and screenshots.
 The plugin implements a simple caching mechanism to decrease render times in the staff interface and PUI
 and prevent overloading the Local Contexts API. Cache invalidation is controlled
 by the time limits specified by `AppConfig[:local_contexts_cache_time]` and `AppConfig[:local_contexts_open_to_collaborate_cache_time]`
-If a request is made to view an object linked to a Local Contexts Project whose cache is out of date, the Local Contexts API is called and the cache for that project is refreshed. Otherwise the cached version of the project data is used for display.
+If a staff user views an object linked to a Local Contexts Project whose cache is out of date, the Local Contexts API is called and the cache for that project is refreshed. The public interface always uses the cached version, even if it is out of date, and never calls the Local Contexts API itself; its cache is kept current by the refresh on backend startup, the scheduled refresh (`AppConfig[:local_contexts_refresh_cache_cron]`), project creation, and staff views or manual refreshes.
 
 Cache files are located in a new directory in the ArchivesSpace data directory named `local_contexts_cache`. This
 directory is created by the plugin during ArchivesSpace startup if it is not present.
