@@ -1,6 +1,9 @@
 require 'aspace_logger'
 class LocalContextsProjectsController < ApplicationController
 
+  # answer with a JSON 401 (not the login page) when the PUI requires authentication
+  json_response_for :fetch_lc_project_data
+
   skip_before_action  :verify_authenticity_token
 
   def fetch_lc_project_data
