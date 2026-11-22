@@ -41,8 +41,12 @@ class LocalContextsMARCSerialize
     (@record.datafields + extra_fields).sort_by(&:tag)
   end
 
-  def method_missing(*args)
-    @record.send(*args)
+  def method_missing(*args, &block)
+    @record.send(*args, &block)
+  end
+
+  def respond_to_missing?(name, include_private = false)
+    @record.respond_to?(name, include_private) || super
   end
 
   def construct_project_text(project_json, lcp_preamble)
